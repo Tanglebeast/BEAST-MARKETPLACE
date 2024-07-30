@@ -1,0 +1,147 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+
+contract NFTMarketplace {
+    struct NFT {
+        address contractAddress;
+        uint256 tokenId;
+        address payable seller;
+        uint256 price;
+    }
+
+    NFT[] public nftsForSale;
+    mapping(address => mapping(uint256 => uint256)) public nftPrice; // Mapping für die Preisabfrage
+    mapping(address => string) public userNames; // Mapping für die Benutzernamen
+    mapping(string => address) private userNameToAddress; // Mapping für die Überprüfung der Eindeutigkeit der Benutzernamen
+    mapping(address => string) public userProfilePictures; // Mapping für die Profilbilder
+
+    // Events
+    event NFTListed(address indexed seller, address indexed contractAddress, uint256 tokenId, uint256 price);
+    event NFTSold(address indexed buyer, address indexed seller, address indexed contractAddress, uint256 tokenId, uint256 price);
+    event NFTListingCancelled(address indexed seller, address indexed contractAddress, uint256 tokenId);
+    event UserNameChanged(address indexed user, string newUserName);
+    event ProfilePictureChanged(address indexed user, string newProfilePicture);
+
+    // Funktion, um ein NFT zum Verkauf anzubieten
+    function listNFT(address _contractAddress, uint256 _tokenId, uint256 _price) public {
+        IERC721 nft = IERC721(_contractAddress);
+        require(nft.ownerOf(_tokenId) == msg.sender, "You are not the owner of this NFT");
+        require(nft.isApprovedForAll(msg.sender, address(this)), "Contract not approved to transfer NFT");
+
+        nftsForSale.push(NFT({
+            contractAddress: _contractAddress,
+            tokenId: _tokenId,
+            seller: payable(msg.sender),
+            price: _price
+        }));
+
+        // Mapping aktualisieren
+        nftPrice[_contractAddress][_tokenId] = _price;
+
+        emit NFTListed(msg.sender, _contractAddress, _tokenId, _price);
+    }
+
+    // Funktion, um ein NFT zu kaufen
+    function buyNFT(uint256 _index) public payable {
+        require(_index < nftsForSale.length, "Invalid index");
+        NFT memory nft = nftsForSale[_index];
+        require(msg.value == nft.price, "Incorrect price sent");
+
+        IERC721(nft.contractAddress).safeTransferFrom(nft.seller, msg.sender, nft.tokenId);
+        nft.seller.transfer(msg.value);
+
+        emit NFTSold(msg.sender, nft.seller, nft.contractAddress, nft.tokenId, nft.price);
+
+        // Preis im Mapping auf 0 setzen oder entfernen
+        delete nftPrice[nft.contractAddress][nft.tokenId];
+
+        removeNFT(_index);
+    }
+
+    // Funktion, um alle NFTs zum Verkauf abzurufen
+    function getNFTsForSale() public view returns (NFT[] memory) {
+        return nftsForSale;
+    }
+
+    // Funktion, um ein NFT aus der Verkaufsliste zu entfernen und den Verkauf abzubrechen
+    function cancelListing(uint256 _index) public {
+        require(_index < nftsForSale.length, "Invalid index");
+        require(nftsForSale[_index].seller == msg.sender, "You are not the seller of this NFT");
+
+        emit NFTListingCancelled(msg.sender, nftsForSale[_index].contractAddress, nftsForSale[_index].tokenId);
+
+        // Preis im Mapping auf 0 setzen oder entfernen
+        delete nftPrice[nftsForSale[_index].contractAddress][nftsForSale[_index].tokenId];
+
+        removeNFT(_index);
+    }
+
+    // Funktion, um ein NFT aus der Verkaufsliste zu entfernen
+    function removeNFT(uint256 _index) internal {
+        require(_index < nftsForSale.length, "Invalid index");
+        nftsForSale[_index] = nftsForSale[nftsForSale.length - 1];
+        nftsForSale.pop();
+    }
+
+    // Funktion, um Details eines NFTs abzurufen, einschließlich des Preises
+    function getNFTDetails(address _contractAddress, uint256 _tokenId) public view returns (string memory name, string memory symbol, string memory tokenURI, address owner, uint256 price) {
+        IERC721Metadata nft = IERC721Metadata(_contractAddress);
+        
+        name = nft.name();
+        symbol = nft.symbol();
+        tokenURI = nft.tokenURI(_tokenId);
+        owner = nft.ownerOf(_tokenId);
+        price = nftPrice[_contractAddress][_tokenId]; // Preis aus dem Mapping abrufen
+    }
+
+    // Neue Funktion, um den Index eines NFTs zu erhalten
+    function getNFTIndex(address _contractAddress, uint256 _tokenId) public view returns (uint256) {
+        for (uint256 i = 0; i < nftsForSale.length; i++) {
+            if (nftsForSale[i].contractAddress == _contractAddress && nftsForSale[i].tokenId == _tokenId) {
+                return i;
+            }
+        }
+        revert("NFT not found in sale list");
+    }
+
+    // Funktion, um den Benutzernamen zu ändern
+    function changeUserName(string calldata newUserName) public {
+        require(bytes(newUserName).length > 0, "UserName cannot be empty");
+        require(userNameToAddress[newUserName] == address(0) || userNameToAddress[newUserName] == msg.sender, "UserName already taken");
+
+        // Den alten Benutzernamen entfernen
+        string memory oldUserName = userNames[msg.sender];
+        if (bytes(oldUserName).length > 0) {
+            delete userNameToAddress[oldUserName];
+        }
+
+        // Neuen Benutzernamen setzen
+        userNames[msg.sender] = newUserName;
+        userNameToAddress[newUserName] = msg.sender;
+
+        emit UserNameChanged(msg.sender, newUserName);
+    }
+
+    // Funktion, um den Benutzernamen abzurufen
+    function getUserName(address user) public view returns (string memory) {
+        return userNames[user];
+    }
+
+    // Funktion, um das Profilbild zu ändern
+    function setProfilePicture(address _contractAddress, uint256 _tokenId, string memory _imageUrl) public {
+        IERC721 nft = IERC721(_contractAddress);
+        require(nft.ownerOf(_tokenId) == msg.sender, "You are not the owner of this NFT");
+
+        userProfilePictures[msg.sender] = _imageUrl;
+
+        emit ProfilePictureChanged(msg.sender, _imageUrl);
+    }
+
+    // Funktion, um das Profilbild abzurufen
+    function getProfilePicture(address user) public view returns (string memory) {
+        return userProfilePictures[user];
+    }
+}

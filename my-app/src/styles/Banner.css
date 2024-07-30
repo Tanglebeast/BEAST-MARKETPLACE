@@ -1,0 +1,77 @@
+.banner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: transparent;
+    margin: 35px 0px;
+  }
+
+  .DescriptionBanner{
+    width: 60%;
+  }
+  
+  .AssetsSpan {
+    color: #535bf2;
+  }
+
+  .card-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 50%;
+    margin: 0 auto;
+  }
+  
+  .card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  }
+  
+  .small {
+    width: 280px;
+    height: 200px;
+  }
+  
+  .medium {
+    width: 350px;
+    height: 300px;
+  }
+  
+  .large {
+    width: 500px;
+    height: 400px;
+  }
+  
+  .left {
+    transform: translateX(15px);
+  }
+
+  .left2 {
+    transform: translateX(25px);
+  }
+  
+  .right {
+    transform: translateX(-15px);
+  }
+
+  .right2 {
+    transform: translateX(-25px);
+    z-index: -3;
+  }
+  
+  .center {
+    z-index: 1;
+  }
+  
+  .card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }

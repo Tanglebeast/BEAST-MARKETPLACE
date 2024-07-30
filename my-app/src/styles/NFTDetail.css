@@ -1,0 +1,105 @@
+.nft-DetailDiv {
+    text-align: center;
+    margin-top: 35px;
+}
+
+.nft-detail img {
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.nft-detail {
+    display: flex;
+    justify-content: center;
+    height: 600px;
+}
+
+.NFT-DetailDiv {
+    margin-left: 50px;
+    background-color: black;
+    padding: 15px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 25%;
+}
+
+.actionbutton {
+    background-color: #535bf2;
+    font-family: 'Josefin Sans', sans-serif !important;
+    border: none;
+    color: white;
+    padding: 13px 15px;
+    font: inherit;
+    border-radius: 5px;
+}
+
+.listinginput {
+    padding: 12px 15px;
+    background-color: #535bf2;
+    color: white;
+    border: none;
+}
+
+.listinginput::placeholder {
+    color: white;
+}
+
+button:hover{
+    cursor: pointer !important;
+}
+
+.loading-container {
+    text-align: center;
+}
+
+.loading-container img{
+    height: 100px;
+    width: auto;
+    margin-top: 150px;
+    margin-bottom: 150px;
+}
+
+.BottomButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.PriceDiv {
+    display: flex;
+    align-items: center;
+}
+
+.PriceDiv p{
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.PriceDiv img {
+    height: 33px;
+    width: auto;
+    margin-right: 5px;
+    
+}
+
+
+.fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .fullscreen-image {
+    max-width: 90%;
+    max-height: 90%;
+    cursor: pointer;
+  }

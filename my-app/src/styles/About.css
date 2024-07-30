@@ -1,0 +1,68 @@
+.about-container {
+    display: flex;
+    font-family: 'Arial', sans-serif;
+    color: white;
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .InfoContainerDiv {
+    height: 330px;
+  }
+
+  .AboutUsText {
+    text-align: center;
+    margin-bottom: 35px;
+  }
+  
+  .sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar-button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 17px;
+    margin: 5px 0;
+    cursor: pointer;
+    text-align: left;
+    border-radius: 5px;
+    margin-right: 20px;
+    border-radius: 5px 0 0 5px;
+    font-size: 18px;
+    font-family: 'Josefin Sans', sans-serif;
+  }
+
+  .sidebar-button.active {
+    margin-right: 0px;
+  }
+  
+  .sidebar-button:hover {
+    background-color: #535bf2;
+  }
+  
+  .AboutContent {
+    flex: 3;
+    background-color: black;
+    padding: 20px;
+    border-radius: 0 10px 10px 0;
+    height: 100%;
+  }
+  
+  .AboutContent h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+    margin-top: 0px;
+  }
+  
+  .AboutContent p {
+    margin-bottom: 20px;
+  }
+  

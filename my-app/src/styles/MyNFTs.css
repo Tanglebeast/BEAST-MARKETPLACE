@@ -1,0 +1,169 @@
+
+.nft-list-my {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    max-width: 90%;
+    margin: 0 auto;
+    gap: 15px;
+}
+
+.loading-gif {
+    height: 100px !important;
+    width: auto;
+    margin-top: 150px;
+    margin-bottom: 150px;
+}
+
+.my-nfts {
+    text-align: center;
+    margin-top: 35px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.my-nft-card a,
+.user-nft-card a{
+    color: white;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.my-nft-card,
+.user-nft-card {
+    background-color: Black;
+    margin: 0px;
+    padding: 10px;
+    width: 270px;
+    border-radius: 10px;
+    transition: all 0.25s;
+}
+
+
+.my-nft-card h3,
+.user-nft-card h3{
+    margin-top: 10px;
+}
+
+.my-nft-card:hover,
+.user-nft-card:hover {
+    transform: scale(1.01);
+  }
+  
+  .my-nft-card:active,
+  .user-nft-card:active {
+    transform: scale(0.95) rotateZ(1.1deg);
+  }
+
+.my-nft-image {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.my-nft-image img{
+    width: 270px;
+    height: auto;
+}
+
+.my-nftListed {
+    color: #535bf2;
+}
+
+
+.ChangeNamebutton {
+    background-color: #535bf2;
+    font-family: 'Josefin Sans', sans-serif !important;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    font: inherit;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.ChangeProfilePicturebutton {
+    background-color: #535bf2;
+    font-family: 'Josefin Sans', sans-serif !important;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    font: inherit;
+    border-radius: 5px;
+    margin-bottom: 50px;
+}
+
+.UserData {
+    display: flex;
+    justify-content: center;
+    height: auto;
+    margin-bottom: 15px;
+    margin-top: 50px;
+}
+
+.ProfilePicture {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+}
+
+.ProfilePicture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.nft-selection {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 40px;
+    overflow: auto;
+    width: 100%;
+    justify-items: center;
+    align-items: center;
+}
+
+.NFT-item img{
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    object-fit: cover;
+}
+
+.profile-picture-section img {
+    height: 50px;
+    width: auto;
+}
+
+.ProfileBannerDiv {
+    width: 95%;
+    height: 500px;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ProfileBannerDiv img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.ProfileBanner {
+    width: 100%;
+    height: 500px;
+}

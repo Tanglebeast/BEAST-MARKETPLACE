@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+.accordion-filterContainer {
+    width: 110%;
+}
+
+.accordion-item {
+    background-color: #000000; /* Black background for items */
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Softer shadow */
+}
+
+.accordion-header {
+    background-color: black; /* Black */
+    color: #FFFFFF; /* White text */
+    padding: 15px;
+    font-size: 18px;
+    font-family: 'Josefin Sans', sans-serif;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+    transition: background-color 0.3s ease;
+}
+
+
+.accordion-filterContent {
+    background-color: black; /* Very dark grey for content */
+    overflow: hidden;
+    padding: 0 15px 15px 15px;
+    max-height: 0;
+    border-radius: 0 0 8px 8px;
+    text-align: left;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  display: flex;
+  flex-direction: column;
+    transition: max-height 0.3s ease;
+}
+
+.checkbox-label {
+    display: block;
+    margin: 15px 0;
+    color: #FFFFFF; /* White text for labels */
+}
+
+.icon {
+    transition: transform 0.3s ease;
+}
+
+
+
+
+
+
+
+/* Verstecke das Standard-Checkbox-Design */
+.checkbox-label input[type="checkbox"] {
+    display: none; /* Versteckt die Standard-Checkbox */
+}
+
+/* Style für die benutzerdefinierte Checkbox */
+.checkbox-label {
+    position: relative;
+    padding-left: 30px; /* Platz für das benutzerdefinierte Häkchen */
+    cursor: pointer;
+    display: inline-block;
+    color: #FFFFFF; /* Textfarbe */
+    line-height: 20px; /* Zeilenhöhe anpassen, um das Häkchen vertikal zu zentrieren */
+}
+
+.custom-checkbox {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    border: 2px solid #FFFFFF; /* Rahmenfarbe */
+    background-color: #000000; /* Hintergrundfarbe der Checkbox */
+    border-radius: 4px; /* Ecken abrunden */
+}
+
+/* Häkchen (Checkmark) sichtbar, wenn Checkbox aktiviert ist */
+.checkbox-label input[type="checkbox"]:checked + .custom-checkbox {
+    background-color: #FFFFFF; /* Hintergrundfarbe des aktivierten Häkchens */
+    border-color: #FFFFFF; /* Rahmenfarbe des aktivierten Häkchens */
+}
+
+.custom-checkbox::after {
+    content: '✔'; /* Das Häkchen-Symbol */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #000000; /* Häkchenfarbe */
+    font-size: 16px; /* Größe des Häkchens */
+    line-height: 0; /* Zeilenhöhe auf 0 setzen, um es präzise zu positionieren */
+}

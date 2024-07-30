@@ -1,0 +1,83 @@
+import React, { useState, useEffect } from 'react';
+import Web3 from 'web3';
+import { fetchAllNFTs, getUserName, getProfilePicture } from '../components/utils';
+import '../styles/ArtworkOwnerRanking.css';
+import ShortenAddress from './ShortenAddress';
+
+const web3 = new Web3(window.ethereum);
+
+const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
+  const [ownerData, setOwnerData] = useState([]);
+  const [totalSupply, setTotalSupply] = useState(0);
+
+  useEffect(() => {
+    const fetchOwnerData = async () => {
+      try {
+        const allNFTs = await fetchAllNFTs(collectionAddress, web3);
+        setTotalSupply(allNFTs.length);
+
+        const ownerCount = allNFTs.reduce((acc, nft) => {
+          acc[nft.owner] = (acc[nft.owner] || 0) + 1;
+          return acc;
+        }, {});
+
+        // Hole die Benutzernamen und Profilbilder für alle Besitzer
+        const owners = Object.keys(ownerCount);
+        const ownerUsernames = await Promise.all(
+          owners.map(owner => getUserName(owner, marketplace))
+        );
+        const ownerProfilePictures = await Promise.all(
+          owners.map(owner => getProfilePicture(owner, marketplace))
+        );
+
+        const sortedOwners = Object.entries(ownerCount)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([owner, count], index) => ({
+            owner,
+            username: ownerUsernames[owners.indexOf(owner)] || '', // Sicherstellen, dass der Index korrekt ist
+            profilePicture: ownerProfilePictures[owners.indexOf(owner)] || '/owner.png',
+            count,
+            percentage: (count / allNFTs.length) * 100,
+          }));
+
+        setOwnerData(sortedOwners);
+      } catch (error) {
+        console.error('Error fetching owner data:', error);
+      }
+    };
+
+    fetchOwnerData();
+  }, [collectionAddress, marketplace]);
+
+  return (
+    <div className="artwork-owner-ranking">
+      <h2>Top Owners</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Owner</th>
+            <th>Owned</th>
+            <th>Ownership</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ownerData.map(({ owner, username, profilePicture, count, percentage }) => (
+            <tr key={owner}>
+              <td className='VisibleLink'>
+                <a className='OwnerInfoDiv' href={`/users/${owner}`}>
+                  <img src={profilePicture} alt={username} className="owner-profile-picture" />
+                  {username || <ShortenAddress address={owner} />}
+                </a>
+              </td>
+              <td>{count} Fractalz</td>
+              <td>{percentage.toFixed(2)}%</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default ArtworkOwnerRanking;

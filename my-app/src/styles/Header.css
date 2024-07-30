@@ -1,0 +1,134 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: black;
+  color: #fff;
+  width: 95%; 
+  border-radius: 15px;
+  margin-top: 15px;
+}
+
+.title {
+  margin: 0;
+}
+
+.logo {
+  height: 60px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
+
+.nav-link {
+  margin: 0 15px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button-disconnect {
+  background-color: transparent;
+  padding: 20px 10px;
+  color: white;
+  border: none;
+  width: 200px;
+  text-align: left;
+  font: inherit;
+}
+
+.account {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.connected-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 10%;
+  background-color: black;
+  border-radius: 5px;
+  z-index: 10;
+  width: 200px;
+}
+
+.dropdown-link {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 21px 10px;
+}
+
+.dropdown-hover:hover {
+  background-color: #535bf2;
+  border-radius: 5px 5px 0 0;
+}
+
+.button-disconnect:hover {
+  background-color: #535bf2;
+  border-radius: 0 0 5px 5px;
+  cursor: pointer;
+}
+
+.button-change-network {
+  background-color: transparent;
+  padding: 20px 10px;
+  color: white;
+  border: none;
+  width: 200px;
+  text-align: left;
+  font: inherit;
+}
+
+.button-change-network:hover {
+  background-color: #535bf2;
+  cursor: pointer;
+}
+
+.PFPImage {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 10px;
+}
+
+.connected-container img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.network {
+  margin-right: 30px;
+}
+
+.network-iconDiv {
+  width: 25px;
+  height: auto;
+  overflow: hidden;
+  margin-right: 5px;
+}
+
+.network-container {
+  display: flex;
+  align-items: center;
+}

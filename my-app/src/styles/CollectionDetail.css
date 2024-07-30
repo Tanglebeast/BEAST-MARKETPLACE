@@ -1,0 +1,157 @@
+.collection-nfts {
+    text-align: center;
+    margin-top: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%; /* Ensure it doesn't exceed its parent's width */
+    overflow-x: hidden; /* Hide horizontal overflow if any */
+}
+
+    .CollectionBanner {
+    width: 95%;
+    border-radius: 15px;
+    height: 500px; /* oder wie groß du es haben möchtest */
+    background-size: cover;
+    background-position: center;
+    }
+
+  .bannerInfo {
+    width: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 22%;
+    background-color: rgba(0, 0, 0, 0.714);
+    padding: 20px;
+    border-radius: 15px;
+    }
+
+
+  
+
+.nft-list {
+    width: 100%;
+}
+
+.NFT-Collection-Div {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 0fr)); /* Flexible grid */
+    max-width: 100%; /* Limit its maximum width */
+    justify-content: center;
+}
+
+.nft-card {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    overflow: hidden;
+    border-radius: 10px;
+    padding: 10px 10px 0 10px;
+    width: 250px;
+}
+
+.owner-note {
+    color: #535bf2;
+    font-weight: bold;
+}
+
+.CollectionDescription {
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+
+.collection-stats {
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 10px 30px;;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 500px;
+}
+
+.splitter {
+    border: 1px solid white;
+    height: 50px;
+}
+
+.collection-stats-div p {
+    margin-top: 0px;
+}
+
+.floorpricediv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floorpricedivcard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16px;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 0px;
+}
+
+.floorpricediv img,
+.floorpricedivcard img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 25px !important;
+    margin-right: 3px;
+    width: auto;
+}
+
+.SearchandFilterDiv {
+    display: flex;
+    align-items: flex-start;
+    width: 20%;
+    margin-bottom: 10px;
+    margin-top: 75px;
+    margin-left: 1%;
+}
+
+.loading-container {
+    width: 100%;
+}
+
+
+.all-nfts {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.WallMode-toggle {
+    margin-top: 5px;
+    margin-left: 20px;
+}
+
+.react-toggle-track {
+    background-color: black;
+}
+
+.react-toggle-thumb {
+    background-color: #535bf2;
+    border: none;
+}
+
+.MapModeText {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+}
+
+
+
+  

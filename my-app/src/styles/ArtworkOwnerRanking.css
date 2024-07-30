@@ -1,0 +1,47 @@
+/* ArtworkOwnerRanking.css */
+
+.artwork-owner-ranking {
+    margin-top: 35px;
+    width: 90%;
+    padding: 15px;
+    background-color: black;
+    border-radius: 15px;
+  }
+  
+  
+  .artwork-owner-ranking table {
+    width: 50%;
+    border-collapse: collapse;
+  }
+  
+  .artwork-owner-ranking th, .artwork-owner-ranking td {
+    border-bottom: 1px solid #cccccc39;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .artwork-owner-ranking th {
+    background-color: transparent;
+    font-weight: bold;
+  }
+  
+  .artwork-owner-ranking tbody tr:nth-child(even) {
+    background-color: transparent;
+  }
+  
+  
+  tbody {
+    border-radius: 15px;
+  }
+
+  .owner-profile-picture {
+width: 35px;
+height: 35px;
+border-radius: 50%;
+margin-right: 15px;
+  }
+
+  .OwnerInfoDiv {
+    display: flex;
+    align-items: center;
+  }

@@ -1,0 +1,10 @@
+/* src/styles/SearchBar.css */
+.search-bar {
+    width: 30%;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: black;
+    border: none;
+    color: white;
+  }
+  

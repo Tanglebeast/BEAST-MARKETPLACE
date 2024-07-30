@@ -1,0 +1,113 @@
+.CollectionDiv {
+    text-align: center;
+    margin-top: 35px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.collection-banner,
+.collectionbannerDiv {
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 10px;
+    position: relative; /* Hinzugefügt für das Positionieren des Netzwerklogos */
+}
+
+.collectionbannerDiv {
+    Width: 250px;
+    height: 220px;
+    height: auto;
+}
+
+.collection-banner img,
+.collectionbannerDiv img{
+    width: 100%;
+    object-fit: cover;
+}
+
+.collection-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+    max-width: 100%;
+}
+
+.collection-cards.centered-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.collection-card {
+    background-color: black;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.25s;
+    width: 250px;
+}
+
+.collection-card:hover {
+    transform: scale(1.01);
+}
+  
+.collection-card:active {
+    transform: scale(0.95) rotateZ(1.1deg);
+}
+
+.currency-logo-coll {
+    height: 25px;
+    width: auto;
+    margin-left: 3px;
+}
+
+.networklogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 100px;
+    position: absolute;
+    top: 10px; /* Positionierung angepasst */
+    left: 10px; /* Positionierung angepasst */
+    background-color: #535bf2;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.blue-dot, .green-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+  }
+  
+  .blue-dot {
+    background-color: blue;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9);
+  }
+
+  .green-dot {
+    background-color: green;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9);
+  }
+
+
+  .centeredimp {
+    display: flex;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+
+
+  

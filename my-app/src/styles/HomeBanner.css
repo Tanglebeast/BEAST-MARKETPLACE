@@ -1,0 +1,111 @@
+.BannerMainDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: auto;
+  background-image: url('https://cdn.shopify.com/s/files/1/0656/6933/3257/files/banner123_b0377ac6-1e7a-4f6e-ae20-ded2c18fe985.png?v=1721651630');
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  padding: 2rem;
+  width: 90%;
+  margin-top: 10px;
+  border-radius: 15px;
+}
+
+.text-container {
+  width: 40%;
+  text-align: left;
+  margin-left: 30px;
+}
+
+.text-container h1,
+.text-container h2 {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  font-size: 48px;
+  font-family: 'Josefin Sans', sans-serif;
+  line-height: 90%;
+}
+
+.text-container p {
+  margin-bottom: 2rem;
+  font-size: 26px;
+  font-family: 'Josefin Sans', sans-serif;
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+.bannerbutton {
+  background-color: #5873f9;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 5px;
+  margin-right: 1rem;
+  cursor: pointer;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+}
+
+.bannerbutton2 {
+  background-color: black;
+  color: #5873f9;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 5px;
+  margin-right: 1rem;
+  cursor: pointer;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+}
+
+.imagebanner-container {
+  width: 50%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: auto;
+}
+
+.image-item-left,
+.image-item-right {
+  width: 200px;
+  height: 300px;
+  position: relative;
+}
+
+.image-item-large {
+  width: 250px;
+  height: 400px;
+  z-index: 1;
+}
+
+.image-item-large img{
+  border-radius: 10px;
+  box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.9);
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.image-item-left img,
+.image-item-right img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.image-item-left:first-child,
+.image-item-left:last-child {
+  z-index: 0;
+  transform: translateX(55%);
+}
+
+.image-item-right:first-child,
+.image-item-right:last-child {
+  z-index: 0;
+  transform: translateX(-55%);
+}

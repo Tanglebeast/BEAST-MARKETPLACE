@@ -1,0 +1,25 @@
+.HomeDiv {
+    text-align: center;
+}
+
+.HomeGridBackDiv {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.HomeGridBackDiv h2{
+    margin-top: 35px;
+}
+
+.FaqHome h2{
+    margin-top: 35px;
+}
+
+
+.centered-collection-cards .CollectionDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+

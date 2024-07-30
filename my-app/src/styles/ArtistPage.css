@@ -1,0 +1,59 @@
+
+.Artist-Maindiv {
+    text-align: center;
+    margin-top: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+}
+
+.artist-page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+    justify-content: center;
+  }
+  
+  .artist-card {
+    background-color: black;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    text-align: center;
+    width: 250px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.25s;
+  }
+
+  .artist-card:hover {
+    transform: scale(1.01);
+  }
+  
+  .artist-card:active {
+    transform: scale(0.95) rotateZ(1.1deg);
+  }
+
+  .artistCard-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 250px;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+  
+  .artist-profile-picture {
+    height: auto;
+    width: 100%;
+    border-radius: 15px;
+  }
+  
+  .artist-name {
+    font-size: 18px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+  
