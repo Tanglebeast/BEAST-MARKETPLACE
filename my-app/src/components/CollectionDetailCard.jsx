@@ -21,10 +21,11 @@ const CollectionDetailCard = ({ nft, account, currencyIcon, userNames }) => {
             </div>
             <div className="card-details">
                 <h3>{nft.name}</h3>
-                <p className="owner-note">{ownerDisplay}</p>
-                <div className='flex center-ho'>
-                    <img className='w25 mr10' src='/id.png' alt='ID Icon' />
-                    <p><ShortenAddress address={nft.tokenId.toString()} /></p>
+                <div className="h4-margin grey">
+                <span>Position: {nft.position}</span>
+                </div>
+                <div className="owner-note">
+                <h3>{ownerDisplay}</h3>
                 </div>
                 {parseFloat(nft.price) !== 0 ? (
                     <div className="floorpricedivcard">
@@ -32,7 +33,7 @@ const CollectionDetailCard = ({ nft, account, currencyIcon, userNames }) => {
                         {parseFloat(nft.price)}
                     </div>
                 ) : (
-                    <p className='not-listed'>Not listed</p>
+                    <p className='not-listed grey'>Not listed</p>
                 )}
             </div>
         </div>

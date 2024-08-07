@@ -157,10 +157,12 @@ const AllUsers = () => {
                             alt={user.name} 
                           />
                         </div>
-                        <h2>
+                        <div className='text-align-left w95 mb5'>
+                        <h3 className='mb10 blue'>
                           {user.name.startsWith('0x') ? <ShortenAddress address={user.name} /> : user.name}
-                        </h2>
-                        <p>{user.nftCount} NFTs</p>
+                        </h3>
+                        <span className='grey'>{user.nftCount} NFTs</span>
+                        </div>
                       </div>
                     ))}
                   </div>

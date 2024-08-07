@@ -3,8 +3,13 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract NFTMarketplace {
+contract NFTMarketplace is Ownable, Pausable {
+
+    constructor() Ownable(msg.sender) {}
+
     struct NFT {
         address contractAddress;
         uint256 tokenId;
@@ -17,6 +22,8 @@ contract NFTMarketplace {
     mapping(address => string) public userNames; // Mapping für die Benutzernamen
     mapping(string => address) private userNameToAddress; // Mapping für die Überprüfung der Eindeutigkeit der Benutzernamen
     mapping(address => string) public userProfilePictures; // Mapping für die Profilbilder
+    mapping(address => address) public collectionToArtistWallet;
+    mapping(address => uint256) public collectionToArtistFee; // Neues Mapping für den Prozentsatz
 
     // Events
     event NFTListed(address indexed seller, address indexed contractAddress, uint256 tokenId, uint256 price);
@@ -25,8 +32,18 @@ contract NFTMarketplace {
     event UserNameChanged(address indexed user, string newUserName);
     event ProfilePictureChanged(address indexed user, string newProfilePicture);
 
+    // Funktion, um den Vertrag zu pausieren
+    function pause() external onlyOwner whenNotPaused {
+        _pause();
+    }
+
+    // Funktion, um den Vertrag fortzusetzen
+    function unpause() external onlyOwner whenPaused {
+        _unpause();
+    }
+
     // Funktion, um ein NFT zum Verkauf anzubieten
-    function listNFT(address _contractAddress, uint256 _tokenId, uint256 _price) public {
+    function listNFT(address _contractAddress, uint256 _tokenId, uint256 _price) public whenNotPaused {
         IERC721 nft = IERC721(_contractAddress);
         require(nft.ownerOf(_tokenId) == msg.sender, "You are not the owner of this NFT");
         require(nft.isApprovedForAll(msg.sender, address(this)), "Contract not approved to transfer NFT");
@@ -45,21 +62,31 @@ contract NFTMarketplace {
     }
 
     // Funktion, um ein NFT zu kaufen
-    function buyNFT(uint256 _index) public payable {
-        require(_index < nftsForSale.length, "Invalid index");
-        NFT memory nft = nftsForSale[_index];
-        require(msg.value == nft.price, "Incorrect price sent");
+    function buyNFT(uint256 _index) public payable whenNotPaused {
+    require(_index < nftsForSale.length, "Invalid index");
+    NFT memory nft = nftsForSale[_index];
+    require(msg.value == nft.price, "Incorrect price sent");
 
-        IERC721(nft.contractAddress).safeTransferFrom(nft.seller, msg.sender, nft.tokenId);
-        nft.seller.transfer(msg.value);
+    address artistWallet = collectionToArtistWallet[nft.contractAddress];
+    uint256 artistFeePercent = collectionToArtistFee[nft.contractAddress];
+    uint256 artistFee = (nft.price * artistFeePercent) / 100;
+    uint256 sellerProceeds = nft.price - artistFee;
 
-        emit NFTSold(msg.sender, nft.seller, nft.contractAddress, nft.tokenId, nft.price);
+    require(nft.price >= artistFee, "Artist fee cannot be more than the price"); // Sicherheitshalber
 
-        // Preis im Mapping auf 0 setzen oder entfernen
-        delete nftPrice[nft.contractAddress][nft.tokenId];
-
-        removeNFT(_index);
+    if (artistWallet != address(0)) {
+        payable(artistWallet).transfer(artistFee);
     }
+    nft.seller.transfer(sellerProceeds);
+
+    // NFT übertragen
+    IERC721(nft.contractAddress).safeTransferFrom(nft.seller, msg.sender, nft.tokenId);
+
+    emit NFTSold(msg.sender, nft.seller, nft.contractAddress, nft.tokenId, nft.price);
+    delete nftPrice[nft.contractAddress][nft.tokenId];
+    removeNFT(_index);
+}
+
 
     // Funktion, um alle NFTs zum Verkauf abzurufen
     function getNFTsForSale() public view returns (NFT[] memory) {
@@ -67,7 +94,7 @@ contract NFTMarketplace {
     }
 
     // Funktion, um ein NFT aus der Verkaufsliste zu entfernen und den Verkauf abzubrechen
-    function cancelListing(uint256 _index) public {
+    function cancelListing(uint256 _index) public whenNotPaused {
         require(_index < nftsForSale.length, "Invalid index");
         require(nftsForSale[_index].seller == msg.sender, "You are not the seller of this NFT");
 
@@ -108,7 +135,7 @@ contract NFTMarketplace {
     }
 
     // Funktion, um den Benutzernamen zu ändern
-    function changeUserName(string calldata newUserName) public {
+    function changeUserName(string calldata newUserName) public whenNotPaused {
         require(bytes(newUserName).length > 0, "UserName cannot be empty");
         require(userNameToAddress[newUserName] == address(0) || userNameToAddress[newUserName] == msg.sender, "UserName already taken");
 
@@ -131,7 +158,7 @@ contract NFTMarketplace {
     }
 
     // Funktion, um das Profilbild zu ändern
-    function setProfilePicture(address _contractAddress, uint256 _tokenId, string memory _imageUrl) public {
+    function setProfilePicture(address _contractAddress, uint256 _tokenId, string memory _imageUrl) public whenNotPaused {
         IERC721 nft = IERC721(_contractAddress);
         require(nft.ownerOf(_tokenId) == msg.sender, "You are not the owner of this NFT");
 
@@ -143,5 +170,12 @@ contract NFTMarketplace {
     // Funktion, um das Profilbild abzurufen
     function getProfilePicture(address user) public view returns (string memory) {
         return userProfilePictures[user];
+    }
+
+    // Funktion, um die Künstler-Wallet und den Prozentsatz zu setzen
+    function setArtistWallet(address _contractAddress, address _artistWallet, uint256 _artistFeePercent) external onlyOwner {
+        require(_artistFeePercent <= 100, "Artist fee percent must be between 0 and 100");
+        collectionToArtistWallet[_contractAddress] = _artistWallet;
+        collectionToArtistFee[_contractAddress] = _artistFeePercent;
     }
 }

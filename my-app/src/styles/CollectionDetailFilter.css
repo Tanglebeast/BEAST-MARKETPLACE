@@ -92,8 +92,8 @@
 
 /* Häkchen (Checkmark) sichtbar, wenn Checkbox aktiviert ist */
 .checkbox-label input[type="checkbox"]:checked + .custom-checkbox {
-    background-color: #FFFFFF; /* Hintergrundfarbe des aktivierten Häkchens */
-    border-color: #FFFFFF; /* Rahmenfarbe des aktivierten Häkchens */
+    background-color: var(--branding-color); /* Hintergrundfarbe des aktivierten Häkchens */
+    border-color: var(--branding-color); /* Rahmenfarbe des aktivierten Häkchens */
 }
 
 .custom-checkbox::after {

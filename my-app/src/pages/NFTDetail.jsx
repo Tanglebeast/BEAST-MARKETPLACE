@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import '../styles/NFTDetail.css';
-import ShortenAddress from '../components/ShortenAddress';
+import { artistList } from '../ArtistList';
 import {
   getNFTDetails,
   initializeMarketplace,
@@ -13,11 +13,12 @@ import {
   fetchAllNFTs,
   getUserName,
   checkNetwork,
-  getProfilePicture // Importiere die getProfilePicture-Funktion
-} from '../components/utils'; // Importiere die getUserName-Funktion
+  getProfilePicture,
+  connectWallet
+} from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import Web3 from 'web3';
-import Popup from '../components/ListingPopup'; // Importieren der Popup-Komponente
+import Popup from '../components/ListingPopup';
 import BlockExplorerLinks from '../components/BlockExplorerLinks';
 import ArtworkDetails from '../components/ArtworkDetails';
 import ArtworkOwnerRanking from '../components/ArtworkOwnerRanking';
@@ -32,37 +33,13 @@ const NFTDetail = () => {
   const [isForSale, setIsForSale] = useState(false);
   const [listingPrice, setListingPrice] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // State for Popup
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [totalSupply, setTotalSupply] = useState(0);
   const [ownershipPercentage, setOwnershipPercentage] = useState(0);
   const [ownedNFTsCount, setOwnedNFTsCount] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false); // State for fullscreen
-  const [ownerUsername, setOwnerUsername] = useState(''); // New state for owner username
-  const [ownerProfilePicture, setOwnerProfilePicture] = useState('/owner.png'); // New state for owner profile picture
-
-  const getExpectedChainId = () => {
-    const collection = nftCollections.find(col => col.address.toLowerCase() === collectionaddress.toLowerCase());
-    return collection ? collection.networkid : null;
-};
-
-useEffect(() => {
-    const verifyNetwork = async () => {
-      const expectedChainId = getExpectedChainId();
-      if (!expectedChainId) {
-        console.error('Collection not found');
-        return;
-      }
-      try {
-        await checkNetwork(expectedChainId);
-        console.log('Correct network');
-      } catch (error) {
-        console.error(error.message);
-        // Optionally, you can show an alert or pop-up to guide users
-      }
-    };
-  
-    verifyNetwork();
-  }, [collectionaddress]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [ownerUsername, setOwnerUsername] = useState('');
+  const [ownerProfilePicture, setOwnerProfilePicture] = useState('/owner.png');
 
   useEffect(() => {
     const fetchNFTData = async (marketplaceInstance) => {
@@ -71,27 +48,22 @@ useEffect(() => {
           const details = await getNFTDetails(collectionaddress, tokenid, marketplaceInstance);
           setNftDetails(details);
 
-          // Fetch total supply
           const allNFTs = await fetchAllNFTs(collectionaddress, marketplaceInstance);
           setTotalSupply(allNFTs.length);
 
-          // Calculate ownership percentage
           const ownedNFTs = allNFTs.filter(nft => nft.owner.toLowerCase() === account.toLowerCase());
           const ownershipPercentage = (ownedNFTs.length / totalSupply) * 100;
           setOwnershipPercentage(ownershipPercentage);
 
-          // Calculate owned NFTs count
           setOwnedNFTsCount(ownedNFTs.length);
 
           setIsForSale(parseFloat(details.price) > 0);
 
-          // Fetch owner's username
           const username = await getUserName(details.owner, marketplaceInstance);
-          setOwnerUsername(username || details.owner); // Fallback to address if username not available
+          setOwnerUsername(username || details.owner);
 
-          // Fetch owner's profile picture
           const profilePicture = await getProfilePicture(details.owner, marketplaceInstance);
-          setOwnerProfilePicture(profilePicture || '/owner.png'); // Fallback to default image if profile picture not available
+          setOwnerProfilePicture(profilePicture || '/owner.png');
 
           setIsLoading(false);
         }
@@ -101,12 +73,10 @@ useEffect(() => {
       }
     };
 
-    if (account !== '') {
-      initializeMarketplace(setMarketplace, async (marketplace) => {
-        await fetchNFTData(marketplace);
-      });
-    }
-  }, [account, collectionaddress, tokenid, totalSupply]);
+    initializeMarketplace(setMarketplace, async (marketplace) => {
+      await fetchNFTData(marketplace);
+    });
+  }, [collectionaddress, tokenid, totalSupply]);
 
   useEffect(() => {
     if (marketplace) {
@@ -120,27 +90,22 @@ useEffect(() => {
         const details = await getNFTDetails(collectionaddress, tokenid, marketplaceInstance);
         setNftDetails(details);
 
-        // Fetch total supply
         const allNFTs = await fetchAllNFTs(collectionaddress, marketplaceInstance);
         setTotalSupply(allNFTs.length);
 
-        // Calculate ownership percentage
         const ownedNFTs = allNFTs.filter(nft => nft.owner.toLowerCase() === account.toLowerCase());
         const ownershipPercentage = (ownedNFTs.length / totalSupply) * 100;
         setOwnershipPercentage(ownershipPercentage);
 
-        // Calculate owned NFTs count
         setOwnedNFTsCount(ownedNFTs.length);
 
         setIsForSale(parseFloat(details.price) > 0);
 
-        // Fetch owner's username
         const username = await getUserName(details.owner, marketplaceInstance);
-        setOwnerUsername(username || details.owner); // Fallback to address if username not available
+        setOwnerUsername(username || details.owner);
 
-        // Fetch owner's profile picture
         const profilePicture = await getProfilePicture(details.owner, marketplaceInstance);
-        setOwnerProfilePicture(profilePicture || '/owner.png'); // Fallback to default image if profile picture not available
+        setOwnerProfilePicture(profilePicture || '/owner.png');
 
         setIsLoading(false);
       }
@@ -175,7 +140,7 @@ useEffect(() => {
           await refreshNFTData(marketplace);
         });
         setListingPrice('');
-        setIsPopupOpen(false); // Close the popup after listing
+        setIsPopupOpen(false);
       }
     } catch (error) {
       console.error("Error listing NFT:", error);
@@ -199,7 +164,23 @@ useEffect(() => {
 
   const getCollectionDetails = (address) => {
     const collection = nftCollections.find(col => col.address === address);
-    return collection ? { name: collection.name, link: `/collections/${address}`, artist: collection.artist, currency: collection.currency } : { name: 'Unknown Collection', link: '#', artist: 'Unknown Artist', currency: '' };
+    if (collection) {
+        const artist = artistList.find(a => a.name === collection.artist);
+        return {
+            name: collection.name,
+            link: `/collections/${address}`,
+            artist: collection.artist,
+            currency: collection.currency,
+            artistpfp: artist ? artist.profilepicture : '/default-artist.png'
+        };
+    } else {
+        return { name: 'Unknown Collection', link: '#', artist: 'Unknown Artist', currency: '', artistpfp: '/default-artist.png' };
+    }
+  };
+
+  const handleConnectWallet = async () => {
+    await connectWallet(setAccount);
+    window.location.reload();
   };
 
   if (isLoading) {
@@ -208,13 +189,6 @@ useEffect(() => {
         <img src="/loading.gif" alt="Loading..." />
       </div>
     );
-  }
-
-  if (!nftDetails) {
-    // Hier kannst du eine Nachricht oder ein Placeholder anzeigen, falls nftDetails nicht vorhanden sind
-    return <div className="loading-container">
-    <img src="/loading.gif" alt="Loading..." />
-  </div>;
   }
 
   const collectionDetails = getCollectionDetails(collectionaddress);
@@ -226,78 +200,116 @@ useEffect(() => {
       <div className="nft-detail">
         <img src={nftDetails.image} alt={nftDetails.name} onClick={() => setIsFullscreen(true)} />
         <div className="NFT-DetailDiv">
-          <div>
-            <h2 className='blue'>{nftDetails.name}</h2>
+          <div className='flex column space-between h100'>
+            <div>
+              <h2 className='blue mb5'>{nftDetails.name}</h2>
+              <div className='flex center-ho grey s18'>
+                <span>Position: {nftDetails.position}</span>
+              </div>
 
-            <div className='flex center-ho'>
-              <img className='w25 mr10' src='/artist.png' alt='Artist' />
-              <p className='VisibleLink'>
-                <Link to={`/artists/${collectionDetails.artist}`}>{collectionDetails.artist}</Link>
-              </p>
+              <div className='flex center-ho grey s18 mt5'>
+                <span>Token-ID: #{tokenid.toString()}</span>
+              </div>
             </div>
 
-            <div className='flex center-ho'>
-              <img className='w25 h25 mr10' src={ownerProfilePicture} alt='Owner' />
-              <p className='VisibleLink'>
-                <Link to={`/users/${nftDetails.owner}`}>{ownerUsername}</Link>
-              </p>
+            <div className='mt20'>
+              <div className='flex center-ho space-between gap10'>
+                <div className='flex center-ho Detail-Div-Cardx'>
+                  <div className='flex column'>
+                    <p className='grey margin-0'>Owner:</p>
+                    <div className='flex center-ho mt5'>
+                      <img className='wh27 mr10' src={ownerProfilePicture} alt='Owner' />
+                      <p className='VisibleLink margin-0 s16'>
+                        <Link to={`/users/${nftDetails.owner}`}>{ownerUsername}</Link>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className='flex center-ho Detail-Div-Cardx'>
+                  <div className='flex column'>
+                    <p className='grey margin-0'>Artist:</p>
+                    <div className='flex center-ho mt5'>
+                      <img className='wh27 mr10' src={collectionDetails.artistpfp} alt='Artist' />
+                      <p className='VisibleLink margin-0 s16'>
+                        <Link to={`/artists/${collectionDetails.artist}`}>{collectionDetails.artist}</Link>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className='flex center-ho Detail-Div-Cardx'>
+                  <div className='flex column'>
+                    <p className='grey margin-0'>Collection:</p>
+                    <div className='flex center-ho mt5'>
+                      <img className='wh27 mr10' src='/artwork.png' alt='Collection' />
+                      <p className='VisibleLink margin-0 s16'>
+                        <Link to={collectionDetails.link}>{collectionDetails.name}</Link>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className='flex center-ho'>
-              <img className='w25 mr10' src='/id.png' alt='ID' />
-              <p>{tokenid.toString()}</p>
-            </div>
-
-            <h3 className='blue mt10'>ARTWORK</h3>
-            <p className='VisibleLink'>
-              <Link to={collectionDetails.link}>{collectionDetails.name}</Link>
-            </p>
-            
             <div className="ownership-details centered space-between">
               <div>
-                <p>Total Fractalz: {totalSupply}</p>
-                <p>Your Fractalz: {ownedNFTsCount}</p>
+                <p className='grey mb5'>Ownership</p>
+                <h3 className='s24 mb0 mt5'>{ownedNFTsCount}/{totalSupply}</h3>
               </div>
-              <div>
-                <p>1 Fractal = {slicePercentage.toFixed(2)}%</p>
-                <p>Your ownership = {ownershipPercentage.toFixed(2)}%</p>
-              </div>
-            </div>
-            <div className='PriceDiv'>
-              {isForSale && (
-                <img src={collectionDetails.currency} alt="Currency Icon" className="currency-icon" />
-              )}
-              {isForSale && (
-                <p>
-                  {nftDetails.price} 
-                </p>
-              )}
-            </div>
-          </div>
 
-          <div className='BottomButtons'>
-            {account.toLowerCase() === nftDetails.owner.toLowerCase() ? (
-              !isForSale ? (
-                <>
-                  <button className="actionbutton" onClick={() => setIsPopupOpen(true)}>
-                    LIST
+              <div className="ownership-details centered space-between">
+                <div>
+                  <p className='grey mb5'>Ownership in %</p>
+                  <h3 className='s24 mb0 mt5'>{ownershipPercentage.toFixed(2)}%</h3>
+                </div>
+              </div>
+            </div>
+
+            <div className='BottomButtons'>
+              <div className='w100'>
+                <div className='PriceDiv'>
+                  {isForSale && (
+                    <img src={collectionDetails.currency} alt="Currency Icon" className="currency-icon" />
+                  )}
+                  {isForSale && (
+                    <p>
+                      {nftDetails.price}
+                    </p>
+                  )}
+                </div>
+
+                {account ? (
+                  account.toLowerCase() === nftDetails.owner.toLowerCase() ? (
+                    !isForSale ? (
+                      <>
+                        <button className="actionbutton w50" onClick={() => setIsPopupOpen(true)}>
+                          <h3 className='margin-0 s16'>LIST</h3>
+                        </button>
+                      </>
+                    ) : (
+                      <button className="actionbutton w50" onClick={handleCancelListing}>
+                        <h3 className='margin-0 s16'>CANCEL LISTING</h3>
+                      </button>
+                    )
+                  ) : (
+                    isForSale ? (
+                      <button className="actionbutton w50" onClick={handleBuy}>
+                        <h3 className='margin-0 s16'>BUY</h3>
+                      </button>
+                    ) : (
+                      <p>NOT FOR SALE</p>
+                    )
+                  )
+                ) : (
+                  <button className="actionbutton w50" onClick={handleConnectWallet}>
+                    <h3 className='margin-0 s16'>CONNECT WALLET</h3>
                   </button>
-                </>
-              ) : (
-                <button className="actionbutton" onClick={handleCancelListing}>
-                  CANCEL LISTING
-                </button>
-              )
-            ) : (
-              isForSale ? (
-                <button className="actionbutton" onClick={handleBuy}>
-                  BUY
-                </button>
-              ) : (
-                <p>NOT FOR SALE</p>
-              )
-            )}
-            <BlockExplorerLinks />
+                )}
+              </div>
+              <div className='w50 text-align-right'>
+                <BlockExplorerLinks />
+              </div>
+            </div>
           </div>
         </div>
         {isPopupOpen && (

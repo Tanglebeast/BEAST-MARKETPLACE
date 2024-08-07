@@ -32,5 +32,21 @@ export const PhysicalItems = [
         '/lmos5.png'
       ]
     },
+    {
+      title: 'LAST MEAL ON SHIMMER',
+      artist: 'Tanglebeasts',
+      category: 'Modern Art',
+      size: '70 X 40 cm',
+      medium: '3D textured Canvas',
+      certificate: '/currency-smr.png',
+      contractaddress: '0x0A7E6B623dd0Cb247Dd522DD2890FCB4Ca99747b',
+      images: [
+        '/lmos1.png',
+        '/lmos2.png',
+        '/lmos3.png',
+        '/lmos4.png',
+        '/lmos5.png'
+      ]
+    },
     // Add more collections as needed
   ];

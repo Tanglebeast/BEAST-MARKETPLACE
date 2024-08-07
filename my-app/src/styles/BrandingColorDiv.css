@@ -1,0 +1,62 @@
+.brandingColorContainer {
+    position: relative;
+  }
+  
+  .toggleButton {
+    transition: left 0.3s ease; /* Smooth Transition */
+    background-color: var(--branding-color); /* Button-Farbe anpassen */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001;
+  }
+
+  .toggleButton:hover {
+    background-color: var(--branding-color-hover);
+  }
+
+  .toggleButton img {
+    width: 24px; /* Anpassung der Größe nach Bedarf */
+    height: 24px; /* Anpassung der Größe nach Bedarf */
+  }
+  
+  
+  .brandingColorDiv {
+    position: absolute;
+    top: 50px;
+    left: -210px; /* Startposition des Div außerhalb des Bildschirms */
+    transform: translateX(10%);
+    transition: left 0.3s ease; /* Smooth Transition */
+    display: flex;
+    align-items: center;
+    background-color: #373737;
+    border: none;
+    border-radius: 5px;
+    z-index: 1000;
+    height: 45px;
+  }
+  
+  .brandingColorDiv.open {
+    left: -25px; /* Position des Div, wenn es geöffnet ist */
+  }
+  
+  .colorOptions {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+  }
+  
+  .colorOption {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent; /* Standard-Rand */
+  }
+  
+  .colorOption.selected {
+    border-color: white; /* Randfarbe für ausgewählte Farbe */
+  }
+  

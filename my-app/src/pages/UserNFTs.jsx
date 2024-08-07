@@ -4,60 +4,62 @@ import { fetchAllNFTs, initializeMarketplace, refreshData, getUserName, getProfi
 import { nftCollections } from '../NFTCollections';
 import '../styles/MyNFTs.css';
 import ShortenAddress from '../components/ShortenAddress';
+import SearchBar from '../components/SearchBar';
+import MyNFTsFilter from '../components/MyNFTsFilter';
 
 const UserNFTs = () => {
   const [account, setAccount] = useState('');
   const [marketplace, setMarketplace] = useState(null);
   const [allNFTs, setAllNFTs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState('Unknown'); // Default username to "USER"
-  const [profilePicture, setProfilePicture] = useState('/placeholder-PFP-black.png'); // Default profile picture
-  const [bannerPicture, setBannerPicture] = useState('/placeholder-PFP-banner.png'); // Default banner picture
-  const { walletAddress } = useParams(); // Get walletAddress from URL params
+  const [userName, setUserName] = useState('Unknown');
+  const [profilePicture, setProfilePicture] = useState('/placeholder-PFP-black.png');
+  const [bannerPicture, setBannerPicture] = useState('/placeholder-PFP-banner.png');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState({
+    availability: [],
+    artist: [],
+    artwork: []
+  });
+  const { walletAddress } = useParams();
 
   useEffect(() => {
-    const savedAccount = localStorage.getItem('account');
-    if (savedAccount) {
-      setAccount(savedAccount);
-      initializeMarketplace(setMarketplace, () => {
-        refreshData(marketplace, '', setAllNFTs, fetchAllNFTs);
-      });
-    }
+    initializeMarketplace(setMarketplace, () => refreshData(marketplace, '', setAllNFTs, fetchAllNFTs));
   }, []);
 
   useEffect(() => {
-    // Update account state with walletAddress from URL params
     if (walletAddress) {
-      setAccount(walletAddress.toLowerCase()); // Convert to lowercase for consistency
-      // Fetch the username and profile picture for the given wallet address, but only if marketplace is initialized
-      if (marketplace) {
-        getUserName(walletAddress.toLowerCase(), marketplace)
-          .then(name => {
-            setUserName(name || 'Unknown');
-          });
+      setAccount(walletAddress.toLowerCase());
+    }
+    if (marketplace) {
+      getUserName(walletAddress?.toLowerCase(), marketplace)
+        .then(name => setUserName(name || 'Unknown'));
 
-        getProfilePicture(walletAddress.toLowerCase(), marketplace)
-          .then(pictureUrl => {
-            setProfilePicture(pictureUrl || '/placeholder-PFP-black.png'); // Use /placeholder-PFP-black.png if no profile picture is set
-            setBannerPicture(pictureUrl || '/placeholder-PFP-banner.png'); // Use /placeholder-Banner.png if no banner picture is set
-          });
-      }
+      getProfilePicture(walletAddress?.toLowerCase(), marketplace)
+        .then(pictureUrl => {
+          setProfilePicture(pictureUrl || '/placeholder-PFP-black.png');
+          setBannerPicture(pictureUrl || '/placeholder-PFP-banner.png');
+        });
     }
   }, [walletAddress, marketplace]);
 
-  const fetchMyNFTs = async () => {
-    let myNFTs = [];
+  const fetchUserNFTs = async () => {
+    let userNFTs = [];
     for (const collection of nftCollections) {
       const nfts = await fetchAllNFTs(collection.address, marketplace);
-      myNFTs = myNFTs.concat(nfts.filter(nft => nft.owner.toLowerCase() === account));
+      if (account) {
+        userNFTs = userNFTs.concat(nfts.filter(nft => nft.owner.toLowerCase() === account.toLowerCase()));
+      } else {
+        userNFTs = userNFTs.concat(nfts); // Oder filtere nach anderen Kriterien, falls nötig
+      }
     }
-    setAllNFTs(myNFTs);
+    setAllNFTs(userNFTs);
     setLoading(false);
   };
 
   useEffect(() => {
-    if (account && marketplace) {
-      fetchMyNFTs();
+    if (marketplace) {
+      fetchUserNFTs();
     }
   }, [account, marketplace]);
 
@@ -66,52 +68,93 @@ const UserNFTs = () => {
     return collection ? collection.name : 'Unknown Collection';
   };
 
+  const filteredNFTs = allNFTs.filter(nft => {
+    const matchesSearchQuery = 
+      nft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getCollectionName(nft.contractAddress).toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesAvailability = filters.availability.length === 0 || (
+      (filters.availability.includes('LISTED') && nft.price > 0) ||
+      (filters.availability.includes('NOT LISTED') && nft.price === 0)
+    );
+
+    const collection = nftCollections.find(col => col.address === nft.contractAddress);
+    const matchesArtist = filters.artist.length === 0 || (collection && filters.artist.includes(collection.artist));
+    const matchesArtwork = filters.artwork.length === 0 || (collection && filters.artwork.includes(collection.name));
+
+    return matchesSearchQuery && matchesAvailability && matchesArtist && matchesArtwork;
+  });
+
   return (
     <div className="my-nfts">
-      <div className='ProfileBannerDiv'>
-        <div className='ProfileBanner flex centered'>
-          <img src={bannerPicture || "/placeholder-Banner.png"} alt="Banner" />
+      {loading ? (
+        <div className="loading-container flex centered column">
+          <img src="/loading.gif" alt="Loading" className="loading-gif" />
         </div>
-      </div>
-      <div className="profile-picture-section flex centered">
-        <div className='ProfilePicture'>
-          <img className="profile-picture" src={profilePicture} alt={`${userName}'s profile`} />
-        </div>
-        <h2 className='mb5'>{userName}</h2>
-      </div>
-      <p className='mb30'>{walletAddress}</p>
-      {loading && <img className="loading-gif" src="/loading.gif" alt="Loading..." />}
-      {!loading && allNFTs.length === 0 && (
-        <p>No NFTs found for this account.</p>
-      )}
-      <div className="nft-list-my">
-        {allNFTs.map(nft => (
-          <div key={nft.tokenId} className="user-nft-card">
-            <Link to={`/collections/${nft.contractAddress}/${nft.tokenId}`}>
-              <div className='my-nft-image'>
-                <img src={nft.image} alt={nft.name} />
-              </div>
-              <h3>{nft.name}</h3>
-
-              <div className='flex center-ho'>
-                <img className='w25 mr10' src='/artwork.png' alt='Artwork' />
-                <p>{getCollectionName(nft.contractAddress)}</p>
-              </div>
-
-              <div className='flex center-ho'>
-                <img className='w25 mr10' src='/id.png' alt='ID' />
-                <p><ShortenAddress address={nft.tokenId.toString()} /></p>
-              </div>
-
-              {Number(nft.price) === 0 ? (
-                <p>NOT LISTED</p>
-              ) : (
-                <p className='my-nftListed'>LISTED</p>
-              )}
-            </Link>
+      ) : (
+        <>
+          <div className='ProfileBannerDiv'>
+            <div className='ProfileBanner flex centered'>
+              <img src={bannerPicture || '/placeholder-PFP-banner.png'} alt="Banner" />
+            </div>
           </div>
-        ))}
-      </div>
+
+          <div className='flex space-between w100 mt50'>
+            <div className='w20'>
+              <MyNFTsFilter onFilterChange={setFilters} />
+            </div>
+            <div className='w80 flex column ml20'>
+              <div className="profile-picture-section flex column mt5">
+                <div className='flex center-ho'>
+                  <div className='ProfilePicture'>
+                    <img className="profile-picture" src={profilePicture} alt={`${userName}'s profile`} />
+                  </div>
+                  <h2 className='mb5'>{userName}</h2>
+                </div>
+                <span className='text-align-left grey mb15 mt5 s16'>{walletAddress}</span>
+              </div>
+
+              <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="nft-list-my">
+                {filteredNFTs.length === 0 ? (
+                  <div className="no-nfts-container flex centered column">
+                    <h2 className="no-nfts-message">No NFTs found...</h2>
+                    <img src="/no-nft.png" alt="No NFTs" className="no-nfts-image" />
+                  </div>
+                ) : (
+                  filteredNFTs.map(nft => (
+                    <div key={nft.tokenId} className="user-nft-card">
+                      <Link to={`/collections/${nft.contractAddress}/${nft.tokenId}`}>
+                        <div className='my-nft-image'>
+                          <img src={nft.image} alt={nft.name} />
+                        </div>
+                        <div className='text-align-left w95 pt12 My-nft-details-Div'>
+                          <div>
+                            <h3>{nft.name}</h3>
+                            <div className='flex center-ho owner-note'>
+                              <span>{getCollectionName(nft.contractAddress)}</span>
+                            </div>
+                            <div className='flex center-ho grey'>
+                              <span className='mt5'>Position: {nft.position}</span>
+                            </div>
+                          </div>
+                          <div>
+                            {Number(nft.price) === 0 ? (
+                              <p>NOT LISTED</p>
+                            ) : (
+                              <p className='my-nftListed'>LISTED</p>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

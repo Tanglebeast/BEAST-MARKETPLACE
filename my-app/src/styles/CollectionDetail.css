@@ -54,7 +54,7 @@
 }
 
 .owner-note {
-    color: #535bf2;
+    color: var(--branding-color);
     font-weight: bold;
 }
 
@@ -93,7 +93,6 @@
 .floorpricedivcard {
     display: flex;
     align-items: center;
-    justify-content: center;
     margin-top: 16px;
     font-weight: bold;
     font-size: 18px;
@@ -141,7 +140,7 @@
 }
 
 .react-toggle-thumb {
-    background-color: #535bf2;
+    background-color: var(--branding-color);
     border: none;
 }
 
@@ -152,6 +151,10 @@
     align-items: center;
 }
 
+.no-nfts-container img{
+    width: 250px;
+    height: auto;
+}
 
 
   

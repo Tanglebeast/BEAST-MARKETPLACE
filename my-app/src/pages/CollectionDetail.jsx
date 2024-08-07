@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Toggle from 'react-toggle';
 import "react-toggle/style.css";
-import { fetchAllNFTs, initializeMarketplace, refreshData, getNFTDetails, getUserName,checkNetwork } from '../components/utils';
+import { fetchAllNFTs, initializeMarketplace, refreshData, getNFTDetails, getUserName, checkNetwork } from '../components/utils';
 import SearchBar from '../components/SearchBar';
 import { nftCollections } from '../NFTCollections';
 import CollectionDetailCard from '../components/CollectionDetailCard';
@@ -26,39 +26,15 @@ const CollectionNFTs = () => {
     const [imageSizes, setImageSizes] = useState([]);
     const [filters, setFilters] = useState({ price: [], availability: [] });
     const [userNames, setUserNames] = useState({});
+    const [areFiltersActive, setAreFiltersActive] = useState(false);
 
-    const getExpectedChainId = () => {
-        const collection = nftCollections.find(col => col.address.toLowerCase() === collectionaddress.toLowerCase());
-        return collection ? collection.networkid : null;
-    };
-
-    useEffect(() => {
-        const verifyNetwork = async () => {
-          const expectedChainId = getExpectedChainId();
-          if (!expectedChainId) {
-            console.error('Collection not found');
-            return;
-          }
-          try {
-            await checkNetwork(expectedChainId);
-            console.log('Correct network');
-          } catch (error) {
-            console.error(error.message);
-            // Optionally, you can show an alert or pop-up to guide users
-          }
-        };
-      
-        verifyNetwork();
-      }, [collectionaddress]);
-      
-    
 
 
     useEffect(() => {
-        if (account !== '') {
+        {
             initializeMarketplace(setMarketplace, async (marketplace) => await refreshData(marketplace, collectionaddress, setNftsForSale, setAllNFTs, fetchAllNFTs));
         }
-    }, [account, collectionaddress]);
+    }, [collectionaddress]);
 
     useEffect(() => {
         const fetchNFTs = async () => {
@@ -108,21 +84,20 @@ const CollectionNFTs = () => {
         const names = {};
         
         for (const owner of owners) {
-          try {
-            const name = await getUserName(owner, marketplace);
-            names[owner] = name || owner; // Falls kein Name vorhanden ist, benutze die Adresse
-          } catch (error) {
-            names[owner] = owner; // Falls ein Fehler auftritt, benutze die Adresse
-          }
+            try {
+                const name = await getUserName(owner, marketplace);
+                names[owner] = name || owner; // Falls kein Name vorhanden ist, benutze die Adresse
+            } catch (error) {
+                names[owner] = owner; // Falls ein Fehler auftritt, benutze die Adresse
+            }
         }
         
         setUserNames(names);
-      };
-      
-      useEffect(() => {
+    };
+    
+    useEffect(() => {
         fetchUserNames();
-      }, [marketplace, allNFTs]);
-      
+    }, [marketplace, allNFTs]);
 
     const getUniqueOwners = (nfts) => {
         const owners = nfts.map(nft => nft.owner.toLowerCase());
@@ -137,30 +112,36 @@ const CollectionNFTs = () => {
     const getGridDimensions = (nfts) => {
         let maxRow = 0;
         let maxCol = 0;
-
+    
         nfts.forEach(nft => {
-            const [letter, number] = nft.name.split('-');
+            if (!nft.position) return; // Skip if position is undefined or null
+    
+            const [letter, number] = nft.position.split('-');
+            if (!number || !letter) return; // Skip if position does not have the expected format
+    
             const row = parseInt(number);
             const col = letter.charCodeAt(0) - 'A'.charCodeAt(0) + 1;
-
+    
             if (row > maxRow) maxRow = row;
             if (col > maxCol) maxCol = col;
         });
-
+    
         return { rows: maxRow, cols: maxCol };
     };
+    
+    
 
     const sortNFTsByPosition = (nfts) => {
         return nfts.sort((a, b) => {
-            const [aLetter, aNumber] = a.name.split('-');
-            const [bLetter, bNumber] = b.name.split('-');
-
+            const [aLetter, aNumber] = a.position.split('-');
+            const [bLetter, bNumber] = b.position.split('-');
+    
             const aRow = parseInt(aNumber);
             const aCol = aLetter.charCodeAt(0) - 'A'.charCodeAt(0);
-
+    
             const bRow = parseInt(bNumber);
             const bCol = bLetter.charCodeAt(0) - 'A'.charCodeAt(0);
-
+    
             if (aRow === bRow) {
                 return aCol - bCol;
             } else {
@@ -168,6 +149,7 @@ const CollectionNFTs = () => {
             }
         });
     };
+    
 
     const sortNFTs = (nfts, sortByPrice) => {
         const sortedNFTs = [...nfts];
@@ -219,13 +201,15 @@ const CollectionNFTs = () => {
     const { rows, cols } = getGridDimensions(filteredAllNFTs);
 
     // Sort NFTs based on their positions
-    const sortedNFTs = sortNFTsByPosition(filteredAllNFTs.map(nft => {
-        const saleInfo = filteredNFTsForSale.find(sale => sale.tokenId === nft.tokenId && sale.contractAddress === nft.contractAddress);
-        return {
-            ...nft,
-            price: saleInfo ? saleInfo.price : '0'
-        };
-    }));
+    // Sort NFTs based on their positions
+const sortedNFTs = sortNFTsByPosition(filteredAllNFTs.map(nft => {
+    const saleInfo = filteredNFTsForSale.find(sale => sale.tokenId === nft.tokenId && sale.contractAddress === nft.contractAddress);
+    return {
+        ...nft,
+        price: saleInfo ? saleInfo.price : '0'
+    };
+}));
+
 
     // Determine grid dimensions
     const gridWidth = 1200;
@@ -265,7 +249,7 @@ const CollectionNFTs = () => {
                     </div>
                 </div>
             </div>
-    
+
             <div className="nft-list">
                 {loading ? (
                     <div className="loading-container">
@@ -278,8 +262,13 @@ const CollectionNFTs = () => {
                                 <span className='mr15 MapModeText'>MAPMODE</span>
                                 <Toggle
                                     checked={wallMode}
-                                    onChange={() => setWallMode(!wallMode)}
+                                    onChange={() => {
+                                        if (!areFiltersActive) {
+                                            setWallMode(!wallMode);
+                                        }
+                                    }}
                                     icons={false}
+                                    disabled={areFiltersActive} // Disable toggle if filters are active
                                 />
                                 <span className='WallMode-label'></span>
                             </label>
@@ -290,6 +279,7 @@ const CollectionNFTs = () => {
                                     <div className='blue-dot'></div><p className='mr15'>FOR SALE</p>
                                     <div className='green-dot'></div><p>YOUR NFT</p>
                                 </div>
+                                
                                 <ArtworkGrid
                                     cols={cols}
                                     rows={rows}
@@ -315,19 +305,28 @@ const CollectionNFTs = () => {
                                     <CollectionDetailFilter onFilterChange={setFilters} />
                                 </div>
                                 <div className='w100 flex column flex-start ml20'>
-                                  <h2 className='mt15'>{collectionName}</h2>
+                                    <h2 className='mt15'>{collectionName}</h2>
                                     <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
                                     <div className='NFT-Collection-Div'>
-                                        {filteredNFTsForSale.map(nft => (
-                                            <Link key={nft.tokenId} to={`/collections/${collectionaddress}/${nft.tokenId}`} className="nft-card">
-                                                <CollectionDetailCard nft={nft} account={account} currencyIcon={currencyIcon} userNames={userNames} />
-                                            </Link>
-                                        ))}
-                                        {filteredAllNFTs.filter(nft => !filteredNFTsForSale.some(forSale => forSale.tokenId === nft.tokenId && forSale.contractAddress === nft.contractAddress)).map(nft => (
-                                            <Link key={nft.tokenId} to={`/collections/${collectionaddress}/${nft.tokenId}`} className="nft-card">
-                                                <CollectionDetailCard nft={nft} account={account} currencyIcon={currencyIcon} userNames={userNames} />
-                                            </Link>
-                                        ))}
+                                        {filteredNFTsForSale.length === 0 && filteredAllNFTs.length === 0 ? (
+                                            <div className="no-nfts-container flex centered column">
+                                            <h2 className="no-nfts-message">No NFTs found...</h2>
+                                            <img src="/no-nft.png" alt="no nft Icon" className="no-nfts-image" />
+                                        </div>
+                                        ) : (
+                                            <>
+                                                {filteredNFTsForSale.map(nft => (
+                                                    <Link key={nft.tokenId} to={`/collections/${collectionaddress}/${nft.tokenId}`} className="nft-card">
+                                                        <CollectionDetailCard nft={nft} account={account} currencyIcon={currencyIcon} userNames={userNames} />
+                                                    </Link>
+                                                ))}
+                                                {filteredAllNFTs.filter(nft => !filteredNFTsForSale.some(forSale => forSale.tokenId === nft.tokenId && forSale.contractAddress === nft.contractAddress)).map(nft => (
+                                                    <Link key={nft.tokenId} to={`/collections/${collectionaddress}/${nft.tokenId}`} className="nft-card">
+                                                        <CollectionDetailCard nft={nft} account={account} currencyIcon={currencyIcon} userNames={userNames} />
+                                                    </Link>
+                                                ))}
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>

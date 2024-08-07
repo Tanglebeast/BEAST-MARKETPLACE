@@ -10,13 +10,13 @@ const UsernamePopup = ({ username, setUsername, handleSave, closePopup }) => {
         </button>
         <h2>Change Username</h2>
         <input
-          className="listinginput"
+          className="listinginput-name"
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Enter new username"
         />
-        <button className="actionbutton" onClick={handleSave}>
+        <button className="actionbutton w20" onClick={handleSave}>
           SAVE
         </button>
       </div>

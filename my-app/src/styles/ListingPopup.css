@@ -1,68 +1,124 @@
 .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .popup-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: black;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: 500px;
-    height: 300px;
-    position: relative; /* Wichtig für die Positionierung des Close-Buttons */
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .popup-content h5{
-    margin: 15px;
-    color: grey;
-  }
-  
-  .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 30px;
-    cursor: pointer;
-  }
-  
-  .close-button:hover {
-    color: #535bf2;
-  }
-  
-  .popup-content .actionbutton {
-    margin-top: 40px;
-    border-radius: 5px;
-  }
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: black;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 500px;
+  height: 300px;
+  position: relative; /* Wichtig für die Positionierung des Close-Buttons */
+}
 
-  .listinginput {
-    border-radius: 5px;
-    margin-top: 20px;
-  }
+.popup-content h5{
+  margin-top: 40px;
+}
 
-  .Fee-details {
-    padding-bottom: 12px;
-  }
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+}
 
-  .TotalFees {
-    border-top: 1px solid rgba(128, 128, 128, 0.433);
-    padding-top: 5px;
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-  
+.close-button:hover {
+  color: var(--branding-color);
+}
+
+.popup-content .actionbutton {
+  margin-top: 40px;
+  border-radius: 30px;
+}
+
+.listinginput-list {
+  color: #fff;
+  background-color: rgb(28,28,30);
+  box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  padding: 10px;
+  max-width: 22%;
+  transition: .4s;
+}
+
+.listinginput-name {
+  color: #fff;
+  background-color: rgb(28,28,30);
+  box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  padding: 10px;
+  transition: .4s;
+  width: 40%;
+}
+
+
+
+.TotalFees {
+  border-top: 1px solid rgba(128, 128, 128, 0.433);
+  padding-top: 5px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.sell-button {
+  background-color: var(--branding-color);
+  font-family: 'Josefin Sans', sans-serif !important;
+  border: none;
+  color: white;
+  padding: 10px 0px;
+  font: inherit;
+  border-radius: 30px;
+  margin-top: 20px;
+  width: 25%;
+  transition: background-color 0.2s ease;
+}
+
+.artistwallet-button {
+  background-color: var(--branding-color);
+  font-family: 'Josefin Sans', sans-serif !important;
+  border: none;
+  color: white;
+  padding: 10px 0px;
+  font: inherit;
+  border-radius: 30px;
+  margin-top: 5px;
+  width: 25%;
+  transition: background-color 0.2s ease;
+}
+
+.sell-button:hover,
+.artistwallet-button:hover {
+  background-color: var(--branding-color-hover);
+}
+
+.Artistwalletsearchbar {
+  background-color: rgb(32, 32, 32);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-bottom: 20px;
+  width: 80%;
+  border-radius: 25px;
+}

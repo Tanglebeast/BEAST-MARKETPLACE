@@ -28,7 +28,7 @@
   
   .popup button {
     margin-top: 15px;
-    background-color: #535bf2;
+    background-color: var(--branding-color);
     border: none;
     color: white;
     padding: 10px 20px;

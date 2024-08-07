@@ -38,7 +38,7 @@
 }
 
 .bannerbutton {
-  background-color: #5873f9;
+  background-color: var(--branding-color);
   color: white;
   padding: 1rem 2rem;
   border: none;
@@ -51,7 +51,7 @@
 
 .bannerbutton2 {
   background-color: black;
-  color: #5873f9;
+  color: var(--branding-color);
   padding: 1rem 2rem;
   border: none;
   border-radius: 5px;

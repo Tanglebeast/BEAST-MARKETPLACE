@@ -7,8 +7,38 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import CustomPopup from '../components/AlertPopup';
 import NetworkSelectionPopup from '../components/NetworkSelectionPopup';
+import { getRpcUrl, setNetwork } from './networkConfig';
+
 
 const web3 = new Web3(window.ethereum);
+let web3OnlyRead = new Web3(getRpcUrl()); // Initialisieren mit der Standard-RPC-URL
+
+const updateWeb3OnlyRead = () => {
+  web3OnlyRead = new Web3(getRpcUrl());
+};
+
+// Update der RPC-URL bei Änderung des Netzwerks
+window.addEventListener('storage', (event) => {
+  if (event.key === 'selectedNetwork') {
+    updateWeb3OnlyRead();
+  }
+});
+
+
+
+export const checkAccountInLocalStorage = () => {
+  const account = localStorage.getItem('account');
+  if (account) {
+    console.log(`Account gefunden im lokalen Speicher: ${account}`);
+  } else {
+    console.log('Kein Account im lokalen Speicher gefunden.');
+  }
+};
+
+
+
+export const CONTRACT_OWNER_ADDRESS = '0x2FEA5b277e4a11406664691ac4A5315e6912ddC1';
+
 
 export const shimmerTestnet = {
   chainId: '0x431',
@@ -65,28 +95,31 @@ const showNetworkSelectionPopup = (onSelectNetwork) => {
 export const checkNetwork = async (expectedChainId) => {
   if (window.ethereum) {
     try {
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      if (chainId !== expectedChainId) {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: expectedChainId }],
-        });
+      const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+
+      if (currentChainId !== expectedChainId) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: expectedChainId }],
+          });
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            const chain = getChainById(expectedChainId);
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [chain],
+            });
+          } else {
+            throw switchError;
+          }
+        }
       }
-    } catch (switchError) {
-      if (switchError.code === 4902) {
-        // Chain not added, prompt user to add it
-        const chain = getChainById(expectedChainId); // Implement this function to return chain details based on ID
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [chain],
-        });
-      } else {
-        // Handle other errors
-        showAlert(`Please connect to the correct network.`);
-      }
+    } catch (error) {
+      console.error('Error checking network:', error);
     }
   } else {
-    showAlert("Please install MetaMask!");
+    console.error("Please install MetaMask!");
   }
 };
 
@@ -94,53 +127,42 @@ const getChainById = (chainId) => {
   const chains = {
     '0x431': shimmerTestnet,
     '0x433': iotaTestnet,
-    // Add other chains as needed
   };
-
   return chains[chainId] || null;
 };
 
 
 
+
+const getNetworkConfig = (network) => {
+  switch (network) {
+    case 'shimmerevm':
+      return shimmerTestnet;
+    case 'iotaevm':
+      return iotaTestnet;
+    default:
+      throw new Error('Unknown network');
+  }
+};
+
 export const connectWallet = async (setAccount) => {
   if (typeof window.ethereum !== 'undefined') {
     try {
-      showNetworkSelectionPopup(async (network) => {
-        const selectedNetwork = network === 'shimmerTestnet' ? shimmerTestnet : iotaTestnet;
-        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const selectedNetwork = localStorage.getItem('selectedNetwork');
+      if (!selectedNetwork) throw new Error('No network selected');
 
-        if (chainId !== selectedNetwork.chainId) {
-          try {
-            await window.ethereum.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: selectedNetwork.chainId }],
-            });
-          } catch (switchError) {
-            if (switchError.code === 4902) {
-              try {
-                await window.ethereum.request({
-                  method: 'wallet_addEthereumChain',
-                  params: [selectedNetwork],
-                });
-              } catch (addError) {
-                showAlert(`Failed to switch network. Please add ${selectedNetwork.chainName} manually.`);
-                return;
-              }
-            } else {
-              showAlert(`Failed to switch network. Please switch to ${selectedNetwork.chainName} manually.`);
-              return;
-            }
-          }
-        }
+      const networkConfig = getNetworkConfig(selectedNetwork);
+      const chainId = networkConfig.chainId;
 
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        if (!accounts.length) {
-          throw new Error('No accounts found');
-        }
+      await checkNetwork(chainId);
 
-        setAccount(accounts[0]);
-        localStorage.setItem('account', accounts[0]);
-      });
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      if (!accounts.length) {
+        throw new Error('No accounts found');
+      }
+
+      setAccount(accounts[0]);
+      localStorage.setItem('account', accounts[0]);
     } catch (error) {
       showAlert(`Failed to connect wallet: ${error.message}`);
     }
@@ -157,40 +179,64 @@ export const disconnectWallet = (setAccount, setIsConnected) => {
 
 export const initializeMarketplace = async (setMarketplace, refreshData) => {
   try {
-    const networkId = await web3.eth.net.getId();
+    // Überprüfe, ob ein Account im lokalen Speicher vorhanden ist
+    const account = localStorage.getItem('account');
+    const web3Instance = account ? web3 : web3OnlyRead;
+
+    // Logge, welche Web3-Instanz verwendet wird
+    console.log(`Using Web3 instance: ${account ? 'web3' : 'web3OnlyRead'}`);
+
+    const networkId = await web3Instance.eth.net.getId();
     const marketplaceData = nftMarketplaceAbi.networks[networkId];
     if (marketplaceData) {
-      const marketplace = new web3.eth.Contract(nftMarketplaceAbi.abi, marketplaceData.address);
+      const marketplace = new web3Instance.eth.Contract(nftMarketplaceAbi.abi, marketplaceData.address);
       setMarketplace(marketplace);
       await refreshData(marketplace);
     } else {
       showAlert('Marketplace contract not deployed to detected network.');
     }
   } catch (error) {
-    // Handle error if needed
+    console.error("Error initializing marketplace:", error);
+    showAlert('Failed to initialize marketplace.');
   }
 };
 
-export const fetchAllNFTs = async (collectionaddress, marketplace) => {
+
+
+export const fetchAllNFTs = async (collectionAddress, marketplace) => {
   try {
-    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionaddress.toLowerCase());
+    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
     if (!selectedCollection) {
+      console.log('Collection not found for address:', collectionAddress);
       return [];
     }
 
-    const contract = new web3.eth.Contract(selectedCollection.abi, selectedCollection.address);
-    const totalSupply = await contract.methods.totalSupply().call();
+    const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
+    const totalSupply = await contract.methods.MAX_SUPPLY().call();
+
+    console.log('Total supply of NFTs in collection:', totalSupply);
 
     // Funktion zum Abrufen der NFT-Daten
     const fetchNFTData = async (index) => {
       try {
         const tokenId = await contract.methods.tokenByIndex(index).call();
         const tokenURI = await contract.methods.tokenURI(tokenId).call();
+
+        // Entferne den ersten Abschnitt der URI bis zum "/"
+        const splitURI = tokenURI.split('/');
+        const newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}.json`;
+
+        // Abrufen der JSON-Daten
+        const response = await axios.get(newURI);
+        const metadata = response.data;
+
+
         const owner = await contract.methods.ownerOf(tokenId).call();
-
-        const metadata = await axios.get(tokenURI).then(response => response.data);
-
         const uid = `${selectedCollection.address}-${tokenId}`;
+
+        // Extract position from attributes
+        const positionAttr = metadata.attributes.find(attr => attr.trait_type === 'position');
+        const position = positionAttr ? positionAttr.value : '0-0'; // Default position if not found
 
         // Fetch price from marketplace
         const nftDetails = await getNFTDetails(selectedCollection.address, tokenId, marketplace);
@@ -202,11 +248,12 @@ export const fetchAllNFTs = async (collectionaddress, marketplace) => {
           tokenId: tokenId,
           owner: owner,
           name: metadata.name,
-          image: metadata.image,
+          image: metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/'),
           price: priceInEther,
+          position: position,
         };
       } catch (error) {
-        // Handle error if needed
+        console.error(`Error fetching NFT data for index ${index}:`, error);
         return null;
       }
     };
@@ -222,6 +269,8 @@ export const fetchAllNFTs = async (collectionaddress, marketplace) => {
     // Filtern Sie alle NFTs heraus, die null sind (aufgrund von Fehlern)
     allNFTs = allNFTs.filter(nft => nft !== null);
 
+    console.log('All NFTs fetched:', allNFTs);
+
     return allNFTs;
   } catch (error) {
     console.error("Error fetching NFTs:", error);
@@ -233,31 +282,44 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
   try {
     const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === contractAddress.toLowerCase());
     if (!selectedCollection) {
+      console.log('Collection not found for address:', contractAddress);
       return null;
     }
 
-    const contract = new web3.eth.Contract(selectedCollection.abi, contractAddress);
+    const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, contractAddress);
     const owner = await contract.methods.ownerOf(tokenId).call();
     const tokenURI = await contract.methods.tokenURI(tokenId).call();
 
-    const metadataResponse = await axios.get(tokenURI);
+    // Entferne den ersten Abschnitt der URI bis zum "/"
+    const splitURI = tokenURI.split('/');
+    const newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}.json`;
+
+    const metadataResponse = await axios.get(newURI);
     const metadata = metadataResponse.data;
 
     const nftDetails = await marketplace.methods.getNFTDetails(contractAddress, tokenId).call();
-    const priceInEther = web3.utils.fromWei(nftDetails.price, 'ether');
+    const priceInEther = web3OnlyRead.utils.fromWei(nftDetails.price, 'ether');
+
+
+    const positionAttr = metadata.attributes.find(attr => attr.trait_type === 'position');
+    const position = positionAttr ? positionAttr.value : '0-0';
 
     return {
       contractAddress: contractAddress,
       tokenId: tokenId,
       owner: owner,
       name: metadata.name,
-      image: metadata.image,
+      image: metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/'),
       price: priceInEther,
+      position: position,
     };
   } catch (error) {
+    console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
     return null;
   }
 };
+
+
 
 export const approveMarketplace = async (contractAddress, tokenId, marketplace, setAccount) => {
   try {
@@ -290,12 +352,36 @@ export const checkApproval = async (contractAddress, account, marketplace) => {
   return await nftContract.methods.isApprovedForAll(account, marketplace._address).call();
 };
 
+
+// Funktion zur Schätzung der Gasgebühren mit Sicherheitsaufschlag
+const getGasEstimate = async (method, params, fromAddress) => {
+  try {
+    const gasEstimate = await method.estimateGas({ ...params, from: fromAddress });
+    const gasPrice = await web3.eth.getGasPrice();
+    
+    // Konvertiere Gaspreis zu Zahlen und füge 15% Sicherheitsaufschlag hinzu
+    const gasPriceInWei = parseFloat(gasPrice);
+    const gasPriceWithMarkup = gasPriceInWei * 1.15; // 15% Aufschlag
+    
+    return { gasEstimate, gasPrice: gasPriceWithMarkup.toString() };
+  } catch (error) {
+    console.error('Error estimating gas:', error);
+    throw error;
+  }
+};
+
+
+
+
 export const buyNFT = async (index, price, account, marketplace, refreshData) => {
   try {
-    const gasLimit = 300000;
-    const gasPrice = await web3.eth.getGasPrice();
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.buyNFT(index),
+      { value: price },
+      account
+    );
 
-    await marketplace.methods.buyNFT(index).send({ from: account, value: price, gas: gasLimit, gasPrice: gasPrice });
+    await marketplace.methods.buyNFT(index).send({ from: account, value: price, gas: gasEstimate, gasPrice: gasPrice });
 
     showAlert("NFT successfully purchased!");
     await refreshData(marketplace);
@@ -304,6 +390,7 @@ export const buyNFT = async (index, price, account, marketplace, refreshData) =>
   }
 };
 
+
 export const listNFT = async (contractAddress, tokenId, price, account, marketplace, checkApproval, approveMarketplace, refreshData) => {
   try {
     const isApproved = await checkApproval(contractAddress, account, marketplace);
@@ -311,16 +398,15 @@ export const listNFT = async (contractAddress, tokenId, price, account, marketpl
       await approveMarketplace(contractAddress, tokenId, marketplace, account);
     }
 
-    const gasPrice = await web3.eth.getGasPrice();
-    const gasLimit = 300000;
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.listNFT(contractAddress, tokenId, web3.utils.toWei(price, 'ether')),
+      {},
+      account
+    );
 
     const tx = await marketplace.methods
       .listNFT(contractAddress, tokenId, web3.utils.toWei(price, 'ether'))
-      .send({
-        from: account,
-        gasPrice: gasPrice,
-        gas: gasLimit,
-      });
+      .send({ from: account, gas: gasEstimate, gasPrice: gasPrice });
 
     showAlert("NFT listed successfully!");
     await refreshData(marketplace);
@@ -331,16 +417,16 @@ export const listNFT = async (contractAddress, tokenId, price, account, marketpl
   }
 };
 
+
 export const cancelListing = async (index, account, marketplace, refreshData) => {
   try {
-    const gasLimit = 300000;
-    const gasPrice = await web3.eth.getGasPrice();
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.cancelListing(index),
+      {},
+      account
+    );
 
-    await marketplace.methods.cancelListing(index).send({
-      from: account,
-      gas: gasLimit,
-      gasPrice: gasPrice,
-    });
+    await marketplace.methods.cancelListing(index).send({ from: account, gas: gasEstimate, gasPrice: gasPrice });
 
     showAlert("Listing canceled successfully!");
     await refreshData(marketplace);
@@ -348,6 +434,7 @@ export const cancelListing = async (index, account, marketplace, refreshData) =>
     showAlert("Failed to cancel listing. Please try again.");
   }
 };
+
 
 export const refreshData = async (marketplaceInstance, collectionaddress, setNftsForSale, setAllNFTs, fetchAllNFTs) => {
   if (!marketplaceInstance) {
@@ -393,7 +480,7 @@ export const refreshData = async (marketplaceInstance, collectionaddress, setNft
 
 export const getCollectionDetails = async (collectionAddress) => {
   try {
-    const marketplace = new web3.eth.Contract(nftMarketplaceAbi.abi, nftMarketplaceAbi.networks[await web3.eth.net.getId()].address);
+    const marketplace = new web3OnlyRead.eth.Contract(nftMarketplaceAbi.abi, nftMarketplaceAbi.networks[await web3OnlyRead.eth.net.getId()].address);
     const nftsForSale = await marketplace.methods.getNFTsForSale().call();
     const collectionNFTs = nftsForSale.filter(nft => nft.contractAddress.toLowerCase() === collectionAddress.toLowerCase());
 
@@ -401,7 +488,7 @@ export const getCollectionDetails = async (collectionAddress) => {
       return { floorPrice: '0', listedCount: 0 };
     }
 
-    const floorPrice = Math.min(...collectionNFTs.map(nft => parseFloat(web3.utils.fromWei(nft.price, 'ether'))));
+    const floorPrice = Math.min(...collectionNFTs.map(nft => parseFloat(web3OnlyRead.utils.fromWei(nft.price, 'ether'))));
     return { floorPrice: floorPrice.toString(), listedCount: collectionNFTs.length };
   } catch (error) {
     console.error('Error fetching collection details:', error);
@@ -414,20 +501,20 @@ export const changeUserName = async (account, newUserName, marketplace) => {
   if (!marketplace) throw new Error("Marketplace not initialized");
 
   try {
-    const gasLimit = 300000;
-    const gasPrice = await web3.eth.getGasPrice();
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.changeUserName(newUserName),
+      {},
+      account
+    );
 
-    await marketplace.methods.changeUserName(newUserName).send({
-      from: account,
-      gas: gasLimit,
-      gasPrice: gasPrice,
-    });
+    await marketplace.methods.changeUserName(newUserName).send({ from: account, gas: gasEstimate, gasPrice: gasPrice });
 
     showAlert("Username changed successfully!");
   } catch (error) {
     showAlert(`Failed to change username: ${error.message}`);
   }
 };
+
 
 export const getUserName = async (account, marketplace) => {
   if (!marketplace) throw new Error("Marketplace not initialized");
@@ -439,14 +526,13 @@ export const setProfilePicture = async (account, contractAddress, tokenId, image
   if (!marketplace) throw new Error("Marketplace not initialized");
 
   try {
-    const gasLimit = 300000;
-    const gasPrice = await web3.eth.getGasPrice();
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.setProfilePicture(contractAddress, tokenId, imageUrl),
+      {},
+      account
+    );
 
-    await marketplace.methods.setProfilePicture(contractAddress, tokenId, imageUrl).send({
-      from: account,
-      gas: gasLimit,
-      gasPrice: gasPrice,
-    });
+    await marketplace.methods.setProfilePicture(contractAddress, tokenId, imageUrl).send({ from: account, gas: gasEstimate, gasPrice: gasPrice });
 
     showAlert("Profile picture changed successfully!");
   } catch (error) {
@@ -461,3 +547,115 @@ export const getProfilePicture = async (account, marketplace) => {
 };
 
 
+export const setArtistWallet = async (contractAddress, artistWallet, artistFeePercent, account, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.setArtistWallet(contractAddress, artistWallet, artistFeePercent),
+      {},
+      account
+    );
+
+    await marketplace.methods.setArtistWallet(contractAddress, artistWallet, artistFeePercent).send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    showAlert("Artist wallet and fee percentage set successfully!");
+  } catch (error) {
+    showAlert(`Failed to set artist wallet: ${error.message}`);
+    throw error;
+  }
+};
+
+
+export const pauseContract = async (account, marketplace) => {
+  try {
+    // Berechne die Gas-Kosten für die Pause-Funktion
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.pause(),
+      {},
+      account
+    );
+
+    // Rufe die Pause-Funktion auf und sende die Transaktion
+    await marketplace.methods.pause().send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice,
+    });
+
+    showAlert("Contract paused successfully!");
+  } catch (error) {
+    showAlert(`Failed to pause contract: ${error.message}`);
+    throw error;
+  }
+};
+
+export const unpauseContract = async (account, marketplace) => {
+  try {
+    // Berechne die Gas-Kosten für die Unpause-Funktion
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.unpause(),
+      {},
+      account
+    );
+
+    // Rufe die Unpause-Funktion auf und sende die Transaktion
+    await marketplace.methods.unpause().send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice,
+    });
+
+    showAlert("Contract unpaused successfully!");
+  } catch (error) {
+    showAlert(`Failed to unpause contract: ${error.message}`);
+    throw error;
+  }
+};
+
+
+export const isContractPaused = async (marketplace) => {
+  if (!marketplace) throw new Error("Marketplace contract not initialized");
+
+  try {
+    const paused = await marketplace.methods.paused().call();
+    return paused;
+  } catch (error) {
+    console.error("Error checking if contract is paused:", error);
+    throw error;
+  }
+};
+
+export const getArtistWalletsAndFees = async () => {
+  try {
+    const networkId = await web3.eth.net.getId();
+    const marketplaceData = nftMarketplaceAbi.networks[networkId];
+    if (!marketplaceData) {
+      throw new Error('Marketplace contract not deployed to detected network.');
+    }
+
+    const marketplace = new web3.eth.Contract(nftMarketplaceAbi.abi, marketplaceData.address);
+
+    const artistData = await Promise.all(nftCollections.map(async (collection) => {
+      const artistWallet = await marketplace.methods.collectionToArtistWallet(collection.address).call();
+      const artistFee = await marketplace.methods.collectionToArtistFee(collection.address).call();
+      return {
+        collectionName: collection.name,
+        collectionAddress: collection.address,  // Contract-Adresse der Kollektion hinzufügen
+        artistWallet: artistWallet,
+        artistFee: artistFee
+      };
+    }));
+
+    console.log('Artist Data:', artistData);
+    return artistData;
+
+  } catch (error) {
+    console.error('Error fetching artist wallets and fees:', error);
+    throw error;
+  }
+};

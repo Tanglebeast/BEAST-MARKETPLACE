@@ -1,10 +1,11 @@
 
 .nft-list-my {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-    max-width: 90%;
-    margin: 0 auto;
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 0fr));
+    max-width: 100%;
+    gap: 10px;
+    justify-content: left;
+    margin-top: 10px;
 }
 
 .loading-gif {
@@ -38,7 +39,7 @@
     background-color: Black;
     margin: 0px;
     padding: 10px;
-    width: 270px;
+    width: 250px;
     border-radius: 10px;
     transition: all 0.25s;
 }
@@ -63,49 +64,53 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    height: 200px;
+    height: auto;
     overflow: hidden;
     border-radius: 10px;
 }
 
 .my-nft-image img{
-    width: 270px;
+    width: 250px;
     height: auto;
 }
 
 .my-nftListed {
-    color: #535bf2;
+    color: var(--branding-color);
+}
+
+.user-name-section {
+    width: 110%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 
-.ChangeNamebutton {
-    background-color: #535bf2;
+.ChangeNamebutton,
+.SetArtistWalletButton,
+.ChangeProfilePicturebutton,
+.PauseToggleButton {
+    background-color: var(--branding-color);
     font-family: 'Josefin Sans', sans-serif !important;
     border: none;
     color: white;
     padding: 10px 15px;
     font: inherit;
-    border-radius: 5px;
+    border-radius: 20px;
     margin-bottom: 15px;
+    transition: background-color 0.2s ease;
 }
 
-.ChangeProfilePicturebutton {
-    background-color: #535bf2;
-    font-family: 'Josefin Sans', sans-serif !important;
-    border: none;
-    color: white;
-    padding: 10px 15px;
-    font: inherit;
-    border-radius: 5px;
-    margin-bottom: 50px;
+
+.ChangeNamebutton:hover,
+.ChangeProfilePicturebutton:hover,
+.SetArtistWalletButton:hover {
+    background-color: var(--branding-color-hover);
 }
 
 .UserData {
     display: flex;
-    justify-content: center;
     height: auto;
-    margin-bottom: 15px;
-    margin-top: 50px;
 }
 
 .ProfilePicture {
@@ -166,4 +171,20 @@
 .ProfileBanner {
     width: 100%;
     height: 500px;
+}
+
+.My-nft-details-Div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.My-nft-details-Div h3{
+    Margin-bottom: 10px;
+    margin-top: 0px;
+}
+
+.My-nft-details-Div p{
+    Margin-bottom: 5px;
+    margin-top: 25px;
 }

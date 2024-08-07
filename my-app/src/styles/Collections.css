@@ -81,7 +81,7 @@
     position: absolute;
     top: 10px; /* Positionierung angepasst */
     left: 10px; /* Positionierung angepasst */
-    background-color: #535bf2;
+    background-color: var(--branding-color);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 

@@ -11,7 +11,7 @@
 .nft-detail {
     display: flex;
     justify-content: center;
-    height: 600px;
+    height: 500px;
 }
 
 .NFT-DetailDiv {
@@ -21,23 +21,34 @@
     border-radius: 15px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     min-width: 25%;
 }
 
 .actionbutton {
-    background-color: #535bf2;
+    background-color: var(--branding-color);
     font-family: 'Josefin Sans', sans-serif !important;
     border: none;
     color: white;
-    padding: 13px 15px;
+    padding: 10px 22px;
     font: inherit;
-    border-radius: 5px;
+    border-radius: 30px;
+    transition: background-color 0.2s ease;
+}
+
+.actionbutton:hover {
+    background-color: var(--branding-color-hover);
+}
+
+.Detail-Div-Cardx {
+    background-color: rgb(28,28,30);
+    width: fit-content;
+    padding: 8px 15px;
+    border-radius: 15px;
 }
 
 .listinginput {
     padding: 12px 15px;
-    background-color: #535bf2;
+    background-color: var(--branding-color);
     color: white;
     border: none;
 }
@@ -64,7 +75,7 @@ button:hover{
 .BottomButtons {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: end;
 }
 
 .PriceDiv {

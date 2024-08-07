@@ -43,7 +43,7 @@
   }
   
   .sidebar-button:hover {
-    background-color: #535bf2;
+    background-color: var(--branding-color);
   }
   
   .AboutContent {
