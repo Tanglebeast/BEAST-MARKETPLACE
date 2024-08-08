@@ -92,7 +92,6 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
                 <div className="dropdown-hover">
                   <a href="/wallet" className="dropdown-link">MY ACCOUNT</a>
                 </div>
-                <button className="button-change-network" onClick={() => connectWallet()}>CHANGE NETWORK</button>
                 <button className="button-disconnect" onClick={handleDisconnect}>DISCONNECT</button>
               </div>
             )}

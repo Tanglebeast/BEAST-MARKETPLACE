@@ -1,26 +1,78 @@
-/* NetworkselectionPopup.css */
 .network-popup {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px rgb(25rgba(128, 128, 128, 0.423) 120);
-    border-radius: 8px;
-  }
-  
-  .network-select {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    background-color: black;
-    color: white;
-  }
-  
-  .network-select option {
-    font-size: 16px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8px;
+  position: relative;
+  width: 150px; /* Anpassen je nach Bedarf */
+}
 
-  
+.network-dropdown {
+  width: 100%;
+}
 
-  
+.network-selected {
+  padding: 5px;
+  border-radius: 20px;
+  background-color: var(--branding-color);
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.network-select:hover {
+  background-color: var(--branding-color-hover);
+}
+
+.network-selected img,
+.network-options img {
+  width: 20px;
+  height: auto;
+  margin-right: 5px;
+}
+
+.network-selected,
+.network-option {
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+.network-selected {
+  justify-content: center;
+}
+
+.network-options {
+  display: none; /* Standardmäßig ausgeblendet */
+  flex-direction: column;
+  width: 100%;
+  background-color: transparent;
+  position: absolute;
+  top: 100%; /* Direkt unter dem ausgewählten Element */
+  left: 0;
+  z-index: 1;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.network-selected:hover + .network-options,
+.network-options:hover {
+  display: flex; /* Optionen anzeigen, wenn ausgewählt oder wenn darübergefahren wird */
+}
+
+.network-option {
+  padding: 15px;
+  cursor: pointer;
+  background-color: black;
+  color: white;
+}
+
+.network-option.selected {
+  background-color: var(--branding-color);
+  color: white;
+}
+
+.network-option:hover {
+  background-color: var(--branding-color);
+  color: white;
+}

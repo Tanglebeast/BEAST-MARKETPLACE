@@ -19,12 +19,13 @@ const CollectionFilter = ({ onFilterChange }) => {
             const updatedWords = prevState[type].includes(word)
                 ? prevState[type].filter(w => w !== word)
                 : [...prevState[type], word];
-
+    
             const newSelectedWords = { ...prevState, [type]: updatedWords };
             onFilterChange(newSelectedWords);
             return newSelectedWords;
         });
     };
+    
 
     // Extrahieren der einzigartigen Artists aus nftCollections
     const uniqueArtists = [...new Set(nftCollections.map(collection => collection.artist))];
@@ -34,13 +35,9 @@ const CollectionFilter = ({ onFilterChange }) => {
             question: 'ARTIST',
             words: uniqueArtists,
             type: 'artists'
-        },
-        {
-            question: 'NETWORK',
-            words: ['iotaevm', 'shimmerevm', 'ETHEREUM', 'POLYGON', 'BNBCHAIN'],
-            type: 'networks'
         }
     ];
+    
 
     const contentRef = useRef([]);
 
@@ -71,15 +68,14 @@ const CollectionFilter = ({ onFilterChange }) => {
                         >
                             {item.words.map((word, i) => (
                                 <label key={i} className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedWords[item.type].includes(word)}
-                                    onChange={() => handleWordToggle(item.type, word)}
-                                />
-                                <span className="custom-checkbox"></span>
-                                {word}
-                            </label>
-                            
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedWords[item.type].includes(word)}
+                                        onChange={() => handleWordToggle(item.type, word)}
+                                    />
+                                    <span className="custom-checkbox"></span>
+                                    {word}
+                                </label>
                             ))}
                         </div>
                     </div>

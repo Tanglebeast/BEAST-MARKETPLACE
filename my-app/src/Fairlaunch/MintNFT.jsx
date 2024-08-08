@@ -1,86 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Web3 from 'web3';
 import { Link } from 'react-router-dom';
-import CustomPopup from '../components/SuccessfulMintPopup';
+import SuccessPopup from '../components/SuccessfulMintPopup';
+import CustomPopup from '../components/AlertPopup';
 import { nftCollections } from '../NFTCollections';
 import ArtworkDetails from '../components/ArtworkDetails';
 import BigNumber from 'bignumber.js';
-import '../styles/Fairlaunch.css'
-
-
-
-// Funktion zum Überprüfen und Wechseln von Netzwerken
-const checkNetwork = async (expectedChainId, showAlert) => {
-    if (window.ethereum) {
-        try {
-            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-            if (chainId !== expectedChainId) {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: expectedChainId }],
-                });
-            }
-        } catch (switchError) {
-            if (switchError.code === 4902) {
-                // Chain not added, prompt user to add it
-                const chain = getChainById(expectedChainId);
-                if (chain) {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [chain],
-                    });
-                } else {
-                    showAlert('Network is not supported');
-                }
-            } else {
-                // Handle other errors
-                showAlert('Please connect to the correct network.');
-            }
-        }
-    } else {
-        showAlert('Please install MetaMask!');
-    }
-};
-
-const getChainById = (chainId) => {
-    const chains = {
-        '0x431': {
-            chainId: '0x431',
-            chainName: 'Shimmer Testnet',
-            rpcUrls: ['https://shimmer.network'],
-            nativeCurrency: {
-                name: 'Shimmer',
-                symbol: 'SMR',
-                decimals: 18,
-            },
-            blockExplorerUrls: ['https://explorer.shimmer.network'],
-        },
-        '0x433': {
-            chainId: '0x433',
-            chainName: 'IOTA Testnet',
-            rpcUrls: ['https://iota.testnet'],
-            nativeCurrency: {
-                name: 'IOTA',
-                symbol: 'IOTA',
-                decimals: 18,
-            },
-            blockExplorerUrls: ['https://explorer.iota.testnet'],
-        },
-        // Add other chains as needed
-    };
-
-    return chains[chainId] || null;
-};
+import '../styles/Fairlaunch.css';
+import { web3OnlyRead, connectWallet } from '../components/utils';
+import { getRpcUrl } from '../components/networkConfig';
 
 // Token-IDs und Besitzer abrufen
 const getUserTokenDetails = async (contract, account) => {
-    if (!contract || !account) return [];
+    if (!contract) return [];
 
     const tokenIds = [];
     const ownerDetails = [];
 
     try {
-        const balance = await contract.methods.balanceOf(account).call();
+        const balance = account ? await contract.methods.balanceOf(account).call() : 0;
         console.log("Token Balance:", balance); // Debugging-Ausgabe
 
         for (let i = 0; i < balance; i++) {
@@ -102,7 +40,7 @@ const getUserTokenDetails = async (contract, account) => {
 
             tokenIds.push(tokenId);
 
-            const owner = await contract.methods.ownerOf(tokenId).call();
+            const owner = account ? await contract.methods.ownerOf(tokenId).call() : "Unknown";
             console.log("Owner for Token ID", tokenId, ":", owner); // Debugging-Ausgabe
 
             ownerDetails.push({
@@ -139,15 +77,21 @@ const MintNFT = () => {
     const [pricePerNFT, setPricePerNFT] = useState(null);
     const maxQuantity = userLimit !== null && walletNFTCount !== null ? Math.max(0, userLimit - walletNFTCount) : 1;
 
+    const handleConnectWallet = async () => {
+        await connectWallet(setAccount);
+        // Seite neu laden, um alle Änderungen widerzuspiegeln
+        window.location.reload();
+    };
 
     const refreshContractData = useCallback(async () => {
-        if (contract && account) {
+        console.log("Refresh Contract Data initiated.");
+        if (contract) {
             setLoading(true);
             try {
                 const maxSupplyBigInt = await contract.methods.MAX_SUPPLY().call();
                 const userLimitBigInt = await contract.methods.USER_LIMIT().call();
                 const totalSupplyBigInt = await contract.methods.totalSupply().call();
-                const balanceBigInt = await contract.methods.balanceOf(account).call();
+                const balanceBigInt = account ? await contract.methods.balanceOf(account).call() : 0;
 
                 const pricePerNFT = await contract.methods.mintPrice().call();
                 setPricePerNFT(pricePerNFT); // Setze den Preis
@@ -174,96 +118,81 @@ const MintNFT = () => {
                 console.log("Token Details:", userTokenDetails);
             } catch (error) {
                 console.error("Fehler beim Abrufen der Vertragsdaten:", error);
-                showAlert('Please switch into the correct Network.');
+                showCustomPopup('Please switch into the correct Network.');
             } finally {
                 setLoading(false);
             }
+        } else {
+            console.log("Contract is null. Cannot refresh data.");
         }
     }, [contract, account]);
 
     useEffect(() => {
         const checkWalletConnection = async () => {
-            if (window.ethereum) {
-                const web3 = new Web3(window.ethereum);
-                const accounts = await web3.eth.getAccounts();
-                if (accounts.length > 0) {
-                    setAccount(accounts[0]);
-
-                    const currentUrl = window.location.pathname;
-                    const contractAddressFromURL = currentUrl.split('/').pop();
-
-                    console.log("Contract Address from URL:", contractAddressFromURL);
-
-                    const collection = nftCollections.find(collection => collection.address.toLowerCase() === contractAddressFromURL.toLowerCase());
-                    setSelectedCollection(collection);
-
-                    if (collection) {
-                        const contractAbi = collection.abi;
-                        const contractAddress = collection.address;
-
-                        console.log("Contract ABI:", contractAbi);
-                        console.log("Contract Address:", contractAddress);
-
-                        if (contractAbi) {
-                            const expectedChainId = collection.networkid;
-                            await checkNetwork(expectedChainId, showAlert);
-
-                            const contractInstance = new web3.eth.Contract(contractAbi, contractAddress);
-                            setContract(contractInstance);
-                        } else {
-                            showAlert('ABI nicht gefunden für die ausgewählte Vertragsadresse');
-                        }
-                    } else {
-                        showAlert('Keine Sammlung gefunden mit der angegebenen Vertragsadresse');
-                    }
+            let web3;
+            const localAccount = localStorage.getItem('account');
+            const isAccountPresent = localAccount !== null;
+    
+            // Hole die aktuelle RPC-URL basierend auf dem ausgewählten Netzwerk
+            const rpcUrl = getRpcUrl();
+            
+            if (isAccountPresent) {
+                // Verwende den Web3-Provider von MetaMask
+                web3 = new Web3(window.ethereum);
+                console.log('Metamask als verbunden verwendet.');
+            } else {
+                // Verwende den readonly Web3-Provider
+                web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
+                console.log('Web3OnlyRead als verbunden verwendet.');
+            }
+    
+            const accounts = await web3.eth.getAccounts();
+            if (accounts.length > 0) {
+                const accountFromWeb3 = accounts[0];
+                setAccount(accountFromWeb3);
+                localStorage.setItem('account', accountFromWeb3); // Account im Local Storage speichern
+            } else {
+                setAccount(null);
+                localStorage.removeItem('account');
+            }
+    
+            const currentUrl = window.location.pathname;
+            const contractAddressFromURL = currentUrl.split('/').pop();
+    
+            console.log("Contract Address from URL:", contractAddressFromURL);
+    
+            const collection = nftCollections.find(collection => collection.address.toLowerCase() === contractAddressFromURL.toLowerCase());
+            setSelectedCollection(collection);
+    
+            if (collection) {
+                const contractAbi = collection.abi;
+                const contractAddress = collection.address;
+    
+                console.log("Contract ABI:", contractAbi);
+                console.log("Contract Address:", contractAddress);
+    
+                if (contractAbi) {
+                    const contractInstance = new web3.eth.Contract(contractAbi, contractAddress);
+                    setContract(contractInstance);
+    
+                    // Hole die Chain ID und logge sie
+                    const chainId = await web3.eth.getChainId();
+                    console.log("Current Chain ID:", chainId); // Logge die Chain ID
+    
+                } else {
+                    showCustomPopup('ABI nicht gefunden für die ausgewählte Vertragsadresse');
                 }
+            } else {
+                showCustomPopup('Keine Sammlung gefunden mit der angegebenen Vertragsadresse');
             }
         };
-
+    
         checkWalletConnection();
     }, []);
 
     useEffect(() => {
         refreshContractData();
-    }, [refreshContractData]);
-
-    const connect = async () => {
-        if (window.ethereum) {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const web3 = new Web3(window.ethereum);
-
-            const accounts = await web3.eth.getAccounts();
-            setAccount(accounts[0]);
-
-            const currentUrl = window.location.pathname;
-            const contractAddressFromURL = currentUrl.split('/').pop();
-
-            console.log("Contract Address from URL (Connect):", contractAddressFromURL);
-
-            const collection = nftCollections.find(collection => collection.address.toLowerCase() === contractAddressFromURL.toLowerCase());
-            setSelectedCollection(collection);
-
-            if (collection) {
-                const contractAbi = collection.abi;
-                const contractAddress = collection.address;
-
-                console.log("Contract ABI (Connect):", contractAbi);
-                console.log("Contract Address (Connect):", contractAddress);
-
-                if (contractAbi) {
-                    const expectedChainId = collection.networkid;
-                    await checkNetwork(expectedChainId, showAlert);
-
-                    const contractInstance = new web3.eth.Contract(contractAbi, contractAddress);
-                    setContract(contractInstance);
-                } else {
-                    showAlert('ABI nicht gefunden für die ausgewählte Vertragsadresse');
-                }
-            } else {
-                showAlert('Keine Sammlung gefunden mit der angegebenen Vertragsadresse');
-            }
-        }
-    };
+    }, [account, contract]);
 
     const getGasPricing = async (web3) => {
         const supportsEIP1559 = await web3.eth.getBlock('latest').then(block => block.baseFeePerGas !== undefined);
@@ -283,15 +212,15 @@ const MintNFT = () => {
         if (contract && quantity > 0 && selectedCollection) {
             const web3 = new Web3(window.ethereum);
             const gasPrice = await getGasPricing(web3);
-    
+
             // Hole den Preis pro NFT vom Smart Contract
             const pricePerNFT = await contract.methods.mintPrice().call();
             // Gesamtpreis berechnen
             const totalPrice = new BigNumber(pricePerNFT).times(quantity).toFixed(); // 'toFixed' für eine präzise Dezimaldarstellung
-    
+
             console.log('Preis pro NFT (in Wei):', pricePerNFT);
             console.log('Gesamtpreis (in Wei):', totalPrice);
-    
+
             try {
                 await contract.methods.mint(quantity).send({
                     from: account,
@@ -300,20 +229,20 @@ const MintNFT = () => {
                 })
                 .on('receipt', async (receipt) => {
                     console.log('Transaktionsbeleg:', receipt);
-    
+
                     if (receipt.events.Transfer) {
                         const tokenId = receipt.events.Transfer.returnValues.tokenId;
                         console.log('Gemintete Token-ID:', tokenId);
-    
+
                         // Abrufen der Details für den neu geminteten Token
                         const tokenURI = await contract.methods.tokenURI(tokenId).call();
                         const splitURI = tokenURI.split('/');
                         const newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}.json`;
-    
+
                         // Abrufen der JSON-Daten
                         const response = await fetch(newURI);
                         const data = await response.json();
-    
+
                         const mintedTokenDetails = [{
                             tokenId,
                             title: data.name,
@@ -321,33 +250,35 @@ const MintNFT = () => {
                             image: data.image.replace('ipfs://', 'https://ipfs.io/ipfs/'),
                             attributes: data.attributes
                         }];
-    
+
                         setTokenDetails(mintedTokenDetails);
-                        showAlert('MINT SUCCESSFULL', mintedTokenDetails);
+                        showSuccessPopup('MINT SUCCESSFULL', mintedTokenDetails);
                     } else {
                         console.log('Kein Transfer-Event im Beleg gefunden');
-                        showAlert('Mint erfolgreich');
+                        showSuccessPopup('Mint erfolgreich');
                     }
-    
+
                     refreshContractData();
                 })
                 .on('error', (error) => {
                     console.error(error);
-                    showAlert('Mint fehlgeschlagen');
+                    showCustomPopup('Mint fehlgeschlagen');
                 });
             } catch (error) {
                 console.error(error);
-                showAlert('Minting-Transaktion fehlgeschlagen');
+                showCustomPopup('Minting-Transaktion fehlgeschlagen');
             }
         } else {
-            showAlert('Ungültige Menge oder Sammlung nicht ausgewählt');
+            showCustomPopup('Ungültige Menge oder Sammlung nicht ausgewählt');
         }
     };
-    
-    
-    
 
-    const showAlert = (message, tokenDetails = []) => {
+    const showCustomPopup = (message) => {
+        setPopupMessage(message);
+        setShowPopup(true);
+    };
+
+    const showSuccessPopup = (message, tokenDetails = []) => {
         setPopupMessage(message);
         setShowPopup(true);
         setTokenDetails(tokenDetails); // Setze die Details der geminteten Tokens
@@ -364,13 +295,12 @@ const MintNFT = () => {
             setQuantity(quantity + 1);
         }
     };
-    
+
     const handleDecreaseQuantity = () => {
         if (quantity > 1) {
             setQuantity(quantity - 1);
         }
     };
-    
 
     return (
         <div className='w100 centered column'>
@@ -398,7 +328,8 @@ const MintNFT = () => {
                                     <img className='FullImageDiv' src={selectedCollection.banner} alt={selectedCollection.name} />
                                 )}
                                 {selectedCollection && selectedCollection.grid && (
-                                    <img className={`OverlayImage ${showOverlay ? 'visible' : 'hidden'}`} src={selectedCollection.grid} alt="Overlay" />
+                                  <img className={`OverlayImage ${showOverlay ? 'visible' : 'hidden'}`} src={selectedCollection.grid} alt="Overlay" />
+
                                 )}
                             </div>
 
@@ -487,18 +418,20 @@ const MintNFT = () => {
                                     </div>
                                     <button
                                         className={`mint-Button ${walletNFTCount === userLimit ? 'disabled' : ''}`}
-                                        onClick={mint}
-                                        disabled={walletNFTCount === userLimit || !account}
+                                        onClick={account ? mint : handleConnectWallet}
+                                        disabled={walletNFTCount === userLimit}
                                     >
                                         <h3 className='margin-0'>
-                                            {walletNFTCount === userLimit ? 'MAX AMOUNT MINTED' : 'MINT NOW'}
+                                            {account ? (walletNFTCount === userLimit ? 'MAX AMOUNT MINTED' : 'MINT NOW') : 'CONNECT WALLET'}
                                         </h3>
                                     </button>
 
-
                                 </div>
 
-                                {showPopup && <CustomPopup message={popupMessage} tokenDetails={tokenDetails} onClose={closePopup} />}
+                                {showPopup && (popupMessage.includes('SUCCESS') 
+                                    ? <SuccessPopup message={popupMessage} tokenDetails={tokenDetails} onClose={closePopup} /> 
+                                    : <CustomPopup message={popupMessage} onClose={closePopup} />
+                                )}
                             </div>
                         </div>
                     </div>

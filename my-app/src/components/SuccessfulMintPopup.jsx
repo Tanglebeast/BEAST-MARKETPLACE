@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/SuccessfulMintPopup.css'; // CSS für das Popup-Design
 
-const CustomPopup = ({ message, tokenDetails, onClose }) => {
+const SuccessPopup = ({ message, tokenDetails, onClose }) => {
   return (
     <div className="popup-overlay">
       <div className="popup-content-mint">
@@ -39,4 +39,4 @@ const CustomPopup = ({ message, tokenDetails, onClose }) => {
   );
 };
 
-export default CustomPopup;
+export default SuccessPopup;

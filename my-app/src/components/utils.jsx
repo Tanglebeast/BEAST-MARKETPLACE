@@ -11,7 +11,7 @@ import { getRpcUrl, setNetwork } from './networkConfig';
 
 
 const web3 = new Web3(window.ethereum);
-let web3OnlyRead = new Web3(getRpcUrl()); // Initialisieren mit der Standard-RPC-URL
+export let web3OnlyRead = new Web3(getRpcUrl()); // Initialisieren mit der Standard-RPC-URL
 
 const updateWeb3OnlyRead = () => {
   web3OnlyRead = new Web3(getRpcUrl());
@@ -145,6 +145,32 @@ const getNetworkConfig = (network) => {
   }
 };
 
+// export const connectWallet = async (setAccount) => {
+//   if (typeof window.ethereum !== 'undefined') {
+//     try {
+//       const selectedNetwork = localStorage.getItem('selectedNetwork');
+//       if (!selectedNetwork) throw new Error('No network selected');
+
+//       const networkConfig = getNetworkConfig(selectedNetwork);
+//       const chainId = networkConfig.chainId;
+
+//       await checkNetwork(chainId);
+
+//       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+//       if (!accounts.length) {
+//         throw new Error('No accounts found');
+//       }
+
+//       setAccount(accounts[0]);
+//       localStorage.setItem('account', accounts[0]);
+//     } catch (error) {
+//       showAlert(`Failed to connect wallet: ${error.message}`);
+//     }
+//   } else {
+//     showAlert("Please install MetaMask!");
+//   }
+// };
+
 export const connectWallet = async (setAccount) => {
   if (typeof window.ethereum !== 'undefined') {
     try {
@@ -163,6 +189,9 @@ export const connectWallet = async (setAccount) => {
 
       setAccount(accounts[0]);
       localStorage.setItem('account', accounts[0]);
+
+      // Seite neu laden
+      window.location.reload();
     } catch (error) {
       showAlert(`Failed to connect wallet: ${error.message}`);
     }
@@ -170,6 +199,7 @@ export const connectWallet = async (setAccount) => {
     showAlert("Please install MetaMask!");
   }
 };
+
 
 export const disconnectWallet = (setAccount, setIsConnected) => {
   localStorage.removeItem('account');

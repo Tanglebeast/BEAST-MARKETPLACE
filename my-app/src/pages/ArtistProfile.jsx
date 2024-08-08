@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../styles/ArtistProfile.css'; // Import the corresponding CSS file
 import { artistList } from '../ArtistList';
 import ArtistCollectionCards from '../components/ArtistCollections';
+import { nftCollections } from '../NFTCollections';
 
 const ArtistProfile = () => {
   const { artistname } = useParams();
@@ -13,6 +14,12 @@ const ArtistProfile = () => {
   if (!artist) {
     return <div>Artist not found</div>;
   }
+
+   // Find collections belonging to this artist
+   const artistCollections = nftCollections.filter(collection => collection.artist.toLowerCase() === artistname.toLowerCase());
+
+   // Extract unique currency icons for the artist's collections
+   const currencyIcons = Array.from(new Set(artistCollections.map(collection => collection.currency)));
 
   return (
     <div className="artist-profile">
@@ -29,6 +36,12 @@ const ArtistProfile = () => {
               <p>{artist.description}</p>
             </div>
           <div className="social-links">
+            <div className='ArtistNetworks'>
+            <h4>NETWORKS</h4>
+            {currencyIcons.map((icon, index) => (
+                <img key={index} src={icon} alt="currency icon" className="network-icon mr5" />
+              ))}
+            </div>
           <h4>SOCIALS</h4>
             {artist.twitter && (
               <a href={artist.twitter} target="_blank" rel="noopener noreferrer">

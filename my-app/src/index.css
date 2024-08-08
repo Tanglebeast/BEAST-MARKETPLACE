@@ -291,6 +291,15 @@ p,span {
   margin-top: 100px;
 }
 
+.margin-10t {
+  margin-top: 10px;
+}
+
+.img25 img {
+  height: 25px;
+  width: auto;
+}
+
 .pt12 {
   padding-top: 12px;
 }
@@ -346,6 +355,10 @@ p,span {
 
 .text-uppercase {
   text-transform: uppercase;
+}
+
+.mr5 {
+  margin-right: 5px;
 }
 
 .margin-0-10 {

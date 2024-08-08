@@ -1,14 +1,19 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { nftCollections } from '../NFTCollections';
+import { getCurrentNetwork } from '../components/networkConfig';
 import '../styles/Collections.css';
 import ShortenAddress from '../components/ShortenAddress';
 
 const ArtistCollectionCards = () => {
   const { artistname } = useParams();
+  const currentNetwork = getCurrentNetwork(); // Das aktuelle Netzwerk abrufen
 
+  // Filtern der Kollektionen nach Künstler und Netzwerk
   const artistCollections = nftCollections.filter(
-    (collection) => collection.artist.toLowerCase() === artistname.toLowerCase()
+    (collection) => 
+      collection.artist.toLowerCase() === artistname.toLowerCase() &&
+      collection.network === currentNetwork // Sicherstellen, dass das Netzwerk übereinstimmt
   );
 
   return (
@@ -20,10 +25,14 @@ const ArtistCollectionCards = () => {
             <div className='collectionbannerDiv'>
               <img src={collection.banner} alt={`${collection.name}`} className="collection-banner" />
             </div>
-            <h3>{collection.name}</h3>
-            <p>Address: <ShortenAddress address={collection.address} /></p>
-            <p>Artist: {collection.artist}</p>
-            {/* Hier kannst du weitere Details oder Aktionen hinzufügen, z.B. Links zu den NFTs */}
+            <div className='text-align-left'>
+            <h3 className='mb5'>{collection.name}</h3>
+            <span className='grey mb10'>{collection.artist}</span>
+            <div className='img25 flex center-ho text-uppercase mt15'>
+            <img src={collection.currency} alt={`currency icon`} className="network-icon mr5" />
+            <span className=''>{collection.network}</span>
+            </div>
+            </div>
           </a>
         ))}
       </div>

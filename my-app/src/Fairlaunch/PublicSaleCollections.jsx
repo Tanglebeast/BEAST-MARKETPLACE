@@ -4,6 +4,7 @@ import { nftCollections } from '../NFTCollections';
 import '../styles/Collections.css';
 import SearchBar from '../components/SearchBar';
 import CollectionFilter from '../components/CollectionFilter';
+import { web3OnlyRead } from '../components/utils';
 
 const FairMintCollections = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,7 +20,7 @@ const FairMintCollections = () => {
         return;
       }
 
-      const web3 = new Web3(window.ethereum);
+      const web3 = web3OnlyRead
 
       try {
         const details = await Promise.all(
