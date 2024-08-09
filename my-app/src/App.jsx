@@ -56,6 +56,7 @@ const App = () => {
 
   return (
     <div>
+      <div className='bg'></div>
       <Header
         isConnected={isConnected}
         account={account}

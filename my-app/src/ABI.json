@@ -648,15 +648,19 @@
 		}
 	],
 	"networks": {
-	  "1": {
-		"address": "0xDC446Da886cF98ac5b910392d41D19BF3AAeCEbe"
+		"//": "POLYGON TESTNET",
+	  "80002": {
+		"address": "0xfc591cf15d49C3cF185CE74A09769ed273404d38"
 	  },
-	  "148": {
-		"address": "0xB04e2F6434e36ec4ee259A9C391561D37C3092C9"
+	  "//": "BNBCHAIN",
+	  "97": {
+		"address": "0x0c5a85E7c687f83AeC5261E46D0880C3a9DD7fd1"
 	  },
+	  "//": "IOTA EVM",
 	  "1075": {
 		"address": "0x3B056C370a325b970e4c4cC150817AFD65466e28"
 	  },
+	  "//": "SHIMMER EVM",
 	  "1073": {
 		"address": "0x9380E882ADdEc9bd690AAf5768D4B0DB16265bc3"
 	  }

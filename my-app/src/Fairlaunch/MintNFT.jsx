@@ -117,7 +117,7 @@ const MintNFT = () => {
                 console.log("Wallet NFT Count:", walletNFTCount);
                 console.log("Token Details:", userTokenDetails);
             } catch (error) {
-                console.error("Fehler beim Abrufen der Vertragsdaten:", error);
+                console.error("Error reading contract data:", error);
                 showCustomPopup('Please switch into the correct Network.');
             } finally {
                 setLoading(false);
@@ -197,16 +197,28 @@ const MintNFT = () => {
     const getGasPricing = async (web3) => {
         const supportsEIP1559 = await web3.eth.getBlock('latest').then(block => block.baseFeePerGas !== undefined);
         let gasPrice;
+    
         if (supportsEIP1559) {
-            const feeData = await web3.eth.getFeeHistory(1, 'pending', [25, 75]);
-            const baseFee = feeData.baseFeePerGas[feeData.baseFeePerGas.length - 1];
-            const priorityFee = web3.utils.toWei('2', 'gwei');
-            gasPrice = web3.utils.toBN(baseFee).add(web3.utils.toBN(priorityFee)).toString();
+            try {
+                const feeData = await web3.eth.getFeeHistory(1, 'pending', [25, 75]);
+                if (feeData.baseFeePerGas && feeData.baseFeePerGas.length > 0) {
+                    const baseFee = feeData.baseFeePerGas[feeData.baseFeePerGas.length - 1];
+                    const priorityFee = web3.utils.toWei('2', 'gwei');
+                    gasPrice = web3.utils.toBN(baseFee).add(web3.utils.toBN(priorityFee)).toString();
+                } else {
+                    gasPrice = await web3.eth.getGasPrice(); // Fallback
+                }
+            } catch (error) {
+                console.error("Error retrieving fee history:", error);
+                gasPrice = await web3.eth.getGasPrice(); // Fallback
+            }
         } else {
             gasPrice = await web3.eth.getGasPrice();
         }
+    
         return gasPrice;
     };
+    
 
     const mint = async () => {
         if (contract && quantity > 0 && selectedCollection) {
@@ -356,7 +368,7 @@ const MintNFT = () => {
 
                                         <div className='flex center-ho space-between'>
                                         <div className='maxperwallet flex centered grey'>
-                                        <span className='margin-0 s16'><span className='margin-0 s16'>{walletNFTCount !== null ? walletNFTCount : 'Loading...'}/</span>{userLimit !== null ? userLimit : 'Loading...'} MAX MINTS PER WALLET</span>
+                                        <span className='margin-0 s16'><span className='margin-0 s16'>{walletNFTCount !== null ? walletNFTCount : <img src='/basic-loading.gif' alt='loading-spinner' className="loading-spinner" />}/</span>{userLimit !== null ? userLimit : <img src='/basic-loading.gif' alt='loading-spinner' className="loading-spinner" />} MAX MINTS PER WALLET</span>
                                         </div>
                                         </div>
                                         
@@ -366,7 +378,7 @@ const MintNFT = () => {
                                             <div className='flex centere-ho column'>
                                             <p className='grey mb5'>Price:</p>
                                             <div className='flex center-ho'>
-                                            <h3 className='s24 mt5 mb0'>{pricePerNFT ? `${Web3.utils.fromWei(pricePerNFT, 'ether')}` : 'Loading...'}</h3>
+                                            <h3 className='s24 mt5 mb0'>{pricePerNFT ? `${Web3.utils.fromWei(pricePerNFT, 'ether')}` : <img src='/basic-loading.gif' alt='loading-spinner' className="loading-spinner" />}</h3>
                                             {selectedCollection.currency && (
                                                 <img src={selectedCollection.currency} alt="Currency Symbol" />
                                             )}
@@ -374,7 +386,7 @@ const MintNFT = () => {
                                             </div>
                                             <div className='flex centere-ho column'>
                                             <p className='grey mb5'>Remaining:</p>
-                                            <h3 className='s24 mt5 mb0'>{availableSupply !== null ? availableSupply : 'Loading...'}/{maxSupply !== null ? maxSupply : 'Loading...'}</h3>
+                                            <h3 className='s24 mt5 mb0'>{availableSupply !== null ? availableSupply : <img src='/basic-loading.gif' alt='loading-spinner' className="loading-spinner" />}/{maxSupply !== null ? maxSupply : <img src='/basic-loading.gif' alt='loading-spinner' className="loading-spinner" />}</h3>
                                             </div>
                                         </div>
                                         </div>

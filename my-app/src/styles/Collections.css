@@ -7,6 +7,13 @@
     align-items: center;
 }
 
+.collection-infoCardDiv {
+    display: flex;
+    flex-direction: column;
+    height: 170px;
+    justify-content: space-between;
+}
+
 .collection-banner,
 .collectionbannerDiv {
     height: 200px;

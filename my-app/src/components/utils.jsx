@@ -64,6 +64,30 @@ export const iotaTestnet = {
   blockExplorerUrls: ['https://explorer.evm.testnet.iotaledger.net'],
 };
 
+export const bnbchain = {
+  chainId: '0x61',
+  chainName: 'BNB Smart Chain Testnet',
+  rpcUrls: ['https://data-seed-prebsc-1-s1.bnbchain.org:8545'],
+  nativeCurrency: {
+    name: 'BNB',
+    symbol: 'BNB',
+    decimals: 18,
+  },
+  blockExplorerUrls: ['https://testnet.bscscan.com/'],
+};
+
+export const polygon = {
+  chainId: '0x13882',
+  chainName: 'Polygon Amoy Testnet',
+  rpcUrls: ['https://rpc-amoy.polygon.technology'],
+  nativeCurrency: {
+    name: 'MATIC',
+    symbol: 'MATIC',
+    decimals: 18,
+  },
+  blockExplorerUrls: ['https://amoy.polygonscan.com'],
+};
+
 const showAlert = (message) => {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -127,6 +151,8 @@ const getChainById = (chainId) => {
   const chains = {
     '0x431': shimmerTestnet,
     '0x433': iotaTestnet,
+    '0x61': bnbchain,
+    '0x13882': polygon,
   };
   return chains[chainId] || null;
 };
@@ -140,6 +166,10 @@ const getNetworkConfig = (network) => {
       return shimmerTestnet;
     case 'iotaevm':
       return iotaTestnet;
+    case 'bnbchain':
+      return bnbchain;
+    case 'polygon':
+      return polygon;
     default:
       throw new Error('Unknown network');
   }

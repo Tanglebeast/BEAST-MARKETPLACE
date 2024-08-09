@@ -76,3 +76,15 @@
   background-color: var(--branding-color);
   color: white;
 }
+
+
+.network-dropdown.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+
+.network-dropdown.disabled .network-option:hover {
+  background-color: initial; /* Kein Hover-Effekt bei deaktiviertem Zustand */
+}
