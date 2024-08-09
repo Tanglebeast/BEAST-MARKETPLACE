@@ -66,20 +66,24 @@ const CollectionCards = ({ limit, showSearchBar, showFilter, selectedNetwork }) 
                       <img src={collection.currency} alt="currency logo" className="currency-logo-coll" />
                     </div>
                   </div>
-                  <h3 className='mb5'>{collection.name}</h3>
-                  <p className='s18'>{collection.artist}</p>
+
+                  <div className='text-align-left collection-infoCardDiv'>
+                    <div className='mb15'>
+                  <h3 className='mb10'>{collection.name}</h3>
+                  <span className='s18 grey'>{collection.artist}</span>
+                  </div>
                   {collectionDetails[collection.address] && (
                     <>
-                      <div className='centered space-between w80'>
+                      <div className='centered space-between w100 border-top'>
                         <div className='centered column'>
-                          <p className='mb5'>FLOOR</p>
+                          <p className='mb5 mt10px'>FLOOR</p>
                           <div className='centered s20'>
                             {collectionDetails[collection.address].floorPrice}
                             <img src={collection.currency} alt="currency logo" className="currency-logo-coll" />
                           </div>
                         </div>
                         <div className='centered column'>
-                          <p className='mb5'>LISTED</p>
+                          <p className='mb5 mt10px'>LISTED</p>
                           <div className='s20'>
                             {collectionDetails[collection.address].listedCount}
                           </div>
@@ -87,6 +91,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter, selectedNetwork }) 
                       </div>
                     </>
                   )}
+                  </div>
                 </a>
               ))}
             </div>

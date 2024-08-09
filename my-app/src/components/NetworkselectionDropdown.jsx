@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/NetworkselectionDropdown.css'; // Falls du CSS für Stile nutzen möchtest
 import { checkNetwork } from './utils';
 
@@ -10,6 +10,14 @@ const networks = {
   iotaevm: {
     url: 'https://json-rpc.evm.testnet.iotaledger.net',
     icon: '/currency-iota.png' // Pfad zum IOTA Icon
+  },
+  bnbchain: {
+    url: 'https://data-seed-prebsc-1-s1.bnbchain.org:8545',
+    icon: '/currency-bnb.png' // Pfad zum BNB Icon
+  },
+  polygon: {
+    url: 'https://rpc-amoy.polygon.technology',
+    icon: '/currency-matic.png' // Pfad zum POLYGON Icon
   }
 };
 
@@ -18,27 +26,34 @@ const NetworkselectionDropdown = ({ onNetworkChange }) => {
     const savedNetwork = localStorage.getItem('selectedNetwork');
     return savedNetwork ? savedNetwork : '';
   });
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    const pathSegments = path.split('/').filter(segment => segment.length > 0);
+
+    // Deaktivieren, wenn das zweite Pfadsegment mit "0x" beginnt
+    if (pathSegments.length > 1 && pathSegments[1].startsWith('0x')) {
+      setIsDisabled(true);
+    }
+  }, []);
 
   const handleNetworkChange = async (network) => {
-    setSelectedNetwork(network);
+    if (isDisabled) return;
 
-    // Speichere die ausgewählten Werte im localStorage
+    setSelectedNetwork(network);
     localStorage.setItem('selectedNetwork', network);
 
-    const account = localStorage.getItem('account'); // Prüfe, ob ein Account im lokalen Speicher vorhanden ist
-
+    const account = localStorage.getItem('account');
     if (account) {
-      // Wenn ein Konto vorhanden ist, versuche, das Netzwerk zu wechseln
       const selectedChainId = getChainIdFromNetwork(network);
       try {
         await checkNetwork(selectedChainId);
-        // Wenn der Netzwerkwechsel erfolgreich war, lade die Seite neu
         window.location.reload();
       } catch (error) {
         console.error('Error switching network:', error);
       }
     } else {
-      // Wenn kein Konto vorhanden ist, lade die Seite neu
       window.location.reload();
     }
   };
@@ -49,14 +64,18 @@ const NetworkselectionDropdown = ({ onNetworkChange }) => {
         return '0x431'; // Chain ID für Shimmer EVM Testnet
       case 'iotaevm':
         return '0x433'; // Chain ID für IOTA EVM Testnet
+      case 'bnbchain':
+        return '0x61'; // Chain ID für BNB EVM Testnet
+      case 'polygon':
+        return '0x13882'; // Chain ID für BNB EVM Testnet
       default:
         return '';
     }
   };
 
   return (
-    <div className="network-popup mr15">
-      <div className="network-dropdown">
+    <div className={`network-popup mr15 ${isDisabled ? 'disabled' : ''}`}>
+      <div className={`network-dropdown ${isDisabled ? 'disabled' : ''}`}>
         <div className="network-selected">
           {selectedNetwork ? (
             <>

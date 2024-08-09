@@ -72,7 +72,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
         </div>
         <NetworkselectionDropdown />
         {isInitializing ? (
-          <div>Loading...</div>
+          <img src='/basic-loading.gif' alt='loading-spinner' className="loading-spinner" />
         ) : isConnected ? (
           <div className="connected-container flex center-ho"
                onMouseEnter={handleMouseEnter}
@@ -97,7 +97,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
             )}
           </div>
         ) : (
-          <button className="button" onClick={connectWallet}>Connect Wallet</button>
+          <button className="button" onClick={connectWallet}>CONNECT</button>
         )}
       </nav>
     </header>

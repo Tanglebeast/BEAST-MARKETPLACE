@@ -31,7 +31,7 @@ const ArtistProfile = () => {
           <img src={artist.profilepicture} alt={artist.name} />
             <div className='profile-info'>
               <h4>ARTIST</h4>
-              <h1>{artist.name}</h1>
+              <h1 className='blue'>{artist.name}</h1>
               <h4>ABOUT</h4>
               <p>{artist.description}</p>
             </div>
