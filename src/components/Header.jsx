@@ -61,7 +61,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
     <header>
       <nav className="navbar">
         <a href="/" className="title">
-          <img src="/fractalz-logo-black.svg" alt="NFT Marketplace Logo" className="logo" />
+          <img src="./fractalz-logo-black.svg" alt="NFT Marketplace Logo" className="logo" />
         </a>
         <div className="nav-links">
           <a href="/collections" className="nav-link">GALLERY</a>
