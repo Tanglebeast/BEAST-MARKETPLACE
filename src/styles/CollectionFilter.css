@@ -106,3 +106,15 @@
     font-size: 16px; /* Größe des Häkchens */
     line-height: 0; /* Zeilenhöhe auf 0 setzen, um es präzise zu positionieren */
 }
+
+
+@media (max-width: 768px) {
+.accordion-filterContent {
+    padding: 0px 10px;
+}
+
+.accordion-header {
+    border-radius: 8px !important;
+    height: 35px;
+}
+}

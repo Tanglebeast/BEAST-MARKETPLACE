@@ -1,10 +1,16 @@
 /* src/styles/SearchBar.css */
 .search-bar {
-    width: 30%;
+    width: 100%;
     padding: 10px;
     border-radius: 25px;
     background-color: black;
     border: none;
     color: white;
+  }
+
+  @media (max-width: 768px) {
+    .search-bar {
+      width: 80%;
+    }
   }
   

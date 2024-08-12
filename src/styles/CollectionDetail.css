@@ -157,4 +157,53 @@
 }
 
 
-  
+@media (max-width: 768px) {
+
+    .collection-nfts {
+        display: flex;
+        justify-content: center;
+        margin-top: 0px;
+        width: 100%;
+    }
+
+    .CollectionBanner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    }
+
+    .bannerInfo {
+        top: auto;
+        width: 100%;
+        display: flex;
+        padding-bottom: 0px;
+    }
+
+    .CollectionDescription {
+        width: 80%;
+    }
+
+    .collection-stats {
+        width: 80%;
+    }
+
+    .NFT-Collection-Div {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .ml0-media {
+        margin-left: 0px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .SearchandFilterDiv {
+        width: 0px;
+        margin-top: 20px;
+    }
+}

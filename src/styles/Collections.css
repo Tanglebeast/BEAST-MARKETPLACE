@@ -115,6 +115,41 @@
     justify-content: center !important;
   }
 
+  .Coll-filter-media {
+    display: none;
+  }
 
+  @media (max-width: 768px) {
+    .MediaGalleryDiv {
+        flex-direction: column;
+        align-items: center;
+    }
 
+    .MediaGalleryUnderDiv {
+        margin-left: 0px;
+        align-items: center;
+    }
+
+    .Coll-FilterDiv {
+        width: 100%;
+    }
+
+    .accordion-filterContainer {
+        width: 100%;
+    }
+
+    .Coll-filter-media {
+        display: flex;
+        align-items: baseline;
+        width: 90%;
+    }
+
+    .SearchbarDesktop {
+        display: none;
+    }
+
+    .Coll-FilterDiv {
+        display: none;
+    }
+  }
   

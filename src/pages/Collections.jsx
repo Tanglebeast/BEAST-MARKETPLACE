@@ -42,15 +42,21 @@ const CollectionCards = ({ limit, showSearchBar, showFilter, selectedNetwork }) 
 
   return (
     <div className='CollectionDiv'>
-      <div className='w95 space-between flex'>
+      <div className='w95 space-between flex MediaGalleryDiv'>
         {showFilter && (
-          <div className='w20'>
+          <div className='w20 Coll-FilterDiv'>
             <CollectionFilter onFilterChange={setFilters} />
           </div>
         )}
-        <div className='centered w95 column flex flex-start ml20'>
+        <div className='centered w95 column flex flex-start ml20 MediaGalleryUnderDiv'>
           <h2 className='text-align-left mt15'>GALLERY</h2>
+          <div className='SearchbarDesktop text-align-left w30'>
           {showSearchBar && <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
+          </div>
+          <div className='flex Coll-filter-media'>
+          {showSearchBar && <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
+          <CollectionFilter onFilterChange={setFilters} />
+          </div>
           {collectionsToShow.length === 0 ? (
             <div className="no-nfts-container flex centered column">
               <h2 className="no-nfts-message">No collections found...</h2>

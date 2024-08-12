@@ -220,6 +220,10 @@ p,span {
   margin-bottom: 10px;
 }
 
+.w30 {
+  width: 30%;
+}
+
 .absolute {
   position: absolute;
 }
@@ -228,6 +232,9 @@ p,span {
   margin-top: 40px;
 }
 
+.d-none {
+  display: none;
+}
 
 .mt5 {
   margin-top: 5px;
