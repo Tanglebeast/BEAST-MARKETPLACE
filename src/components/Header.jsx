@@ -3,6 +3,7 @@ import '../styles/Header.css';
 import ShortenAddress from './ShortenAddress';
 import { getUserName, getProfilePicture, initializeMarketplace } from '../components/utils';
 import NetworkselectionDropdown from './NetworkselectionDropdown';
+import '/fractalz-logo-black.svg'
 
 const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -61,7 +62,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
     <header>
       <nav className="navbar">
         <a href="/" className="title">
-          <img src="./fractalz-logo-black.svg" alt="NFT Marketplace Logo" className="logo" />
+          <img src="/fractalz-logo-black.svg" alt="NFT Marketplace Logo" className="logo" />
         </a>
         <div className="nav-links">
           <a href="/collections" className="nav-link">GALLERY</a>
