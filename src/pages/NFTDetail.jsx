@@ -316,7 +316,7 @@ setMaxSupply(maxSupply);
                     )
                   )
                 ) : (
-                  <button className="actionbutton w50" onClick={handleConnectWallet}>
+                  <button className="actionbutton w60" onClick={handleConnectWallet}>
                     <h3 className='margin-0 s16'>CONNECT WALLET</h3>
                   </button>
                 )}
