@@ -338,6 +338,27 @@ export const fetchAllNFTs = async (collectionAddress, marketplace) => {
   }
 };
 
+export const getMaxSupply = async (collectionAddress) => {
+  try {
+    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
+    if (!selectedCollection) {
+      console.log('Collection not found for address:', collectionAddress);
+      return null;
+    }
+
+    const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
+    const maxSupply = await contract.methods.MAX_SUPPLY().call();
+
+    console.log(`TOTAL SUPPLY IS EXACTLY ${maxSupply}`);
+
+    return maxSupply;
+  } catch (error) {
+    console.error('Error fetching MAX_SUPPLY:', error);
+    return null;
+  }
+};
+
+
 export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
   try {
     const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === contractAddress.toLowerCase());

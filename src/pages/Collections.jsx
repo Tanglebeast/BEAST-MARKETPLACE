@@ -67,7 +67,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter, selectedNetwork }) 
                     </div>
                   </div>
 
-                  <div className='text-align-left collection-infoCardDiv'>
+                  <div className='text-align-left w90 mb5 collection-infoCardDiv'>
                     <div className='mb15'>
                   <h3 className='mb10'>{collection.name}</h3>
                   <span className='s18 grey'>{collection.artist}</span>

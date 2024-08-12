@@ -29,6 +29,9 @@ import MintNFT from './Fairlaunch/MintNFT';
 import FairMintCollections from './Fairlaunch/PublicSaleCollections';
 import ChangeTheme from './components/ChangeTheme';
 import { nftCollections } from './NFTCollections';
+import Imprint from './components/Imprint';
+import Terms from './components/TermsofUse';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 const App = () => {
   const [account, setAccount] = useState(localStorage.getItem('account') || '');
@@ -83,6 +86,9 @@ const App = () => {
             <Route path="/users" element={<AllUsers />} />
             <Route path="/faq" element={<Accordion />} />
             <Route path="/about" element={<About />} />
+            <Route path="/imprint" element={<Imprint />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/artists/:artistname" element={<ArtistProfile />} />
             <Route path="/users/:walletAddress" element={<UserNFTs />} />
             <Route path="/collections/:collectionaddress" element={<CollectionDetail />} />

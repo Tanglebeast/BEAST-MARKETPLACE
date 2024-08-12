@@ -189,6 +189,10 @@ p,span {
   width: 80%;
 }
 
+.w40 {
+  width: 40%;
+}
+
 .w25P {
   width: 25%;
 }
@@ -333,6 +337,10 @@ p,span {
   text-align: right;
 }
 
+.text-align-center {
+  text-align: center;
+}
+
 .mt100 {
   margin-top: 100px;
 }
@@ -385,6 +393,10 @@ p,span {
 
 .w50 {
   width: 50%;
+}
+
+.w60 {
+  width: 60%;
 }
 
 .h25 {

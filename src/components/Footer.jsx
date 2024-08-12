@@ -45,7 +45,7 @@ const Footer = () => {
                     <p>Email: info@fractalz.xyz</p>
                 </div>
             </div>
-            <div className="footer-bottom">
+            <div className="footer-bottom VisibleLink">
                 &copy; 2024 FRACTALZ all rights reserved | <a href="/imprint">Imprint</a> | <a href="/terms">Terms of Use</a> | <a href="/privacy">Privacy Policy</a>
             </div>
             </div>

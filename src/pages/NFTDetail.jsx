@@ -14,7 +14,8 @@ import {
   getUserName,
   checkNetwork,
   getProfilePicture,
-  connectWallet
+  connectWallet,
+  getMaxSupply
 } from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import Web3 from 'web3';
@@ -35,11 +36,13 @@ const NFTDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [totalSupply, setTotalSupply] = useState(0);
+  const [maxSupply, setMaxSupply] = useState(0);
   const [ownershipPercentage, setOwnershipPercentage] = useState(0);
   const [ownedNFTsCount, setOwnedNFTsCount] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ownerUsername, setOwnerUsername] = useState('');
   const [ownerProfilePicture, setOwnerProfilePicture] = useState('/owner.png');
+  
 
   useEffect(() => {
     const fetchNFTData = async (marketplaceInstance) => {
@@ -51,8 +54,13 @@ const NFTDetail = () => {
           const allNFTs = await fetchAllNFTs(collectionaddress, marketplaceInstance);
           setTotalSupply(allNFTs.length);
 
+          const maxSupply = Number(await getMaxSupply(collectionaddress, marketplaceInstance));
+console.log('Max Supply:', maxSupply);
+setMaxSupply(maxSupply);
+
           const ownedNFTs = allNFTs.filter(nft => nft.owner.toLowerCase() === account.toLowerCase());
-          const ownershipPercentage = (ownedNFTs.length / totalSupply) * 100;
+          const ownershipPercentage = maxSupply > 0 ? (ownedNFTs.length / maxSupply) * 100 : 0;
+
           setOwnershipPercentage(ownershipPercentage);
 
           setOwnedNFTsCount(ownedNFTs.length);
@@ -93,8 +101,14 @@ const NFTDetail = () => {
         const allNFTs = await fetchAllNFTs(collectionaddress, marketplaceInstance);
         setTotalSupply(allNFTs.length);
 
+        const maxSupply = Number(await getMaxSupply(collectionaddress, marketplaceInstance));
+setMaxSupply(maxSupply);
+
+
+
         const ownedNFTs = allNFTs.filter(nft => nft.owner.toLowerCase() === account.toLowerCase());
-        const ownershipPercentage = (ownedNFTs.length / totalSupply) * 100;
+        const ownershipPercentage = maxSupply > 0 ? (ownedNFTs.length / maxSupply) * 100 : 0;
+
         setOwnershipPercentage(ownershipPercentage);
 
         setOwnedNFTsCount(ownedNFTs.length);
@@ -254,16 +268,17 @@ const NFTDetail = () => {
             <div className="ownership-details centered space-between">
               <div>
                 <p className='grey mb5'>Ownership</p>
-                <h3 className='s24 mb0 mt5'>{ownedNFTsCount}/{totalSupply}</h3>
+                <h3 className='s24 mb0 mt5'>{ownedNFTsCount}/{maxSupply}</h3>
               </div>
 
               <div className="ownership-details centered space-between">
                 <div>
                   <p className='grey mb5'>Ownership in %</p>
-                  <h3 className='s24 mb0 mt5'>{ownershipPercentage.toFixed(2)}%</h3>
+                  <h3 className='s24 mb0 mt5'>{totalSupply > 0 ? ownershipPercentage.toFixed(2) : '0.00'}%</h3>
                 </div>
               </div>
             </div>
+
 
             <div className='BottomButtons'>
               <div className='w100'>
@@ -282,18 +297,18 @@ const NFTDetail = () => {
                   account.toLowerCase() === nftDetails.owner.toLowerCase() ? (
                     !isForSale ? (
                       <>
-                        <button className="actionbutton w50" onClick={() => setIsPopupOpen(true)}>
+                        <button className="actionbutton w60" onClick={() => setIsPopupOpen(true)}>
                           <h3 className='margin-0 s16'>LIST</h3>
                         </button>
                       </>
                     ) : (
-                      <button className="actionbutton w50" onClick={handleCancelListing}>
+                      <button className="actionbutton w60" onClick={handleCancelListing}>
                         <h3 className='margin-0 s16'>CANCEL LISTING</h3>
                       </button>
                     )
                   ) : (
                     isForSale ? (
-                      <button className="actionbutton w50" onClick={handleBuy}>
+                      <button className="actionbutton w60" onClick={handleBuy}>
                         <h3 className='margin-0 s16'>BUY</h3>
                       </button>
                     ) : (

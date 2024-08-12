@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Toggle from 'react-toggle';
 import "react-toggle/style.css";
-import { fetchAllNFTs, initializeMarketplace, refreshData, getNFTDetails, getUserName, checkNetwork } from '../components/utils';
+import { fetchAllNFTs, initializeMarketplace, refreshData, getNFTDetails, getUserName, checkNetwork, getMaxSupply } from '../components/utils';
 import SearchBar from '../components/SearchBar';
 import { nftCollections } from '../NFTCollections';
 import CollectionDetailCard from '../components/CollectionDetailCard';
@@ -27,6 +27,7 @@ const CollectionNFTs = () => {
     const [filters, setFilters] = useState({ price: [], availability: [] });
     const [userNames, setUserNames] = useState({});
     const [areFiltersActive, setAreFiltersActive] = useState(false);
+    const [maxSupply, setMaxSupply] = useState(null);
 
 
 
@@ -41,6 +42,9 @@ const CollectionNFTs = () => {
             const nfts = await fetchAllNFTs(collectionaddress);
             setAllNFTs(nfts);
             setLoading(false);
+
+            const supply = await getMaxSupply(collectionaddress);
+            setMaxSupply(Number(supply));
 
             const sizes = await Promise.all(nfts.map(async (nft) => {
                 const img = new Image();
@@ -232,7 +236,7 @@ const sortedNFTs = sortNFTsByPosition(filteredAllNFTs.map(nft => {
                     <div className="collection-stats">
                         <div className='collection-stats-div'>
                             <p>FRACTALZ</p>
-                            {allNFTs.length}
+                            {maxSupply}
                         </div>
                         <div className='splitter'></div>
                         <div className='collection-stats-div'>
