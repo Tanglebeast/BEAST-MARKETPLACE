@@ -149,7 +149,10 @@
         width: 90%;
     }
 
-
+    .networklogo img {
+        height: 22px;
+        width: 22px;
+    }
 
 
   }
