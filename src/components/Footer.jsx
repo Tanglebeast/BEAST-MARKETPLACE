@@ -14,9 +14,11 @@ const Footer = () => {
                 <img src="/fractalz-logo-black.svg" alt="Logo" />
               </div>
             </a>
+            <div className='footerdescription'>
                     <p>
                         We are merging the digital and physical art worlds, enabling everyone to discover and collect physical art NFTs.
                     </p>
+            </div>
 
                     <div className="social-iconDiv">
                         <a href="https://x.com/tanglebeasts">

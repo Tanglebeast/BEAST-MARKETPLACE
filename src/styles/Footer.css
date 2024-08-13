@@ -55,7 +55,7 @@
 
 
 .footer-section p {
-    width: 400px;
+    max-width: 400px;
 }
 
 .footer-bottom {
@@ -87,5 +87,9 @@
         padding:0px;
         border-radius: 0px;
         max-width: 100%
+    }
+
+    .footer-content {
+        flex-direction: column;
     }
 }
