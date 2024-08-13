@@ -114,3 +114,59 @@ button:hover{
     max-height: 90%;
     cursor: pointer;
   }
+
+
+  @media (max-width: 768px) {
+    .nft-detail {
+        flex-direction: column;
+        justify-content: center;
+        height: auto;
+        align-items: center;
+        background-color: black;
+        padding: 15px;
+        width: 90%;
+        border-radius: 10px;
+    }
+
+    .MainDetailDivMedia {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .NFT-DetailDiv {
+        margin-left: 0px;
+    }
+
+    .nft-detail img{
+        width: 90%;
+        height: auto;
+    }
+
+    .NFT-DetailDiv img{
+        width: 30px;
+        height: 30px;
+    }
+
+    .ownership-details {
+        margin-top: 12px;
+    }
+
+    .Detail-Div-CardA {
+        width: 100%;
+    }
+
+    .Detail-Div-Cardx {
+        width: auto;
+    }
+
+    .ownership-detailsinP {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .BottomButtons {
+        margin-top: 30px;
+    }
+  }

@@ -134,14 +134,17 @@ const AllUsers = () => {
           <div>{error}</div>
         ) : (
           <>
-            <div className='flex w100 mt10'>
-                <div className='w20'>
+            <div className='flex w100 mt10 myNFTMainDivMedia'>
+            <h1 className='mt0 s24 onlymedia'>USERS</h1>
+                <div className='w20 ButtonandFilterMedia'>
                     <UsersFilter onFilterChange={handleFilterChange} />
                 </div>
-                <div className='flex-start flex column ml20 w100'>
+                <div className='flex-start flex column ml20 w100 AllUser-List-Media'>
                   <div className='flex-start flex column w90'>
-                    <h1 className='mt0 s24'>USERS</h1>
+                    <h1 className='mt0 s24 OnlyDesktop'>USERS</h1>
+                    <div className='w30 w100media'>
                     <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                    </div>
                   </div>
                   <div className="users-list">
                     {filteredUsers.map((user, index) => (

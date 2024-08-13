@@ -159,6 +159,10 @@
 
 @media (max-width: 768px) {
 
+    .CollectionDetail-mediaDiv {
+        flex-direction: column;
+    }
+
     .collection-nfts {
         display: flex;
         justify-content: center;
@@ -177,7 +181,8 @@
         top: auto;
         width: 100%;
         display: flex;
-        padding-bottom: 0px;
+        padding: 8px 0px;
+        height: auto;
     }
 
     .CollectionDescription {

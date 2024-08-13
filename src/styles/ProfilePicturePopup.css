@@ -101,4 +101,22 @@
 
   }
 
+  @media (max-width: 768px) {
+    .popup-content-image {
+      width: 90%;
+      margin-right: 5%;
+    }
+
+    .nft-selection-popup {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+      overflow: auto;
+      width: 100%;
+      justify-items: center;
+      align-items: center;
+      min-height: 50%;
+  }
+  }
+
   

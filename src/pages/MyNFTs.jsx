@@ -198,8 +198,17 @@ const MyNFTs = () => {
         <>
 
 
-          <div className='flex space-between w100 mt50'>
-  <div className='w20'>
+          <div className='flex space-between w100 mt50 myNFTMainDivMedia'>
+  <div className='w20 ButtonandFilterMedia'>
+
+  <div className='UserData onlymedia'>
+              <div className='ProfilePicture'>
+                <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
+              </div>
+              <h2>
+                {userName ? userName : <ShortenAddress address={account} />}
+              </h2>
+            </div>
     
   <div className="user-name-section">
             
@@ -221,8 +230,8 @@ const MyNFTs = () => {
 
     <MyNFTsFilter onFilterChange={setFilters} />
   </div>
-  <div className='w80 flex column ml20'>
-  <div className='UserData'>
+  <div className='w80 flex column ml20 w100media'>
+  <div className='UserData OnlyDesktop'>
               <div className='ProfilePicture'>
                 <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
               </div>
@@ -230,7 +239,9 @@ const MyNFTs = () => {
                 {userName ? userName : <ShortenAddress address={account} />}
               </h2>
             </div>
+            <div className='w30 w100media'>
     <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+    </div>
     <div className="nft-list-my">
       {filteredNFTs.length === 0 ? (
         <div className="no-nfts-container flex centered column">

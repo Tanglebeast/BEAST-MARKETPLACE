@@ -188,3 +188,61 @@
     Margin-bottom: 5px;
     margin-top: 25px;
 }
+
+.onlymedia {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .myNFTMainDivMedia {
+        flex-direction: column;
+    }
+    .ButtonandFilterMedia {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .w100media {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-left: 0;
+    }
+
+    .onlymedia {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .OnlyDesktop {
+        display: none;
+    }
+
+    .myNFTMainDivMedia {
+        margin-top: 10px;
+    }
+
+    .nft-list-my {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .my-nfts {
+        margin-top: 10px;
+    }
+
+    .ProfileBannerDiv {
+        height: 300px;
+    }
+
+    .mt5media {
+        margin-top: 5px;
+    }
+}

@@ -45,3 +45,9 @@ margin-right: 15px;
     display: flex;
     align-items: center;
   }
+
+  @media (max-width: 768px) {
+    .artwork-owner-ranking table {
+      width: 100%;
+    }
+  }

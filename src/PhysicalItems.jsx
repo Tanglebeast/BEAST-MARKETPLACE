@@ -7,7 +7,7 @@ export const PhysicalItems = [
       size: '80 X 100 cm',
       medium: '3D textured Canvas',
       certificate: '/currency-smr.png',
-      contractaddress: '0x8331dF63603d9d2dA72FCcEE73f4434C792ec529',
+      contractaddress: '0xA8B18AF398F5B00aD90E65c5aE775744904138f9',
       images: [
         '/Ape.webp',
         '/Duck.webp',

@@ -114,4 +114,30 @@
     cursor: pointer;
     border-radius: 15px;
   }
+
+  @media (max-width: 768px) {
+    .ArtworkdetailsBody {
+      flex-direction: column;
+    }
+
+    .artwork-details {
+      height: auto;
+    }
+
+    .artwork-details table{
+      width: 90%;
+    }
+
+    .nav-button.left {
+      margin-left: -40%;
+    }
+
+    .nav-button.right {
+      margin-right: -40%;
+    }
+
+    .ArtworkImages img {
+      border-radius: 10px;
+    }
+  }
   

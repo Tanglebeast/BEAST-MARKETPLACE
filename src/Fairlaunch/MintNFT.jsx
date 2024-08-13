@@ -334,7 +334,7 @@ const MintNFT = () => {
                         </div>
                     )}
                     <div className='w95 mt35 Mint-DetailDiv centered'>
-                        <div className='flex centered w100 margin-0-10 h500'>
+                        <div className='flex centered w100 margin-0-10 h500 mediacolumn'>
                             <div className="image-container-mint">
                                 {selectedCollection && selectedCollection.banner && (
                                     <img className='FullImageDiv' src={selectedCollection.banner} alt={selectedCollection.name} />

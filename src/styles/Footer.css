@@ -81,3 +81,10 @@
 .social-icons:hover{
     transform: scale(1.07);
 }
+
+@media (max-width: 768px) {
+    .footerDiv {
+        padding:0px;
+        border-radius: 0px;
+    }
+}

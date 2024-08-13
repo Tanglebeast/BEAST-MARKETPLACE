@@ -81,6 +81,16 @@
   font: inherit;
 }
 
+.dropdown-hover {
+  background-color: transparent;
+  padding: 20px 10px;
+  color: white;
+  border: none;
+  width: auto;
+  text-align: left;
+  font: inherit;
+}
+
 .account {
   display: inline-block;
   margin-right: 10px;
@@ -111,6 +121,12 @@
 .dropdown-hover:hover {
   background-color: var(--branding-color);
   border-radius: 5px 5px 0 0;
+}
+
+.dropdown-hover:hover a{
+  color: white;
+  text-decoration: none;
+  border: none;
 }
 
 .button-disconnect:hover {

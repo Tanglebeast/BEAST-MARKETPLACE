@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import { fetchAllNFTs, getUserName, getProfilePicture } from '../components/utils';
+import { fetchAllNFTs, getUserName, getProfilePicture, getMaxSupply } from '../components/utils';
 import '../styles/ArtworkOwnerRanking.css';
 import ShortenAddress from './ShortenAddress';
 
@@ -13,8 +13,11 @@ const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
   useEffect(() => {
     const fetchOwnerData = async () => {
       try {
+        // Hole die maximale Anzahl an NFTs und wandle sie in eine Zahl um
+        const maxSupply = await getMaxSupply(collectionAddress);
+        setTotalSupply(Number(maxSupply) || 0); // Fallback auf 0, falls maxSupply null oder ungültig ist
+
         const allNFTs = await fetchAllNFTs(collectionAddress, web3);
-        setTotalSupply(allNFTs.length);
 
         const ownerCount = allNFTs.reduce((acc, nft) => {
           acc[nft.owner] = (acc[nft.owner] || 0) + 1;
@@ -38,7 +41,7 @@ const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
             username: ownerUsernames[owners.indexOf(owner)] || '', // Sicherstellen, dass der Index korrekt ist
             profilePicture: ownerProfilePictures[owners.indexOf(owner)] || '/owner.png',
             count,
-            percentage: (count / allNFTs.length) * 100,
+            percentage: (count / Number(maxSupply)) * 100, // Verwendung von maxSupply als Zahl
           }));
 
         setOwnerData(sortedOwners);

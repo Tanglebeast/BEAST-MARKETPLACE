@@ -305,18 +305,15 @@ const sortedNFTs = sortNFTsByPosition(filteredAllNFTs.map(nft => {
                             </div>
                         ) : (
                             <div className='w100 flex space-between CollectionDetail-mediaDiv'>
-                                <div className='w20 Coll-FilterDiv'>
+                                <div className='w20 Coll-FilterDiv ButtonandFilterMedia'>
                                     <CollectionDetailFilter onFilterChange={setFilters} />
                                 </div>
                                 <div className='w100 flex column flex-start ml20 ml0-media'>
-                                    <h2 className='mt15'>{collectionName}</h2>
-                                    <div className='SearchbarDesktop text-align-left w30'>
+                                    <h2 className='mt15 OnlyDesktop'>{collectionName}</h2>
+                                    <div className='SearchbarDesktop text-align-left w30 w100media'>
                                     <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
                                     </div>
-                                    <div className='flex Coll-filter-media'>
-                                    <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                                    <CollectionDetailFilter onFilterChange={setFilters} />
-                                </div>
+
                                     <div className='NFT-Collection-Div'>
                                         {filteredNFTsForSale.length === 0 && filteredAllNFTs.length === 0 ? (
                                             <div className="no-nfts-container flex centered column">

@@ -70,4 +70,16 @@
     margin-top: 0px;
     margin-bottom: 0px;
   }
+
+  @media (max-width: 768px) {
+    .myNFTMainDivMedia {
+      flex-direction: column;
+    }
+
+    .AllUser-List-Media {
+      width: 100%;
+      align-items: center;
+      margin-left: 0;
+    }
+  }
   

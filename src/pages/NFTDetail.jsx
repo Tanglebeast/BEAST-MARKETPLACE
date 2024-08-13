@@ -23,6 +23,7 @@ import Popup from '../components/ListingPopup';
 import BlockExplorerLinks from '../components/BlockExplorerLinks';
 import ArtworkDetails from '../components/ArtworkDetails';
 import ArtworkOwnerRanking from '../components/ArtworkOwnerRanking';
+import ShortenAddress from '../components/ShortenAddress';
 
 const web3 = new Web3(window.ethereum);
 
@@ -209,7 +210,7 @@ setMaxSupply(maxSupply);
   const slicePercentage = (1 / totalSupply) * 100;
 
   return (
-    <div>
+    <div className='MainDetailDivMedia'>
       <h2 className="nft-DetailDiv">DETAILS</h2>
       <div className="nft-detail">
         <img src={nftDetails.image} alt={nftDetails.name} onClick={() => setIsFullscreen(true)} />
@@ -227,31 +228,7 @@ setMaxSupply(maxSupply);
             </div>
 
             <div className='mt20'>
-              <div className='flex center-ho space-between gap10'>
-                <div className='flex center-ho Detail-Div-Cardx'>
-                  <div className='flex column'>
-                    <p className='grey margin-0'>Owner:</p>
-                    <div className='flex center-ho mt5'>
-                      <img className='wh27 mr10' src={ownerProfilePicture} alt='Owner' />
-                      <p className='VisibleLink margin-0 s16'>
-                        <Link to={`/users/${nftDetails.owner}`}>{ownerUsername}</Link>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className='flex center-ho Detail-Div-Cardx'>
-                  <div className='flex column'>
-                    <p className='grey margin-0'>Artist:</p>
-                    <div className='flex center-ho mt5'>
-                      <img className='wh27 mr10' src={collectionDetails.artistpfp} alt='Artist' />
-                      <p className='VisibleLink margin-0 s16'>
-                        <Link to={`/artists/${collectionDetails.artist}`}>{collectionDetails.artist}</Link>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className='flex center-ho Detail-Div-Cardx'>
+            <div className='flex center-ho Detail-Div-Cardx mb10'>
                   <div className='flex column'>
                     <p className='grey margin-0'>Collection:</p>
                     <div className='flex center-ho mt5'>
@@ -262,6 +239,31 @@ setMaxSupply(maxSupply);
                     </div>
                   </div>
                 </div>
+              <div className='flex center-ho gap10'>
+                <div className='flex center-ho Detail-Div-Cardx'>
+                  <div className='flex column'>
+                    <p className='grey margin-0'>Owner:</p>
+                    <div className='flex center-ho mt5'>
+                      <img className='wh27 mr10' src={ownerProfilePicture} alt='Owner' />
+                      <p className='VisibleLink margin-0 s16'>
+                        <Link to={`/users/${nftDetails.owner}`}><ShortenAddress address={ownerUsername} /></Link>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className='flex center-ho Detail-Div-Cardx Detail-Div-CardA'>
+                  <div className='flex column'>
+                    <p className='grey margin-0'>Artist:</p>
+                    <div className='flex center-ho mt5'>
+                      <img className='wh27 mr10' src={collectionDetails.artistpfp} alt='Artist' />
+                      <p className='VisibleLink margin-0 s16'>
+                        <Link to={`/artists/${collectionDetails.artist}`}>{collectionDetails.artist}</Link>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
               </div>
             </div>
 
@@ -272,7 +274,7 @@ setMaxSupply(maxSupply);
               </div>
 
               <div className="ownership-details centered space-between">
-                <div>
+                <div className='ownership-detailsinP'>
                   <p className='grey mb5'>Ownership in %</p>
                   <h3 className='s24 mb0 mt5'>{totalSupply > 0 ? ownershipPercentage.toFixed(2) : '0.00'}%</h3>
                 </div>
@@ -333,6 +335,7 @@ setMaxSupply(maxSupply);
             setListingPrice={setListingPrice}
             handleList={handleList}
             closePopup={() => setIsPopupOpen(false)}
+            currency={collectionDetails.currency}
           />
         )}
       </div>

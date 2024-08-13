@@ -93,13 +93,16 @@ const FairMintCollections = () => {
 
   return (
     <div className='CollectionDiv'>
-      <div className='w95 space-between flex'>
-        <div className='w20'>
+      <h2 className='text-align-left mt15 onlymedia'>FAIRMINT</h2>
+      <div className='w95 space-between flex MediaGalleryDiv'>
+        <div className='w20 ButtonandFilterMedia'>
           <CollectionFilter onFilterChange={setFilters} />
         </div>
         <div className='w95 column flex flex-start ml20'>
-          <h2 className='text-align-left mt15'>FAIRMINT</h2>
+          <h2 className='text-align-left mt15 OnlyDesktop'>FAIRMINT</h2>
+          <div className='w30 w100media'>
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          </div>
           {filteredCollections.length === 0 ? (
             <div className="no-nfts-container flex centered column">
               <h2 className="no-nfts-message">No collections found...</h2>

@@ -99,12 +99,23 @@ const UserNFTs = () => {
             </div>
           </div>
 
-          <div className='flex space-between w100 mt50'>
-            <div className='w20'>
+          <div className='flex space-between w100 mt50 myNFTMainDivMedia'>
+            
+          <div className="profile-picture-section flex column mt5 onlymedia">
+                <div className='flex center-ho'>
+                  <div className='ProfilePicture'>
+                    <img className="profile-picture" src={profilePicture} alt={`${userName}'s profile`} />
+                  </div>
+                  <h2 className='mb5 mt5media'>{userName}</h2>
+                </div>
+                <span className='text-align-left grey mb15 mt5 s16'>{walletAddress}</span>
+              </div>
+
+            <div className='w20 ButtonandFilterMedia'>
               <MyNFTsFilter onFilterChange={setFilters} />
             </div>
-            <div className='w80 flex column ml20'>
-              <div className="profile-picture-section flex column mt5">
+            <div className='w80 flex column ml20 w100media'>
+              <div className="profile-picture-section flex column mt5 OnlyDesktop">
                 <div className='flex center-ho'>
                   <div className='ProfilePicture'>
                     <img className="profile-picture" src={profilePicture} alt={`${userName}'s profile`} />
@@ -113,8 +124,9 @@ const UserNFTs = () => {
                 </div>
                 <span className='text-align-left grey mb15 mt5 s16'>{walletAddress}</span>
               </div>
-
+              <div className='w30 w100media'>
               <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              </div>
               <div className="nft-list-my">
                 {filteredNFTs.length === 0 ? (
                   <div className="no-nfts-container flex centered column">

@@ -16,7 +16,7 @@ const UsernamePopup = ({ username, setUsername, handleSave, closePopup }) => {
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Enter new username"
         />
-        <button className="actionbutton w20" onClick={handleSave}>
+        <button className="actionbutton w20 w40media" onClick={handleSave}>
           SAVE
         </button>
       </div>
