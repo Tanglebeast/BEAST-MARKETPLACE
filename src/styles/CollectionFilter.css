@@ -25,7 +25,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 8px 8px 0 0;
+    border-radius: 8px !important;
     transition: background-color 0.3s ease;
 }
 
@@ -33,7 +33,7 @@
 .accordion-filterContent {
     background-color: black; /* Very dark grey for content */
     overflow: hidden;
-    padding: 0 15px 15px 15px;
+    padding: 0 15px 0px 15px;
     max-height: 0;
     border-radius: 0 0 8px 8px;
     text-align: left;
@@ -111,6 +111,7 @@
 @media (max-width: 768px) {
 .accordion-filterContent {
     padding: 0px 10px;
+    max-height: 0;
 }
 
 .accordion-header {

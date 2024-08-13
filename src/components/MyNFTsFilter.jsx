@@ -3,8 +3,9 @@ import '../styles/CollectionFilter.css';
 import { nftCollections } from '../NFTCollections';
 
 const MyNFTsFilter = ({ onFilterChange }) => {
-    const [activeIndices, setActiveIndices] = useState([0, 1, 2]); // Beide Felder standardmäßig geöffnet
+    const [activeIndices, setActiveIndices] = useState([]);
     const [selectedWords, setSelectedWords] = useState({ artist: [], availability: [], artwork: [] });
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     const toggleAccordion = (index) => {
         setActiveIndices(prevState =>
@@ -45,6 +46,29 @@ const MyNFTsFilter = ({ onFilterChange }) => {
     ];
 
     const contentRef = useRef([]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isMobile) {
+            // Keep all items closed on mobile
+            setActiveIndices([]);
+        } else {
+            // Open some items if not mobile
+            setActiveIndices([0, 1, 2]); // Example: Open all by default
+        }
+    }, [isMobile]);
 
     useEffect(() => {
         contentRef.current.forEach((el, index) => {

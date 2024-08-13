@@ -3,7 +3,7 @@ import { nftCollections } from '../NFTCollections';
 import '../styles/CollectionFilter.css';
 
 const CollectionFilter = ({ onFilterChange }) => {
-    const [activeIndices, setActiveIndices] = useState([0, 1]); // Beide Felder standardmäßig geöffnet
+    const [activeIndices, setActiveIndices] = useState([]);
     const [selectedWords, setSelectedWords] = useState({ artists: [], networks: [] });
 
     const toggleAccordion = (index) => {
@@ -25,7 +25,6 @@ const CollectionFilter = ({ onFilterChange }) => {
             return newSelectedWords;
         });
     };
-    
 
     // Extrahieren der einzigartigen Artists aus nftCollections
     const uniqueArtists = [...new Set(nftCollections.map(collection => collection.artist))];
@@ -38,8 +37,22 @@ const CollectionFilter = ({ onFilterChange }) => {
         }
     ];
     
-
     const contentRef = useRef([]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setActiveIndices([]);
+            } else {
+                setActiveIndices([0, 1]); // Beide Felder standardmäßig geöffnet
+            }
+        };
+
+        handleResize(); // Initiale Überprüfung
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         contentRef.current.forEach((el, index) => {

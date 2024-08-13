@@ -197,6 +197,11 @@
     .myNFTMainDivMedia {
         flex-direction: column;
     }
+
+    .user-name-section {
+        width: 100%;
+    }
+
     .ButtonandFilterMedia {
         width: 100%;
         display: flex;

@@ -14,11 +14,11 @@ const FairMintCollections = () => {
 
   useEffect(() => {
     const fetchCollectionDetails = async () => {
-      if (!window.ethereum) {
-        console.error('MetaMask is not installed');
-        setLoading(false); // Setze loading auf false, wenn MetaMask nicht installiert ist
-        return;
-      }
+      // if (!window.ethereum) {
+      //   console.error('MetaMask is not installed');
+      //   setLoading(false); // Setze loading auf false, wenn MetaMask nicht installiert ist
+      //   return;
+      // }
 
       const web3 = web3OnlyRead
 
@@ -98,7 +98,7 @@ const FairMintCollections = () => {
         <div className='w20 ButtonandFilterMedia'>
           <CollectionFilter onFilterChange={setFilters} />
         </div>
-        <div className='w95 column flex flex-start ml20'>
+        <div className='w95 column flex flex-start ml20 mlnull'>
           <h2 className='text-align-left mt15 OnlyDesktop'>FAIRMINT</h2>
           <div className='w30 w100media'>
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />

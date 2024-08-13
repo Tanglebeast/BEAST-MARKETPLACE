@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/CollectionFilter.css';
 
 const CollectionDetailFilter = ({ onFilterChange }) => {
-    const [activeIndices, setActiveIndices] = useState([0, 1]); // Beide Felder standardmäßig geöffnet
+    const [activeIndices, setActiveIndices] = useState([]);
     const [selectedWords, setSelectedWords] = useState({ price: [], availability: [] });
 
     const toggleAccordion = (index) => {
@@ -39,6 +39,21 @@ const CollectionDetailFilter = ({ onFilterChange }) => {
     ];
 
     const contentRef = useRef([]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setActiveIndices([]); // Standardmäßig alle Akkordeons schließen
+            } else {
+                setActiveIndices([0, 1]); // Beide Felder standardmäßig geöffnet
+            }
+        };
+
+        handleResize(); // Initiale Überprüfung
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         contentRef.current.forEach((el, index) => {
