@@ -7,7 +7,6 @@
     background-color: var(--branding-color); /* Button-Farbe anpassen */
     color: white;
     border: none;
-    padding: 10px;
     border-radius: 5px;
     cursor: pointer;
     z-index: 1001;
@@ -31,7 +30,7 @@
     transition: left 0.3s ease; /* Smooth Transition */
     display: flex;
     align-items: center;
-    background-color: #373737;
+    background-color: var(--branding-color);
     border: none;
     border-radius: 5px;
     z-index: 1000;

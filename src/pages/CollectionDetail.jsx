@@ -215,9 +215,30 @@ const sortedNFTs = sortNFTsByPosition(filteredAllNFTs.map(nft => {
 }));
 
 
-    // Determine grid dimensions
-    const gridWidth = 1200;
-    const gridHeight = 900;
+const [gridDimensions, setGridDimensions] = useState({ gridWidth: 1200, gridHeight: 900 });
+
+useEffect(() => {
+    const handleResize = () => {
+        if (window.innerWidth <= 768) {
+            // Verkleinere das Grid für kleinere Bildschirme
+            setGridDimensions({ gridWidth: 400, gridHeight: 600 });
+        } else {
+            // Standardgröße für größere Bildschirme
+            setGridDimensions({ gridWidth: 1200, gridHeight: 900 });
+        }
+    };
+
+    // Event Listener hinzufügen
+    window.addEventListener('resize', handleResize);
+
+    // Initial aufrufen, um die Größe basierend auf der aktuellen Fensterbreite festzulegen
+    handleResize();
+
+    // Event Listener beim Unmount entfernen
+    return () => window.removeEventListener('resize', handleResize);
+}, []);
+
+const { gridWidth, gridHeight } = gridDimensions;
     const gridRatio = gridWidth / gridHeight;
     const actualRatio = cols / rows;
 

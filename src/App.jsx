@@ -32,6 +32,7 @@ import Imprint from './components/Imprint';
 import Terms from './components/TermsofUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Importieren Sie BrowserRouter
+import NotFound from './components/Error404';
 
 const App = () => {
   const [account, setAccount] = useState(localStorage.getItem('account') || '');
@@ -93,6 +94,7 @@ const App = () => {
             <Route path="/users/:walletAddress" element={<UserNFTs />} />
             <Route path="/collections/:collectionaddress" element={<CollectionDetail />} />
             <Route path="/collections/:collectionaddress/:tokenid" element={<NFTDetail />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
         <Footer />
