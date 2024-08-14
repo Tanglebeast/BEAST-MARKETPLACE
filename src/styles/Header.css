@@ -1,16 +1,24 @@
 /* Gemeinsame Stile für Desktop und mobile Version */
 
-.navbar {
+.navbar.scrolled {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   background-color: black;
   color: #fff;
-  width: 95%; 
+  width: 100%; 
   border-radius: 15px;
-  margin-top: 15px;
   position: relative; /* Für mobile Menü Positionierung */
+}
+
+.navbar {
+  background-color: transparent;
+  width: 100%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 0;
 }
 
 .title {
@@ -33,6 +41,7 @@
   border: none;
   cursor: pointer;
   z-index: 1000;
+  margin-right: 10px;
 }
 
 .hamburger .bar {
@@ -203,7 +212,7 @@
   width: 100%;
   background-color: black;
   border-radius: 0 0 15px 15px;
-  padding: 5px 0;
+  margin-top: 10px;
   z-index: 9999;
   max-height: 0; /* Startwert für max-height */
   overflow: hidden; /* Verstecke überlaufenden Inhalt */
@@ -260,11 +269,6 @@
     flex-direction: column;
     align-items: flex-start;
   }
-
-
-
-
-
 
   .hamburger {
     cursor: pointer;

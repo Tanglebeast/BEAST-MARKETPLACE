@@ -1,0 +1,23 @@
+.containerSupport {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    margin-top: 50px;
+    width: 80%;
+  }
+  
+  .text-sectionSupport {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  
+  .image-section img {
+    max-width: 50%;
+    height: auto;
+  }
+  

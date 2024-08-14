@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';  // Importieren Sie useLocation
 import '../styles/Header.css';  // Verweisen Sie auf Ihre einzige CSS-Datei
 import ShortenAddress from './ShortenAddress';
 import { getUserName, getProfilePicture, initializeMarketplace } from '../components/utils';
 import NetworkselectionDropdown from './NetworkselectionDropdown';
-import '/fractalz-logo-black.svg'
+import '/fractalz-logo-black.svg';
 
 const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -12,6 +13,9 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
   const [marketplace, setMarketplace] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [showMobileMenu, setShowMobileMenu] = useState(false); // Zustand für das Hamburger-Menü
+  const [isScrolled, setIsScrolled] = useState(true); // Standardmäßig `true` setzen
+  
+  const location = useLocation(); // Verwenden Sie useLocation, um den aktuellen Pfad zu erhalten
 
   useEffect(() => {
     const setupMarketplace = async () => {
@@ -46,6 +50,24 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
     fetchUserDetails();
   }, [account, marketplace]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (location.pathname === '/') {
+        // Auf der Homepage, scrolled nur auf Basis des Scrollens
+        setIsScrolled(window.scrollY > 0);
+      } else {
+        // Auf anderen Seiten immer scrolled
+        setIsScrolled(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initialer Check beim ersten Rendern
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [location.pathname]);
+
   const handleMouseEnter = () => {
     setShowDropdown(true);
   };
@@ -58,41 +80,37 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
     disconnectWallet();
     window.location.reload();
   };
-  
 
   return (
-    <header>
-      <nav className="navbar">
-        <div className="nav-container">
-
+    <header className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+      <nav className="nav-container">
         <a href="/" className="title">
-  <img src="/fractalz-logo-black.svg" alt="NFT Marketplace Logo" className="logo" />
-</a>
-<label className="hamburger">
-  <input type="checkbox" checked={showMobileMenu} onChange={() => setShowMobileMenu(!showMobileMenu)} />
-  <svg viewBox="0 0 32 32">
-    <path className="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
-    <path className="line" d="M7 16 27 16"></path>
-  </svg>
-</label>
+          <img src="/fractalz-logo-black.svg" alt="NFT Marketplace Logo" className="logo" />
+        </a>
+        <label className="hamburger">
+          <input type="checkbox" checked={showMobileMenu} onChange={() => setShowMobileMenu(!showMobileMenu)} />
+          <svg viewBox="0 0 32 32">
+            <path className="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+            <path className="line" d="M7 16 27 16"></path>
+          </svg>
+        </label>
 
-
-          <div className={`nav-links ${showMobileMenu ? 'active' : ''}`}>
-            <div className='ml200'>
+        <div className={`nav-links ${showMobileMenu ? 'active' : ''}`}>
+          <div className='ml200'>
             <a href="/collections" className="nav-link">GALLERY</a>
             <a href="/artists" className="nav-link">ARTISTS</a>
             <a href="/users" className="nav-link">USERS</a>
             <a href="/fairmint" className="nav-link">FAIRMINT</a>
             <a href="/about" className="nav-link">ABOUT</a>
-            </div>
-            <div className='flex centered burder-account-network'>
+          </div>
+          <div className='flex centered burder-account-network'>
             <NetworkselectionDropdown />
             {isInitializing ? (
               <img src='/basic-loading.gif' alt='loading-spinner' className="loading-spinner" />
             ) : isConnected ? (
               <div className="connected-container flex center-ho"
-                   onMouseEnter={handleMouseEnter}
-                   onMouseLeave={handleMouseLeave}>
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
                 <div className='PFPImage flex centered'>
                   <img 
                     src={profilePicture} 
@@ -115,7 +133,6 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
             ) : (
               <button className="button" onClick={connectWallet}>CONNECT</button>
             )}
-            </div>
           </div>
         </div>
       </nav>

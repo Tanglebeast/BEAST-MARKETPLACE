@@ -10,6 +10,9 @@ import HomeBanner from '../components/HomeBanner';
 import FaqHome from '../components/FaqHome';
 import AboutHome from '../components/AboutHome';
 import NetworkselectionDropdown from '../components/NetworkselectionDropdown'; // Importieren Sie die Dropdown-Komponente
+import NetworkHome from '../components/NetworkHome';
+import EventsHome from '../components/ExclusiveEventsHome';
+import SupportArtistsHome from '../components/SupportArtistsHome';
 
 export function Homepage() {
   const [selectedNetwork, setSelectedNetwork] = useState(localStorage.getItem('selectedNetwork') || 'shimmerevm');
@@ -20,30 +23,19 @@ export function Homepage() {
         <HomeBanner />
       </div>
       <div className='w100 centered'>
+        <NetworkHome />
       </div>
-      <div className='centered column w100'>
-        <div className='centered-collection-cards'>
-          <CollectionCards limit={4} showSearchBar={false} showFilter={false} selectedNetwork={selectedNetwork}/>
-        </div>
+      <div className='w100 centered'>
+        <EventsHome />
       </div>
-      <div className='HomeGridBackDiv'>
-        <h2>TRENDING ARTWORK</h2>
-        {ArtworkGridItems.map((item, index) => (
-          <ArtworkGrid
-            key={index}
-            cols={item.cols}
-            rows={item.rows}
-            width={item.width}
-            height={item.height}
-            images={item.images}
-          />
-        ))}
-      </div>
-      <div className='w100 centered column FaqHome'>
-        <AboutHome />
+      <div className='w100 centered'>
+        <SupportArtistsHome />
       </div>
       <div className='w100 centered column'>
         <ArtistPage limit={4} />
+      </div>
+      <div className='w100 centered column FaqHome'>
+        <AboutHome />
       </div>
     </div>
   );

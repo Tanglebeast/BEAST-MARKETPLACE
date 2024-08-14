@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Web3 from 'web3';
 import nftMarketplaceAbi from './ABI.json';
 import CollectionCards from './pages/Collections';
@@ -32,6 +31,7 @@ import { nftCollections } from './NFTCollections';
 import Imprint from './components/Imprint';
 import Terms from './components/TermsofUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Importieren Sie BrowserRouter
 
 const App = () => {
   const [account, setAccount] = useState(localStorage.getItem('account') || '');
@@ -58,22 +58,22 @@ const App = () => {
   }, [account]);
 
   return (
-    <div>
-      <div className='bg'></div>
-      <Header
-        isConnected={isConnected}
-        account={account}
-        connectWallet={() => {
-          console.log('Connecting wallet...');
-          connectWallet(setAccount);
-        }}
-        disconnectWallet={() => {
-          console.log('Disconnecting wallet...');
-          disconnectWallet(setAccount, setIsConnected);
-        }}
-      />
-      <ChangeTheme />
-      <Router>
+    <Router>
+      <div>
+        <div className='bg'></div>
+        <Header
+          isConnected={isConnected}
+          account={account}
+          connectWallet={() => {
+            console.log('Connecting wallet...');
+            connectWallet(setAccount);
+          }}
+          disconnectWallet={() => {
+            console.log('Disconnecting wallet...');
+            disconnectWallet(setAccount, setIsConnected);
+          }}
+        />
+        <ChangeTheme />
         <div className="MainDiv">
           <Routes>
             <Route path="/" element={<Homepage />} />
@@ -95,9 +95,9 @@ const App = () => {
             <Route path="/collections/:collectionaddress/:tokenid" element={<NFTDetail />} />
           </Routes>
         </div>
-      </Router>
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </Router>
   );
 };
 

@@ -1,111 +1,137 @@
 .BannerMainDiv {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: auto;
-  background-image: url('https://cdn.shopify.com/s/files/1/0656/6933/3257/files/banner123_b0377ac6-1e7a-4f6e-ae20-ded2c18fe985.png?v=1721651630');
-  background-size: cover;
-  background-position: center;
-  color: #fff;
-  padding: 2rem;
-  width: 90%;
-  margin-top: 10px;
-  border-radius: 15px;
-}
-
-.text-container {
-  width: 40%;
-  text-align: left;
-  margin-left: 30px;
-}
-
-.text-container h1,
-.text-container h2 {
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  font-size: 48px;
-  font-family: 'Josefin Sans', sans-serif;
-  line-height: 90%;
-}
-
-.text-container p {
-  margin-bottom: 2rem;
-  font-size: 26px;
-  font-family: 'Josefin Sans', sans-serif;
-  text-transform: uppercase;
-  font-weight: 700;
-  line-height: 120%;
-}
-
-.bannerbutton {
-  background-color: var(--branding-color);
-  color: white;
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 5px;
-  margin-right: 1rem;
-  cursor: pointer;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-}
-
-.bannerbutton2 {
-  background-color: black;
-  color: var(--branding-color);
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 5px;
-  margin-right: 1rem;
-  cursor: pointer;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-}
-
-.imagebanner-container {
-  width: 50%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: auto;
-}
-
-.image-item-left,
-.image-item-right {
-  width: 200px;
-  height: 300px;
   position: relative;
-}
-
-.image-item-large {
-  width: 250px;
-  height: 400px;
-  z-index: 1;
-}
-
-.image-item-large img{
-  border-radius: 10px;
-  box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.9);
-  object-fit: cover;
+  margin-top: -90px;
   width: 100%;
-  height: 100%;
+  height: 100vh; /* Banner nimmt die volle Höhe des Viewports ein */
+  background-color: #191c2c; 
+  background: #191c2c url('/banner-fractalz.png') no-repeat center center;
+  background-size: cover;
+  z-index: -1; /* Banner hat einen niedrigeren z-index */
 }
 
-.image-item-left img,
-.image-item-right img{
+.gifsize {
+  margin-top: 15px;
+}
+
+.gifsize img{
+  width: 60px;
+  height: 60px;
+}
+
+.OverlayContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 100px;
+  text-align: center;
+  position: relative;
+  height: 100%;
+  color: white;
+  z-index: 5; /* Container liegt über dem Hintergrundbild */
+  padding: 20px;
+}
+
+.OverlayContainer h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.OverlayContainer p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.OverlayContainer button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #191c2c;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.OverlayContainer button:hover {
+  background-color: #f0f0f0;
+}
+
+.lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  margin: auto;
+  width: 90vw;
+}
+
+.line {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  top: 0;
+  left: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.line::after {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 15vh;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
+  top: -50%;
+  left: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 75%, #ffffff 100%);
+  animation: drop 7s 0s infinite;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.4, 0.26, 0, 0.97);
 }
 
-.image-item-left:first-child,
-.image-item-left:last-child {
-  z-index: 0;
-  transform: translateX(55%);
+.line:nth-child(1) {
+  margin-left: -25%;
 }
 
-.image-item-right:first-child,
-.image-item-right:last-child {
-  z-index: 0;
-  transform: translateX(-55%);
+.line:nth-child(1)::after {
+  animation-delay: 2s;
+}
+
+.line:nth-child(3) {
+  margin-left: 25%;
+}
+
+.line:nth-child(3)::after {
+  animation-delay: 2.5s;
+}
+
+@keyframes drop {
+  0% {
+    top: -50%;
+  }
+  100% {
+    top: 110%;
+  }
+}
+
+@media (max-width: 1100px) {
+  .widthmedia {
+    width: 100%;
+  }
+
+  .OverlayContainer {
+    margin-top: 60px;
+  }
+
+  .OverlayContainer h1{
+    font-size: 2.0rem;
+  }
+
+  .OverlayContainer p {
+    margin-top: 5px;
+  }
+
+  .gifsize {
+    margin-top: 5px;
+}
 }
