@@ -34,7 +34,7 @@ export function Homepage() {
       <div className='w100 centered column'>
         <ArtistPage limit={4} />
       </div>
-      <div className='w100 centered column FaqHome'>
+      <div className='w100 centered column FaqHome OnlyDesktop'>
         <AboutHome />
       </div>
     </div>

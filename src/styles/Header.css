@@ -9,7 +9,7 @@
   background-color: black;
   color: #fff;
   width: 100%; 
-  border-radius: 15px;
+  border-radius: 0;
   position: relative; /* Für mobile Menü Positionierung */
 }
 

@@ -19,4 +19,27 @@
     max-width: 50%;
     height: auto;
   }
+
+  @media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .centeredmediaD {
+        text-align: center;
+    }
+
+    .image-section img {
+        max-width: 70% !important;
+        height: auto;
+    }
+
+    .containerSupport {
+        margin-top: 0px !important;
+    }
+
+    .wnone {
+        width: 100%;
+    }
+  }
   
