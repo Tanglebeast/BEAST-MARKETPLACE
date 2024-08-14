@@ -277,4 +277,8 @@ background-color: var(--branding-color-hover);
   margin-left: 0px;
 }
 
+.centered-media {
+  align-items: center;
+}
+
 }

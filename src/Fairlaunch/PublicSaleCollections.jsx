@@ -98,7 +98,7 @@ const FairMintCollections = () => {
         <div className='w20 ButtonandFilterMedia'>
           <CollectionFilter onFilterChange={setFilters} />
         </div>
-        <div className='w95 column flex flex-start ml20 mlnull'>
+        <div className='w95 column flex flex-start ml20 mlnull centered-media'>
           <h2 className='text-align-left mt15 OnlyDesktop'>FAIRMINT</h2>
           <div className='w30 w100media'>
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
