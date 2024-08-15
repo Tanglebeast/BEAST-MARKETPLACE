@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { fetchAllNFTs, initializeMarketplace, refreshData, getUserName, getProfilePicture } from '../components/utils';
+import {
+  fetchAllNFTs,
+  initializeMarketplace,
+  refreshData,
+  getUserName,
+  getProfilePicture,
+  getTokenIdsOfOwner // Importiere hier
+} from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import '../styles/MyNFTs.css';
 import ShortenAddress from '../components/ShortenAddress';
@@ -44,21 +51,27 @@ const UserNFTs = () => {
   }, [walletAddress, marketplace]);
 
   const fetchUserNFTs = async () => {
-    let userNFTs = [];
-    for (const collection of nftCollections) {
-      const nfts = await fetchAllNFTs(collection.address, marketplace);
-      if (account) {
-        userNFTs = userNFTs.concat(nfts.filter(nft => nft.owner.toLowerCase() === account.toLowerCase()));
-      } else {
-        userNFTs = userNFTs.concat(nfts); // Oder filtere nach anderen Kriterien, falls nötig
+    try {
+      let userNFTs = [];
+      for (const collection of nftCollections) {
+        const tokenIds = await getTokenIdsOfOwner(collection.address, account);
+        console.log(`Token IDs for collection ${collection.address}:`, tokenIds);
+
+        // Fetch NFTs based on token IDs
+        const nfts = await Promise.all(tokenIds.map(tokenId => fetchAllNFTs(collection.address, marketplace)
+          .then(nfts => nfts.find(nft => nft.tokenId === tokenId))
+        ));
+        userNFTs = userNFTs.concat(nfts.filter(nft => nft !== undefined)); // Filter out undefined NFTs
       }
+      setAllNFTs(userNFTs);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching token IDs:', error);
     }
-    setAllNFTs(userNFTs);
-    setLoading(false);
   };
 
   useEffect(() => {
-    if (marketplace) {
+    if (marketplace && account) {
       fetchUserNFTs();
     }
   }, [account, marketplace]);
@@ -101,15 +114,15 @@ const UserNFTs = () => {
 
           <div className='flex space-between w100 mt50 myNFTMainDivMedia'>
             
-          <div className="profile-picture-section flex column mt5 onlymedia">
-                <div className='flex center-ho'>
-                  <div className='ProfilePicture'>
-                    <img className="profile-picture" src={profilePicture} alt={`${userName}'s profile`} />
-                  </div>
-                  <h2 className='mb5 mt5media'>{userName}</h2>
+            <div className="profile-picture-section flex column mt5 onlymedia">
+              <div className='flex center-ho'>
+                <div className='ProfilePicture'>
+                  <img className="profile-picture" src={profilePicture} alt={`${userName}'s profile`} />
                 </div>
-                <span className='text-align-left grey mb15 mt5 s16'>{walletAddress}</span>
+                <h2 className='mb5 mt5media'>{userName}</h2>
               </div>
+              <span className='text-align-left grey mb15 mt5 s16'>{walletAddress}</span>
+            </div>
 
             <div className='w20 ButtonandFilterMedia'>
               <MyNFTsFilter onFilterChange={setFilters} />
@@ -125,7 +138,7 @@ const UserNFTs = () => {
                 <span className='text-align-left grey mb15 mt5 s16'>{walletAddress}</span>
               </div>
               <div className='w30 w100media'>
-              <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
               </div>
               <div className="nft-list-my">
                 {filteredNFTs.length === 0 ? (

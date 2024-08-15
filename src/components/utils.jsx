@@ -338,6 +338,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace) => {
   }
 };
 
+
 export const getMaxSupply = async (collectionAddress) => {
   try {
     const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
@@ -740,3 +741,29 @@ export const getArtistWalletsAndFees = async () => {
     throw error;
   }
 };
+
+export const getTokenIdsOfOwner = async (contractAddress, ownerAddress) => {
+  try {
+    // Finde das ausgewählte NFT-Contract
+    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === contractAddress.toLowerCase());
+    if (!selectedCollection) {
+      console.log('Collection not found for address:', contractAddress);
+      return [];
+    }
+
+    // Erstelle eine Instanz des Contracts
+    const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, contractAddress);
+
+    // Rufe die Token-IDs des Besitzers ab
+    const tokenIds = await contract.methods.tokenIdsOfOwner(ownerAddress).call();
+
+    console.log(`Token IDs for owner ${ownerAddress}:`, tokenIds);
+
+    return tokenIds;
+  } catch (error) {
+    console.error(`Error fetching token IDs for owner ${ownerAddress}:`, error);
+    return [];
+  }
+};
+
+

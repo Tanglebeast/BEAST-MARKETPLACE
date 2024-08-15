@@ -1,0 +1,68 @@
+.main-container {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 100px 0;
+    background-color: #191c2c; /* Fallback-Farbe, falls das Bild nicht geladen wird */
+    width: 100%;
+    background-image: url('/network-bg.png'); /* Überprüfe den Pfad hier */
+    background-size: cover; /* Stellt sicher, dass das Bild den gesamten Container abdeckt */
+    background-position: center; /* Zentriert das Bild im Container */
+    background-repeat: no-repeat; /* Verhindert Wiederholung des Bildes */
+  }
+  
+  
+  .card {
+    display: flex;
+    align-items: center;
+    width: 300px;
+    height: 175px;
+    border: 2px solid;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-left, .card-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+  
+  .card-left {
+    width: 40%;
+  }
+  
+  .card-right {
+    width: 60%;
+    flex-direction: column;
+  }
+  
+  .card-icon {
+    max-width: 100%;
+  }
+  
+  .card-button {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 2px solid;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: transparent;
+    color: white;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .card-button:hover {
+    background-color: var(--hoverColor); /* Hover-Farbe von der Variable */
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .columnmedia {
+        flex-direction: column;
+    }
+  }
+  

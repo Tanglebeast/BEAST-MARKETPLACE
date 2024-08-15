@@ -374,6 +374,18 @@ p,span {
   gap: 5px;
 }
 
+.gap15 {
+  gap: 15px;
+}
+
+.bghome {
+  background-color: #191c2c;
+}
+
+.pb30 {
+  padding-bottom: 30px;
+}
+
 .mr15 {
   margin-right: 15px;
 }

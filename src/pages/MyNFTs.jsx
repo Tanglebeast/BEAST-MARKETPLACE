@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchAllNFTs, initializeMarketplace, getArtistWalletsAndFees, CONTRACT_OWNER_ADDRESS, setArtistWallet, refreshData, changeUserName, getUserName, getProfilePicture, setProfilePicture, pauseContract, unpauseContract, isContractPaused } from '../components/utils';
+import {
+  fetchAllNFTs,
+  initializeMarketplace,
+  getArtistWalletsAndFees,
+  CONTRACT_OWNER_ADDRESS,
+  setArtistWallet,
+  refreshData,
+  changeUserName,
+  getUserName,
+  getProfilePicture,
+  setProfilePicture,
+  pauseContract,
+  unpauseContract,
+  isContractPaused,
+  getTokenIdsOfOwner // Importiere die Funktion hier
+} from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import '../styles/MyNFTs.css';
 import ShortenAddress from '../components/ShortenAddress';
@@ -29,7 +44,7 @@ const MyNFTs = () => {
     artist: [], // e.g., ['Tanglebeasts', 'Vyzor']
     artwork: [] // e.g., ['LAST MOMENT OF SOON MAN', 'LAST MEAL ON SHIMMER']
   });
-  
+
   useEffect(() => {
     const checkContractPaused = async () => {
       if (marketplace) {
@@ -52,7 +67,6 @@ const MyNFTs = () => {
       console.error("Failed to toggle pause state:", error);
     }
   };
-  
 
   useEffect(() => {
     const savedAccount = localStorage.getItem('account');
@@ -72,19 +86,28 @@ const MyNFTs = () => {
     }
   }, [account, marketplace]);
 
-  const fetchMyNFTs = async () => {
-    let myNFTs = [];
-    for (const collection of nftCollections) {
-      const nfts = await fetchAllNFTs(collection.address, marketplace);
-      myNFTs = myNFTs.concat(nfts.filter(nft => nft.owner.toLowerCase() === account.toLowerCase()));
-    }
-    setAllNFTs(myNFTs);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    if (account) {
-      fetchMyNFTs();
+    if (account && marketplace) {
+      const fetchAndLogTokenIds = async () => {
+        try {
+          let myNFTs = [];
+          for (const collection of nftCollections) {
+            const tokenIds = await getTokenIdsOfOwner(collection.address, account);
+            console.log(`Token IDs for collection ${collection.address}:`, tokenIds);
+
+            // Fetch NFTs based on token IDs
+            const nfts = await Promise.all(tokenIds.map(tokenId => fetchAllNFTs(collection.address, marketplace)
+              .then(nfts => nfts.find(nft => nft.tokenId === tokenId))
+            ));
+            myNFTs = myNFTs.concat(nfts.filter(nft => nft !== undefined)); // Filter out undefined NFTs
+          }
+          setAllNFTs(myNFTs);
+          setLoading(false);
+        } catch (error) {
+          console.error('Error fetching token IDs:', error);
+        }
+      };
+      fetchAndLogTokenIds();
     }
   }, [account, marketplace]);
 
@@ -138,30 +161,30 @@ const MyNFTs = () => {
   const closeArtistWalletPopup = () => {
     setIsArtistWalletPopupOpen(false);
   };
+  
 
   const handleSetArtistWallet = async (contractAddress, artistWallet, artistFeePercent) => {
     try {
       if (!marketplace) throw new Error("Marketplace not initialized");
-  
+
       await setArtistWallet(contractAddress, artistWallet, artistFeePercent, account, marketplace);
-      
+
       console.log('Artist wallet and fee percentage set:', { contractAddress, artistWallet, artistFeePercent });
       closeArtistWalletPopup();
     } catch (error) {
       console.error("Failed to set artist wallet:", error);
     }
   };
-  
+
   getArtistWalletsAndFees().then((data) => {
     console.log(data);
   }).catch((error) => {
     console.error('Error:', error);
   });
-  
 
   // Filter NFTs based on filters state
   const filteredNFTs = allNFTs.filter(nft => {
-    const matchesSearchQuery = 
+    const matchesSearchQuery =
       nft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       getCollectionName(nft.contractAddress).toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -195,93 +218,84 @@ const MyNFTs = () => {
         <img className="loading-gif" src="/loading.gif" alt="Loading..." />
       )}
       {account && !loading && (
-        <>
-
-
+        <div className='w100'>
           <div className='flex space-between w100 mt50 myNFTMainDivMedia'>
-  <div className='w20 ButtonandFilterMedia'>
-
-  <div className='UserData onlymedia'>
-              <div className='ProfilePicture'>
-                <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
-              </div>
-              <h2>
-                {userName ? userName : <ShortenAddress address={account} />}
-              </h2>
-            </div>
-    
-  <div className="user-name-section">
-            
-            <div className='flex column'>
-              <button className='ChangeNamebutton' onClick={openUsernamePopup}>CHANGE USERNAME</button>
-              <button className='ChangeProfilePicturebutton' onClick={openProfilePicturePopup}>CHANGE PROFILE PICTURE</button>
-              {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
-                <>
-                  <button className='SetArtistWalletButton' onClick={openArtistWalletPopup}>SET ARTIST WALLET</button>
-                  <button className='PauseToggleButton alert-color' onClick={handlePauseToggle}>
-                    {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
-                  </button>
-                </>
-              )}
-
-
-            </div>
-          </div>
-
-    <MyNFTsFilter onFilterChange={setFilters} />
-  </div>
-  <div className='w80 flex column ml20 w100media'>
-  <div className='UserData OnlyDesktop'>
-              <div className='ProfilePicture'>
-                <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
-              </div>
-              <h2>
-                {userName ? userName : <ShortenAddress address={account} />}
-              </h2>
-            </div>
-            <div className='w30 w100media'>
-    <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-    </div>
-    <div className="nft-list-my">
-      {filteredNFTs.length === 0 ? (
-        <div className="no-nfts-container flex centered column">
-          <h2 className="no-nfts-message">No NFTs found...</h2>
-          <img src="/no-nft.png" alt="No NFTs" className="no-nfts-image" />
-        </div>
-      ) : (
-        filteredNFTs.map(nft => (
-          <div key={nft.tokenId} className="my-nft-card">
-            <Link to={`/collections/${nft.contractAddress}/${nft.tokenId}`}>
-              <div className='my-nft-image'>
-                <img src={nft.image} alt={nft.name} />
-              </div>
-              <div className='text-align-left w95 pt12 My-nft-details-Div'>
-                <div>
-                  <h3>{nft.name}</h3>
-                  <div className='flex center-ho owner-note'>
-                    <span>{getCollectionName(nft.contractAddress)}</span>
-                  </div>
-                  <div className='flex center-ho grey'>
-                    <span className='mt5'>Position: {nft.position}</span>
-                  </div>
+            <div className='w20 ButtonandFilterMedia'>
+              <div className='UserData onlymedia'>
+                <div className='ProfilePicture'>
+                  <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
                 </div>
-                <div>
-                  {Number(nft.price) === 0 ? (
-                    <p>NOT LISTED</p>
-                  ) : (
-                    <p className='my-nftListed'>LISTED</p>
+                <h2>
+                  {userName ? userName : <ShortenAddress address={account} />}
+                </h2>
+              </div>
+              <div className="user-name-section">
+                <div className='flex column'>
+                  <button className='ChangeNamebutton' onClick={openUsernamePopup}>CHANGE USERNAME</button>
+                  <button className='ChangeProfilePicturebutton' onClick={openProfilePicturePopup}>CHANGE PROFILE PICTURE</button>
+                  {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
+                    <>
+                      <button className='SetArtistWalletButton' onClick={openArtistWalletPopup}>SET ARTIST WALLET</button>
+                      <button className='PauseToggleButton alert-color' onClick={handlePauseToggle}>
+                        {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
-            </Link>
+              <MyNFTsFilter onFilterChange={setFilters} />
+            </div>
+            <div className='w80 flex column ml20 w100media'>
+              <div className='UserData OnlyDesktop'>
+                <div className='ProfilePicture'>
+                  <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
+                </div>
+                <h2>
+                  {userName ? userName : <ShortenAddress address={account} />}
+                </h2>
+              </div>
+              <div className='w30 w100media'>
+                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              </div>
+              <div className="nft-list-my">
+                {filteredNFTs.length === 0 ? (
+                  <div className="no-nfts-container flex centered column">
+                    <h2 className="no-nfts-message">No NFTs found...</h2>
+                    <img src="/no-nft.png" alt="No NFTs" className="no-nfts-image" />
+                  </div>
+                ) : (
+                  filteredNFTs.map(nft => (
+                    <div key={nft.tokenId} className="my-nft-card">
+                      <Link to={`/collections/${nft.contractAddress}/${nft.tokenId}`}>
+                        <div className='my-nft-image'>
+                          <img src={nft.image} alt={nft.name} />
+                        </div>
+                        <div className='text-align-left w95 pt12 My-nft-details-Div'>
+                          <div>
+                            <h3>{nft.name}</h3>
+                            <div className='flex center-ho owner-note'>
+                              <span>{getCollectionName(nft.contractAddress)}</span>
+                            </div>
+                            <div className='flex center-ho grey'>
+                              <span className='mt5'>Position: {nft.position}</span>
+                            </div>
+                          </div>
+                          <div>
+                            {Number(nft.price) === 0 ? (
+                              <p>NOT LISTED</p>
+                            ) : (
+                              <p className='my-nftListed'>LISTED</p>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
-        ))
-      )}
-    </div>
-  </div>
-</div>
-
-        </>
+        </div>
       )}
       {isPopupOpen && (
         <UsernamePopup
@@ -298,7 +312,7 @@ const MyNFTs = () => {
           closePopup={closeProfilePicturePopup}
         />
       )}
-       {isArtistWalletPopupOpen && (
+      {isArtistWalletPopupOpen && (
         <SetArtistWalletPopup
           handleSave={handleSetArtistWallet}
           closePopup={closeArtistWalletPopup}

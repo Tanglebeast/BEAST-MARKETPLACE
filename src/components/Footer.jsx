@@ -9,7 +9,7 @@ const Footer = () => {
             <div className='footerDiv'>
             <div className="footer-content">
                 <div className="footer-section about">
-                <a href="/">
+                <a href="/collections">
               <div className="logo-footer">
                 <img src="/fractalz-logo-black.svg" alt="Logo" />
               </div>

@@ -31,7 +31,7 @@ import { nftCollections } from './NFTCollections';
 import Imprint from './components/Imprint';
 import Terms from './components/TermsofUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Importieren Sie BrowserRouter
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importieren Sie BrowserRouter
 import NotFound from './components/Error404';
 
 const App = () => {
@@ -59,47 +59,47 @@ const App = () => {
   }, [account]);
 
   return (
-    <Router>
-      <div>
-        <div className='bg'></div>
-        <Header
-          isConnected={isConnected}
-          account={account}
-          connectWallet={() => {
-            console.log('Connecting wallet...');
-            connectWallet(setAccount);
-          }}
-          disconnectWallet={() => {
-            console.log('Disconnecting wallet...');
-            disconnectWallet(setAccount, setIsConnected);
-          }}
-        />
-        <ChangeTheme />
-        <div className="MainDiv">
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/collections" element={<CollectionCards showSearchBar={true} showFilter={true} selectedNetwork={selectedNetwork} />} />
-            <Route path="/wallet" element={<MyNFTs />} />
-            <Route path="/artists" element={<ArtistPage />} />
-            <Route path="/nfts" element={<AllNFTs />} />
-            <Route path="/fairmint" element={<FairMintCollections />} />
-            <Route path="/fairmint/:collectionaddress" element={<MintNFT />} />
-            <Route path="/users" element={<AllUsers />} />
-            <Route path="/faq" element={<Accordion />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/imprint" element={<Imprint />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/artists/:artistname" element={<ArtistProfile />} />
-            <Route path="/users/:walletAddress" element={<UserNFTs />} />
-            <Route path="/collections/:collectionaddress" element={<CollectionDetail />} />
-            <Route path="/collections/:collectionaddress/:tokenid" element={<NFTDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-        <Footer />
-      </div>
-    </Router>
+<Router>
+  <div>
+    <div className='bg'></div>
+    <Header
+      isConnected={isConnected}
+      account={account}
+      connectWallet={() => {
+        console.log('Connecting wallet...');
+        connectWallet(setAccount);
+      }}
+      disconnectWallet={() => {
+        console.log('Disconnecting wallet...');
+        disconnectWallet(setAccount, setIsConnected);
+      }}
+    />
+    <ChangeTheme />
+    <div className="MainDiv">
+      <Routes>
+        <Route path="/" element={<Navigate to="/collections" replace />} />
+        <Route path="/collections" element={<CollectionCards showSearchBar={true} showFilter={true} selectedNetwork={selectedNetwork} />} />
+        <Route path="/wallet" element={<MyNFTs />} />
+        <Route path="/artists" element={<ArtistPage />} />
+        <Route path="/nfts" element={<AllNFTs />} />
+        <Route path="/fairmint" element={<FairMintCollections />} />
+        <Route path="/fairmint/:collectionaddress" element={<MintNFT />} />
+        <Route path="/users" element={<AllUsers />} />
+        <Route path="/faq" element={<Accordion />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/imprint" element={<Imprint />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/artists/:artistname" element={<ArtistProfile />} />
+        <Route path="/users/:walletAddress" element={<UserNFTs />} />
+        <Route path="/collections/:collectionaddress" element={<CollectionDetail />} />
+        <Route path="/collections/:collectionaddress/:tokenid" element={<NFTDetail />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+    <Footer />
+  </div>
+</Router>
   );
 };
 

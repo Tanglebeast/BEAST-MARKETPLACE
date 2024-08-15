@@ -29,6 +29,21 @@ const NetworkselectionDropdown = ({ onNetworkChange }) => {
   const [isDisabled, setIsDisabled] = useState(false);
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const chainFromUrl = urlParams.get('chain');
+
+    if (chainFromUrl && networks[chainFromUrl]) {
+      setSelectedNetwork(chainFromUrl);
+      localStorage.setItem('selectedNetwork', chainFromUrl);
+
+      // Entfernen der URL-Parameter
+      urlParams.delete('chain');
+      const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
+      window.history.replaceState(null, '', newUrl);
+
+      window.location.reload();  // Seite neu laden
+    }
+
     const path = window.location.pathname;
     const pathSegments = path.split('/').filter(segment => segment.length > 0);
 
@@ -67,7 +82,7 @@ const NetworkselectionDropdown = ({ onNetworkChange }) => {
       case 'bnbchain':
         return '0x61'; // Chain ID für BNB EVM Testnet
       case 'polygon':
-        return '0x13882'; // Chain ID für BNB EVM Testnet
+        return '0x13882'; // Chain ID für Polygon EVM Testnet
       default:
         return '';
     }

@@ -13,6 +13,7 @@ import NetworkselectionDropdown from '../components/NetworkselectionDropdown'; /
 import NetworkHome from '../components/NetworkHome';
 import EventsHome from '../components/ExclusiveEventsHome';
 import SupportArtistsHome from '../components/SupportArtistsHome';
+import CrosschainHome from '../components/CrosschainHome';
 
 export function Homepage() {
   const [selectedNetwork, setSelectedNetwork] = useState(localStorage.getItem('selectedNetwork') || 'shimmerevm');
@@ -23,15 +24,15 @@ export function Homepage() {
         <HomeBanner />
       </div>
       <div className='w100 centered'>
-        <NetworkHome />
+        <SupportArtistsHome />
+      </div>
+      <div className='w100 centered'>
+        <CrosschainHome />
       </div>
       <div className='w100 centered'>
         <EventsHome />
       </div>
-      <div className='w100 centered'>
-        <SupportArtistsHome />
-      </div>
-      <div className='w100 centered column'>
+      <div className='w100 centered column bghome pb30'>
         <ArtistPage limit={4} />
       </div>
       <div className='w100 centered column FaqHome OnlyDesktop'>
