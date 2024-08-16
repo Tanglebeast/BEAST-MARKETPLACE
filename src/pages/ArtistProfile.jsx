@@ -36,12 +36,15 @@ const ArtistProfile = () => {
               <p>{artist.description}</p>
             </div>
           <div className="social-links">
+            <div>
             <div className='ArtistNetworks'>
             <h4>NETWORKS</h4>
             {currencyIcons.map((icon, index) => (
                 <img key={index} src={icon} alt="currency icon" className="network-icon mr5" />
               ))}
             </div>
+            </div>
+            <div>
           <h4>SOCIALS</h4>
             {artist.twitter && (
               <a href={artist.twitter} target="_blank" rel="noopener noreferrer">
@@ -63,6 +66,7 @@ const ArtistProfile = () => {
                 <img src="/website.png" alt="Website Icon" />
               </a>
             )}
+          </div>
           </div>
           </div>
       </div>

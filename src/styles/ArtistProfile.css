@@ -79,3 +79,37 @@
   .social-links a:hover{
     transform: scale(1.07);
 }
+
+@media (max-width: 768px) {
+  .profile-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .content {
+    margin-left: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .profile-info {
+    width: 80%;
+  }
+
+  .social-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+  }
+
+  .ArtistNetworks {
+    text-align: left;
+  }
+
+  .banner {
+    height: 250px;
+  }
+}

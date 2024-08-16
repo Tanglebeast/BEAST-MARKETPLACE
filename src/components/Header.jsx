@@ -84,7 +84,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
   return (
     <header className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <nav className="nav-container">
-        <a href="/collections" className="title">
+        <a href="https://fractalz.xyz" className="title">
           <img src="/fractalz-logo-black.svg" alt="NFT Marketplace Logo" className="logo" />
         </a>
         <label className="hamburger">
