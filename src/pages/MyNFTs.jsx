@@ -14,7 +14,7 @@ import {
   pauseContract,
   unpauseContract,
   isContractPaused,
-  getTokenIdsOfOwner // Importiere die Funktion hier
+  getTokenIdsOfOwner
 } from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import '../styles/MyNFTs.css';
@@ -33,17 +33,18 @@ const MyNFTs = () => {
   const [userName, setUserName] = useState('');
   const [newUserName, setNewUserName] = useState('');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [profilePicture, setProfilePictureState] = useState('/placeholder-PFP-black.png'); // Default profile picture
-  const [bannerPicture, setBannerPicture] = useState('/placeholder-PFP-banner.png'); // Default banner picture
+  const [profilePicture, setProfilePictureState] = useState('/placeholder-PFP-black.png');
+  const [bannerPicture, setBannerPicture] = useState('/placeholder-PFP-banner.png');
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isArtistWalletPopupOpen, setIsArtistWalletPopupOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isContractPausedState, setIsContractPausedState] = useState(false);
   const [filters, setFilters] = useState({
-    availability: [], // e.g., ['LISTED', 'NOT LISTED']
-    artist: [], // e.g., ['Tanglebeasts', 'Vyzor']
-    artwork: [] // e.g., ['LAST MOMENT OF SOON MAN', 'LAST MEAL ON SHIMMER']
+    availability: [],
+    artist: [],
+    artwork: []
   });
+  const [ownedCollections, setOwnedCollections] = useState([]);
 
   useEffect(() => {
     const checkContractPaused = async () => {
@@ -81,7 +82,7 @@ const MyNFTs = () => {
       getUserName(account, marketplace).then(setUserName);
       getProfilePicture(account, marketplace).then(picture => {
         setProfilePictureState(picture || '/placeholder-PFP-black.png');
-        setBannerPicture(picture || '/placeholder-PFP-banner.png'); // Update the banner picture if a profile picture is available
+        setBannerPicture(picture || '/placeholder-PFP-banner.png');
       });
     }
   }, [account, marketplace]);
@@ -91,17 +92,22 @@ const MyNFTs = () => {
       const fetchAndLogTokenIds = async () => {
         try {
           let myNFTs = [];
+          let ownedCollectionsSet = new Set();
           for (const collection of nftCollections) {
             const tokenIds = await getTokenIdsOfOwner(collection.address, account);
             console.log(`Token IDs for collection ${collection.address}:`, tokenIds);
 
-            // Fetch NFTs based on token IDs
+            if (tokenIds.length > 0) {
+              ownedCollectionsSet.add(collection.name);
+            }
+
             const nfts = await Promise.all(tokenIds.map(tokenId => fetchAllNFTs(collection.address, marketplace)
               .then(nfts => nfts.find(nft => nft.tokenId === tokenId))
             ));
-            myNFTs = myNFTs.concat(nfts.filter(nft => nft !== undefined)); // Filter out undefined NFTs
+            myNFTs = myNFTs.concat(nfts.filter(nft => nft !== undefined));
           }
           setAllNFTs(myNFTs);
+          setOwnedCollections(Array.from(ownedCollectionsSet));
           setLoading(false);
         } catch (error) {
           console.error('Error fetching token IDs:', error);
@@ -161,7 +167,6 @@ const MyNFTs = () => {
   const closeArtistWalletPopup = () => {
     setIsArtistWalletPopupOpen(false);
   };
-  
 
   const handleSetArtistWallet = async (contractAddress, artistWallet, artistFeePercent) => {
     try {
@@ -182,23 +187,19 @@ const MyNFTs = () => {
     console.error('Error:', error);
   });
 
-  // Filter NFTs based on filters state
   const filteredNFTs = allNFTs.filter(nft => {
     const matchesSearchQuery =
       nft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       getCollectionName(nft.contractAddress).toLowerCase().includes(searchQuery.toLowerCase());
 
-    // Filter by availability
     const matchesAvailability = filters.availability.length === 0 || (
       (filters.availability.includes('LISTED') && nft.price > 0) ||
       (filters.availability.includes('NOT LISTED') && nft.price === 0)
     );
 
-    // Filter by artist
     const collection = nftCollections.find(col => col.address === nft.contractAddress);
     const matchesArtist = filters.artist.length === 0 || (collection && filters.artist.includes(collection.artist));
 
-    // Filter by artwork
     const matchesArtwork = filters.artwork.length === 0 || (collection && filters.artwork.includes(collection.name));
 
     return matchesSearchQuery && matchesAvailability && matchesArtist && matchesArtwork;
@@ -243,7 +244,7 @@ const MyNFTs = () => {
                   )}
                 </div>
               </div>
-              <MyNFTsFilter onFilterChange={setFilters} />
+              <MyNFTsFilter onFilterChange={setFilters} ownedCollections={ownedCollections} />
             </div>
             <div className='w80 flex column ml20 w100media'>
               <div className='UserData OnlyDesktop'>

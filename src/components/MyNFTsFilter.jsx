@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/CollectionFilter.css';
 import { nftCollections } from '../NFTCollections';
 
-const MyNFTsFilter = ({ onFilterChange }) => {
+const MyNFTsFilter = ({ onFilterChange, ownedCollections }) => {
     const [activeIndices, setActiveIndices] = useState([]);
     const [selectedWords, setSelectedWords] = useState({ artist: [], availability: [], artwork: [] });
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -22,7 +22,7 @@ const MyNFTsFilter = ({ onFilterChange }) => {
                 : [...prevState[type], word];
 
             const newSelectedWords = { ...prevState, [type]: updatedWords };
-            onFilterChange(newSelectedWords); // Update filters in parent component
+            onFilterChange(newSelectedWords);
             return newSelectedWords;
         });
     };
@@ -35,12 +35,12 @@ const MyNFTsFilter = ({ onFilterChange }) => {
         },
         {
             question: 'ARTIST',
-            words: [...new Set(nftCollections.map(collection => collection.artist))],
+            words: [...new Set(nftCollections.filter(collection => ownedCollections.includes(collection.name)).map(collection => collection.artist))],
             type: 'artist'
         },
         {
             question: 'ARTWORK',
-            words: [...new Set(nftCollections.map(collection => collection.name))],
+            words: ownedCollections,
             type: 'artwork'
         }
     ];
@@ -53,7 +53,7 @@ const MyNFTsFilter = ({ onFilterChange }) => {
         };
 
         window.addEventListener('resize', handleResize);
-        handleResize(); // Initial check
+        handleResize();
 
         return () => {
             window.removeEventListener('resize', handleResize);
@@ -62,11 +62,9 @@ const MyNFTsFilter = ({ onFilterChange }) => {
 
     useEffect(() => {
         if (isMobile) {
-            // Keep all items closed on mobile
             setActiveIndices([]);
         } else {
-            // Open some items if not mobile
-            setActiveIndices([0, 1, 2]); // Example: Open all by default
+            setActiveIndices([0, 1, 2]);
         }
     }, [isMobile]);
 

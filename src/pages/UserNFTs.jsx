@@ -6,7 +6,7 @@ import {
   refreshData,
   getUserName,
   getProfilePicture,
-  getTokenIdsOfOwner // Importiere hier
+  getTokenIdsOfOwner
 } from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import '../styles/MyNFTs.css';
@@ -28,6 +28,7 @@ const UserNFTs = () => {
     artist: [],
     artwork: []
   });
+  const [ownedCollections, setOwnedCollections] = useState([]);
   const { walletAddress } = useParams();
 
   useEffect(() => {
@@ -53,17 +54,22 @@ const UserNFTs = () => {
   const fetchUserNFTs = async () => {
     try {
       let userNFTs = [];
+      let ownedCollectionsSet = new Set();
       for (const collection of nftCollections) {
         const tokenIds = await getTokenIdsOfOwner(collection.address, account);
         console.log(`Token IDs for collection ${collection.address}:`, tokenIds);
 
-        // Fetch NFTs based on token IDs
+        if (tokenIds.length > 0) {
+          ownedCollectionsSet.add(collection.name);
+        }
+
         const nfts = await Promise.all(tokenIds.map(tokenId => fetchAllNFTs(collection.address, marketplace)
           .then(nfts => nfts.find(nft => nft.tokenId === tokenId))
         ));
-        userNFTs = userNFTs.concat(nfts.filter(nft => nft !== undefined)); // Filter out undefined NFTs
+        userNFTs = userNFTs.concat(nfts.filter(nft => nft !== undefined));
       }
       setAllNFTs(userNFTs);
+      setOwnedCollections(Array.from(ownedCollectionsSet));
       setLoading(false);
     } catch (error) {
       console.error('Error fetching token IDs:', error);
@@ -125,7 +131,7 @@ const UserNFTs = () => {
             </div>
 
             <div className='w20 ButtonandFilterMedia'>
-              <MyNFTsFilter onFilterChange={setFilters} />
+              <MyNFTsFilter onFilterChange={setFilters} ownedCollections={ownedCollections} />
             </div>
             <div className='w80 flex column ml20 w100media'>
               <div className="profile-picture-section flex column mt5 OnlyDesktop">

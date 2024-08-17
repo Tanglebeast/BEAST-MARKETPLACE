@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract NFTMarketplace is Ownable, Pausable {
+contract NFTMarketplace is Ownable, Pausable, ReentrancyGuard {
 
     constructor() Ownable(msg.sender) {}
 
@@ -62,58 +64,58 @@ contract NFTMarketplace is Ownable, Pausable {
     }
 
     // Funktion, um ein NFT zu kaufen
-    function buyNFT(uint256 _index) public payable whenNotPaused {
-    require(_index < nftsForSale.length, "Invalid index");
-    NFT memory nft = nftsForSale[_index];
-    require(msg.value == nft.price, "Incorrect price sent");
+     function buyNFT(uint256 _index) public payable whenNotPaused nonReentrant {
+        require(_index < nftsForSale.length, "Invalid index");
+        NFT memory nft = nftsForSale[_index];
+        require(msg.value == nft.price, "Incorrect price sent");
 
-    address artistWallet = collectionToArtistWallet[nft.contractAddress];
-    uint256 artistFeePercent = collectionToArtistFee[nft.contractAddress];
-    uint256 artistFee = (nft.price * artistFeePercent) / 100;
-    uint256 sellerProceeds = nft.price - artistFee;
+        address artistWallet = collectionToArtistWallet[nft.contractAddress];
+        uint256 artistFeePercent = collectionToArtistFee[nft.contractAddress];
+        uint256 artistFee = (nft.price * artistFeePercent) / 100;
+        uint256 sellerProceeds = nft.price - artistFee;
 
-    require(nft.price >= artistFee, "Artist fee cannot be more than the price"); // Sicherheitshalber
+        require(nft.price >= artistFee, "Artist fee cannot be more than the price");
 
-    if (artistWallet != address(0)) {
-        payable(artistWallet).transfer(artistFee);
+        if (artistWallet != address(0)) {
+            payable(artistWallet).transfer(artistFee);
+        }
+        payable(nft.seller).transfer(sellerProceeds);
+
+        // NFT transfer
+        IERC721(nft.contractAddress).safeTransferFrom(nft.seller, msg.sender, nft.tokenId);
+
+        emit NFTSold(msg.sender, nft.seller, nft.contractAddress, nft.tokenId, nft.price);
+        delete nftPrice[nft.contractAddress][nft.tokenId];
+        removeNFT(_index);
     }
-    nft.seller.transfer(sellerProceeds);
-
-    // NFT übertragen
-    IERC721(nft.contractAddress).safeTransferFrom(nft.seller, msg.sender, nft.tokenId);
-
-    emit NFTSold(msg.sender, nft.seller, nft.contractAddress, nft.tokenId, nft.price);
-    delete nftPrice[nft.contractAddress][nft.tokenId];
-    removeNFT(_index);
-}
 
 
-    // Funktion, um alle NFTs zum Verkauf abzurufen
+    // Get all NFTs for sale
     function getNFTsForSale() public view returns (NFT[] memory) {
         return nftsForSale;
     }
 
-    // Funktion, um ein NFT aus der Verkaufsliste zu entfernen und den Verkauf abzubrechen
+    // Remove NFT from NFTs for sale list
     function cancelListing(uint256 _index) public whenNotPaused {
         require(_index < nftsForSale.length, "Invalid index");
         require(nftsForSale[_index].seller == msg.sender, "You are not the seller of this NFT");
 
         emit NFTListingCancelled(msg.sender, nftsForSale[_index].contractAddress, nftsForSale[_index].tokenId);
 
-        // Preis im Mapping auf 0 setzen oder entfernen
+        // Set price in mapping on 0
         delete nftPrice[nftsForSale[_index].contractAddress][nftsForSale[_index].tokenId];
 
         removeNFT(_index);
     }
 
-    // Funktion, um ein NFT aus der Verkaufsliste zu entfernen
+    // Remove NFT from NFTs for sale list
     function removeNFT(uint256 _index) internal {
         require(_index < nftsForSale.length, "Invalid index");
         nftsForSale[_index] = nftsForSale[nftsForSale.length - 1];
         nftsForSale.pop();
     }
 
-    // Funktion, um Details eines NFTs abzurufen, einschließlich des Preises
+    // Get the details of an NFT
     function getNFTDetails(address _contractAddress, uint256 _tokenId) public view returns (string memory name, string memory symbol, string memory tokenURI, address owner, uint256 price) {
         IERC721Metadata nft = IERC721Metadata(_contractAddress);
         
@@ -124,7 +126,7 @@ contract NFTMarketplace is Ownable, Pausable {
         price = nftPrice[_contractAddress][_tokenId]; // Preis aus dem Mapping abrufen
     }
 
-    // Neue Funktion, um den Index eines NFTs zu erhalten
+    // Get NFT Index
     function getNFTIndex(address _contractAddress, uint256 _tokenId) public view returns (uint256) {
         for (uint256 i = 0; i < nftsForSale.length; i++) {
             if (nftsForSale[i].contractAddress == _contractAddress && nftsForSale[i].tokenId == _tokenId) {
@@ -134,30 +136,30 @@ contract NFTMarketplace is Ownable, Pausable {
         revert("NFT not found in sale list");
     }
 
-    // Funktion, um den Benutzernamen zu ändern
+    // Change username
     function changeUserName(string calldata newUserName) public whenNotPaused {
         require(bytes(newUserName).length > 0, "UserName cannot be empty");
         require(userNameToAddress[newUserName] == address(0) || userNameToAddress[newUserName] == msg.sender, "UserName already taken");
 
-        // Den alten Benutzernamen entfernen
+        // Remove username
         string memory oldUserName = userNames[msg.sender];
         if (bytes(oldUserName).length > 0) {
             delete userNameToAddress[oldUserName];
         }
 
-        // Neuen Benutzernamen setzen
+        // Set new username
         userNames[msg.sender] = newUserName;
         userNameToAddress[newUserName] = msg.sender;
 
         emit UserNameChanged(msg.sender, newUserName);
     }
 
-    // Funktion, um den Benutzernamen abzurufen
+    // Call username
     function getUserName(address user) public view returns (string memory) {
         return userNames[user];
     }
 
-    // Funktion, um das Profilbild zu ändern
+    // Change profileimage
     function setProfilePicture(address _contractAddress, uint256 _tokenId, string memory _imageUrl) public whenNotPaused {
         IERC721 nft = IERC721(_contractAddress);
         require(nft.ownerOf(_tokenId) == msg.sender, "You are not the owner of this NFT");
@@ -167,12 +169,12 @@ contract NFTMarketplace is Ownable, Pausable {
         emit ProfilePictureChanged(msg.sender, _imageUrl);
     }
 
-    // Funktion, um das Profilbild abzurufen
+    // Call profileimage
     function getProfilePicture(address user) public view returns (string memory) {
         return userProfilePictures[user];
     }
 
-    // Funktion, um die Künstler-Wallet und den Prozentsatz zu setzen
+    // Set Artistfees
     function setArtistWallet(address _contractAddress, address _artistWallet, uint256 _artistFeePercent) external onlyOwner {
         require(_artistFeePercent <= 100, "Artist fee percent must be between 0 and 100");
         collectionToArtistWallet[_contractAddress] = _artistWallet;
