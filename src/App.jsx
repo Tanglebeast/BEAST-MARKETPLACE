@@ -33,6 +33,7 @@ import Terms from './components/TermsofUse';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importieren Sie BrowserRouter
 import NotFound from './components/Error404';
+import TestnetFaucets from './pages/TestnetFaucets';
 
 const App = () => {
   const [account, setAccount] = useState(localStorage.getItem('account') || '');
@@ -90,6 +91,7 @@ const App = () => {
         <Route path="/imprint" element={<Imprint />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/faucet" element={<TestnetFaucets />} />
         <Route path="/artists/:artistname" element={<ArtistProfile />} />
         <Route path="/users/:walletAddress" element={<UserNFTs />} />
         <Route path="/collections/:collectionaddress" element={<CollectionDetail />} />

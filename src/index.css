@@ -193,6 +193,10 @@ p,span {
   font-size: 20px;
 }
 
+.s14 {
+  font-size: 14px;
+}
+
 .s16 {
   font-size: 16px;
 }
@@ -282,6 +286,10 @@ p,span {
 
 .w100 {
   width: 100%;
+}
+
+.mb60 {
+  margin-bottom: 60px;
 }
 
 .w10 {
