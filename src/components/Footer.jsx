@@ -37,7 +37,7 @@ const Footer = () => {
                     <h2>Quick Links</h2>
                     <ul>
                         <li><a href="https://fractalz.xyz">Homepage</a></li>
-                        <li><a href="/faucet">Get Testtokens</a></li>
+                        <li><a href="/faucet">Faucets</a></li>
                         <li><a href="/collections">Gallery</a></li>
                         <li><a href="/contact">Contact Us</a></li>
                         <li><a href="/faq">FAQ</a></li>
