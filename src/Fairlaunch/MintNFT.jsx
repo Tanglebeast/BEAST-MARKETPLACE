@@ -8,7 +8,8 @@ import ArtworkDetails from '../components/ArtworkDetails';
 import BigNumber from 'bignumber.js';
 import '../styles/Fairlaunch.css';
 import { web3OnlyRead, connectWallet } from '../components/utils';
-import { getRpcUrl } from '../components/networkConfig';
+import { getRpcUrl, getCurrentNetwork } from '../components/networkConfig';
+
 
 // Token-IDs und Besitzer abrufen
 const getUserTokenDetails = async (contract, account) => {
@@ -19,20 +20,20 @@ const getUserTokenDetails = async (contract, account) => {
 
     try {
         const balance = account ? await contract.methods.balanceOf(account).call() : 0;
-        console.log("Token Balance:", balance); // Debugging-Ausgabe
+        // console.log("Token Balance:", balance); // Debugging-Ausgabe
 
         for (let i = 0; i < balance; i++) {
             const tokenId = await contract.methods.tokenOfOwnerByIndex(account, i).call();
-            console.log("Token ID:", tokenId); // Debugging-Ausgabe
+            // console.log("Token ID:", tokenId); // Debugging-Ausgabe
 
             const tokenURI = await contract.methods.tokenURI(tokenId).call(); // Abrufen der Token URI
-            console.log("Token URI for Token ID", tokenId, ":", tokenURI); // Alte URI in der Konsole anzeigen
+            // console.log("Token URI for Token ID", tokenId, ":", tokenURI); // Alte URI in der Konsole anzeigen
 
             // Entferne den ersten Abschnitt der URI bis zum "/"
             const splitURI = tokenURI.split('/');
             const newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}.json`;
 
-            console.log("Formatted Token URI for Token ID", tokenId, ":", newURI); // Neue formatierte URI in der Konsole anzeigen
+            // console.log("Formatted Token URI for Token ID", tokenId, ":", newURI); // Neue formatierte URI in der Konsole anzeigen
 
             // Abrufen der JSON-Daten
             const response = await fetch(newURI);
@@ -41,7 +42,7 @@ const getUserTokenDetails = async (contract, account) => {
             tokenIds.push(tokenId);
 
             const owner = account ? await contract.methods.ownerOf(tokenId).call() : "Unknown";
-            console.log("Owner for Token ID", tokenId, ":", owner); // Debugging-Ausgabe
+            // console.log("Owner for Token ID", tokenId, ":", owner); // Debugging-Ausgabe
 
             ownerDetails.push({
                 tokenId,
@@ -84,7 +85,7 @@ const MintNFT = () => {
     };
 
     const refreshContractData = useCallback(async () => {
-        console.log("Refresh Contract Data initiated.");
+        // console.log("Refresh Contract Data initiated.");
         if (contract) {
             setLoading(true);
             try {
@@ -111,11 +112,11 @@ const MintNFT = () => {
                 const userTokenDetails = await getUserTokenDetails(contract, account);
                 setTokenDetails(userTokenDetails);
 
-                console.log("Max Supply:", maxSupply);
-                console.log("User Limit:", userLimit);
-                console.log("Total Supply:", totalSupply);
-                console.log("Wallet NFT Count:", walletNFTCount);
-                console.log("Token Details:", userTokenDetails);
+                // console.log("Max Supply:", maxSupply);
+                // console.log("User Limit:", userLimit);
+                // console.log("Total Supply:", totalSupply);
+                // console.log("Wallet NFT Count:", walletNFTCount);
+                // console.log("Token Details:", userTokenDetails);
             } catch (error) {
                 console.error("Error reading contract data:", error);
                 showCustomPopup('Please switch into the correct Network.');
@@ -123,7 +124,7 @@ const MintNFT = () => {
                 setLoading(false);
             }
         } else {
-            console.log("Contract is null. Cannot refresh data.");
+            // console.log("Contract is null. Cannot refresh data.");
         }
     }, [contract, account]);
 
@@ -139,11 +140,11 @@ const MintNFT = () => {
             if (isAccountPresent) {
                 // Verwende den Web3-Provider von MetaMask
                 web3 = new Web3(window.ethereum);
-                console.log('Metamask als verbunden verwendet.');
+                // console.log('Metamask connected.');
             } else {
                 // Verwende den readonly Web3-Provider
                 web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
-                console.log('Web3OnlyRead als verbunden verwendet.');
+                // console.log('Web3OnlyRead connected.');
             }
     
             const accounts = await web3.eth.getAccounts();
@@ -159,7 +160,7 @@ const MintNFT = () => {
             const currentUrl = window.location.pathname;
             const contractAddressFromURL = currentUrl.split('/').pop();
     
-            console.log("Contract Address from URL:", contractAddressFromURL);
+            // console.log("Contract Address from URL:", contractAddressFromURL);
     
             const collection = nftCollections.find(collection => collection.address.toLowerCase() === contractAddressFromURL.toLowerCase());
             setSelectedCollection(collection);
@@ -168,8 +169,8 @@ const MintNFT = () => {
                 const contractAbi = collection.abi;
                 const contractAddress = collection.address;
     
-                console.log("Contract ABI:", contractAbi);
-                console.log("Contract Address:", contractAddress);
+                // console.log("Contract ABI:", contractAbi);
+                // console.log("Contract Address:", contractAddress);
     
                 if (contractAbi) {
                     const contractInstance = new web3.eth.Contract(contractAbi, contractAddress);
@@ -177,7 +178,7 @@ const MintNFT = () => {
     
                     // Hole die Chain ID und logge sie
                     const chainId = await web3.eth.getChainId();
-                    console.log("Current Chain ID:", chainId); // Logge die Chain ID
+                    // console.log("Current Chain ID:", chainId); // Logge die Chain ID
     
                 } else {
                     showCustomPopup('ABI nicht gefunden für die ausgewählte Vertragsadresse');
@@ -230,8 +231,8 @@ const MintNFT = () => {
             // Gesamtpreis berechnen
             const totalPrice = new BigNumber(pricePerNFT).times(quantity).toFixed(); // 'toFixed' für eine präzise Dezimaldarstellung
 
-            console.log('Preis pro NFT (in Wei):', pricePerNFT);
-            console.log('Gesamtpreis (in Wei):', totalPrice);
+            console.log('Price per NFT (in Wei):', pricePerNFT);
+            console.log('Foll price (in Wei):', totalPrice);
 
             try {
                 await contract.methods.mint(quantity).send({
@@ -240,11 +241,11 @@ const MintNFT = () => {
                     gasPrice
                 })
                 .on('receipt', async (receipt) => {
-                    console.log('Transaktionsbeleg:', receipt);
+                    console.log('Transaktionbill:', receipt);
 
                     if (receipt.events.Transfer) {
                         const tokenId = receipt.events.Transfer.returnValues.tokenId;
-                        console.log('Gemintete Token-ID:', tokenId);
+                        // console.log('Gemintete Token-ID:', tokenId);
 
                         // Abrufen der Details für den neu geminteten Token
                         const tokenURI = await contract.methods.tokenURI(tokenId).call();
@@ -266,22 +267,22 @@ const MintNFT = () => {
                         setTokenDetails(mintedTokenDetails);
                         showSuccessPopup('MINT SUCCESSFULL', mintedTokenDetails);
                     } else {
-                        console.log('Kein Transfer-Event im Beleg gefunden');
-                        showSuccessPopup('Mint erfolgreich');
+                        // console.log('Kein Transfer-Event im Beleg gefunden');
+                        showSuccessPopup('Mint successfull');
                     }
 
                     refreshContractData();
                 })
                 .on('error', (error) => {
                     console.error(error);
-                    showCustomPopup('Mint fehlgeschlagen');
+                    showCustomPopup('Mint failed');
                 });
             } catch (error) {
                 console.error(error);
-                showCustomPopup('Minting-Transaktion fehlgeschlagen');
+                showCustomPopup('Minting-transaction failed');
             }
         } else {
-            showCustomPopup('Ungültige Menge oder Sammlung nicht ausgewählt');
+            showCustomPopup('wrong amount or no chosen collection');
         }
     };
 

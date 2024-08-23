@@ -5,22 +5,37 @@ import '../styles/Collections.css';
 import SearchBar from '../components/SearchBar';
 import CollectionFilter from '../components/CollectionFilter';
 import { web3OnlyRead } from '../components/utils';
+import { getRpcUrl, getCurrentNetwork } from '../components/networkConfig';
 
 const FairMintCollections = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionDetails, setCollectionDetails] = useState({});
   const [filters, setFilters] = useState({ artists: [], networks: [] });
   const [loading, setLoading] = useState(true); // Zustand für das Laden hinzufügen
+  const [currentNetwork, setCurrentNetwork] = useState(''); // Zustand für das aktuelle Netzwerk hinzufügen
+
+  useEffect(() => {
+    const fetchCurrentNetwork = async () => {
+      try {
+        const network = await getCurrentNetwork(); // Hole das aktuelle Netzwerk
+        setCurrentNetwork(network);
+      } catch (error) {
+        console.error('Error fetching current network:', error);
+      }
+    };
+
+    fetchCurrentNetwork();
+  }, []);
 
   useEffect(() => {
     const fetchCollectionDetails = async () => {
-      // if (!window.ethereum) {
-      //   console.error('MetaMask is not installed');
-      //   setLoading(false); // Setze loading auf false, wenn MetaMask nicht installiert ist
-      //   return;
-      // }
+      if (!window.ethereum) {
+        console.error('MetaMask is not installed');
+        setLoading(false); // Setze loading auf false, wenn MetaMask nicht installiert ist
+        return;
+      }
 
-      const web3 = web3OnlyRead
+      const web3 = web3OnlyRead;
 
       try {
         const details = await Promise.all(
@@ -34,11 +49,6 @@ const FairMintCollections = () => {
               const maxSupply = Number(await contract.methods.MAX_SUPPLY().call());
               const availableSupply = maxSupply - totalSupply;
 
-              console.log('Contract Address:', collection.address);
-              console.log('Total Supply:', totalSupply);
-              console.log('Max Supply:', maxSupply);
-              console.log('Available Supply:', availableSupply);
-
               return {
                 address: collection.address,
                 totalSupply,
@@ -46,7 +56,6 @@ const FairMintCollections = () => {
                 availableSupply, // Berechneter Wert für verfügbare Menge
               };
             } catch (error) {
-              console.error('Error fetching contract details:', error);
               return {
                 address: collection.address,
                 totalSupply: null,
@@ -74,6 +83,7 @@ const FairMintCollections = () => {
 
   const filteredCollections = nftCollections
     .filter(collection =>
+      (collection.network === currentNetwork) && // Filtere nach aktuellem Netzwerk
       (collection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         collection.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
         collection.address.toLowerCase().includes(searchQuery.toLowerCase())) &&
@@ -101,7 +111,7 @@ const FairMintCollections = () => {
         <div className='w95 column flex flex-start ml20 mlnull centered-media'>
           <h2 className='text-align-left mt15 OnlyDesktop'>FAIRMINT</h2>
           <div className='w30 w100media'>
-          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           </div>
           {filteredCollections.length === 0 ? (
             <div className="no-nfts-container flex centered column">

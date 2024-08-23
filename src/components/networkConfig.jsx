@@ -1,11 +1,12 @@
 // src/utils/networkConfig.js
-const defaultNetwork = 'shimmerevm'; // Standardnetzwerk
+const defaultNetwork = 'iotaevm'; // Standardnetzwerk
 
 const networks = {
-  shimmerevm: 'https://json-rpc.evm.testnet.shimmer.network',
+  // shimmerevm: 'https://json-rpc.evm.testnet.shimmer.network',
   iotaevm: 'https://json-rpc.evm.testnet.iotaledger.net',
   bnbchain: 'https://data-seed-prebsc-1-s1.bnbchain.org:8545',
-  polygon: 'https://rpc-amoy.polygon.technology'
+  polygon: 'https://rpc-amoy.polygon.technology',
+  ethereum: 'wss://sepolia.drpc.org'
 };
 
 let currentNetwork = localStorage.getItem('selectedNetwork') || defaultNetwork;

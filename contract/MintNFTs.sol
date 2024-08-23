@@ -5,9 +5,10 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract FreeMintToken is ERC721Enumerable, Pausable, Ownable {
+contract FreeMintToken is ERC721Enumerable, Pausable, Ownable, ReentrancyGuard {
     using Strings for uint256;
 
     uint256 public constant USER_LIMIT = 10;
@@ -40,7 +41,8 @@ contract FreeMintToken is ERC721Enumerable, Pausable, Ownable {
         ownerShare = _share;
     }
 
-    function mint(uint256 quantity) external payable whenNotPaused {
+    function mint(uint256 quantity) external payable whenNotPaused nonReentrant {
+        require(quantity > 0, "Quantity must be greater than 0");
         require(_currentTokenId + quantity <= MAX_SUPPLY, "Not more supply left");
         require(balanceOf(msg.sender) + quantity <= USER_LIMIT, "User limit reached");
         require(msg.value >= mintPrice * quantity, "Incorrect payment amount");
@@ -50,12 +52,10 @@ contract FreeMintToken is ERC721Enumerable, Pausable, Ownable {
             _safeMint(msg.sender, _currentTokenId);
         }
 
-        // Calculate shares
         uint256 totalAmount = msg.value;
         uint256 ownerAmount = (totalAmount * ownerShare) / 100;
         uint256 paymentAmount = totalAmount - ownerAmount;
 
-        // Send the payment to the contract owner and the payment wallet
         (bool ownerSuccess, ) = owner().call{value: ownerAmount}("");
         require(ownerSuccess, "Owner payment transfer failed");
 
@@ -87,12 +87,10 @@ contract FreeMintToken is ERC721Enumerable, Pausable, Ownable {
         return _ownerOf(tokenId) != address(0);
     }
 
-    // Pause function
     function pause() external onlyOwner {
         _pause();
     }
 
-    // Unpause function
     function unpause() external onlyOwner {
         _unpause();
     }

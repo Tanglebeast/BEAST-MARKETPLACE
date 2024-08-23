@@ -351,6 +351,45 @@
 					"internalType": "address",
 					"name": "",
 					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "collectionPriceHistory",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "averagePrice",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "totalSales",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "floorPrice",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
 				}
 			],
 			"name": "collectionToArtistFee",
@@ -378,6 +417,64 @@
 					"internalType": "address",
 					"name": "",
 					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_contractAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_startTime",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_endTime",
+					"type": "uint256"
+				}
+			],
+			"name": "getAveragePriceInPeriod",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_contractAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_startTime",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_endTime",
+					"type": "uint256"
+				}
+			],
+			"name": "getFloorPriceInPeriod",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
 				}
 			],
 			"stateMutability": "view",
@@ -509,6 +606,35 @@
 			"inputs": [
 				{
 					"internalType": "address",
+					"name": "_contractAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_startTime",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_endTime",
+					"type": "uint256"
+				}
+			],
+			"name": "getTotalSalesInPeriod",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
 					"name": "user",
 					"type": "address"
 				}
@@ -519,6 +645,19 @@
 					"internalType": "string",
 					"name": "",
 					"type": "string"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "HISTORY_HOURS",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
 				}
 			],
 			"stateMutability": "view",
@@ -650,19 +789,23 @@
 	"networks": {
 		"//": "POLYGON TESTNET",
 	  "80002": {
-		"address": "0xfc591cf15d49C3cF185CE74A09769ed273404d38"
+		"address": "0x3BE9edEF5c1F12EF1698A19a069155b5A0b1031A"
+	  },
+	  "//": "ETHEREUM SEPOLIA TESTNET",
+	  "11155111": {
+		"address": "0xCd38449bFc122bA8CAcA3580968fA0536Bc4f80c"
 	  },
 	  "//": "BNBCHAIN",
 	  "97": {
-		"address": "0x0c5a85E7c687f83AeC5261E46D0880C3a9DD7fd1"
+		"address": "0x9Ca1711e023dd0Fa3FE30c0A0714F1ad53DCF5d6"
 	  },
 	  "//": "IOTA EVM",
 	  "1075": {
-		"address": "0x3B056C370a325b970e4c4cC150817AFD65466e28"
+		"address": "0xDC446Da886cF98ac5b910392d41D19BF3AAeCEbe"
 	  },
 	  "//": "SHIMMER EVM",
 	  "1073": {
-		"address": "0x333D9Fd3475A92410561462E9f0809dBbab613AB"
+		"address": "0xa6448EB186B425b57EC666cC69F18F0e5Bdbf41c"
 	  }
 	}
   }

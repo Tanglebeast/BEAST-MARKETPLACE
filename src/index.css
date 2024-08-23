@@ -205,6 +205,10 @@ p,span {
   font-size: 18px;
 }
 
+.s28 {
+  font-size: 28px;
+}
+
 .s24{
   font-size: 24px;
 }
@@ -305,8 +309,12 @@ p,span {
 }
 
 .wh27 {
-  width: 27px;
-  height: 27px;
+  width: 27px !important;
+  height: 27px !important;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .gap10 {
@@ -415,6 +423,10 @@ p,span {
   width: 60%;
 }
 
+.w70 {
+  width: 70%;
+}
+
 .h25 {
   height: 30px;
 }
@@ -427,6 +439,14 @@ p,span {
   margin-left: 20px;
 }
 
+.ml10 {
+  margin-left: 10px;
+}
+
+.ml5 {
+  margin-left: 5px;
+}
+
 .text-uppercase {
   text-transform: uppercase;
 }
@@ -435,11 +455,27 @@ p,span {
   margin-right: 5px;
 }
 
+.r50 {
+  border-radius: 50% !important;
+}
+
 .margin-0-10 {
   margin: 0 10%;
 }
 .h500 {
-  height: 500px;
+  height: 550px;
+}
+
+.hauto {
+  height: auto;
+}
+
+.h700 {
+  height: 700px;
+}
+
+.w91 {
+  width: 91%;
 }
 
 .h4-margin h4{

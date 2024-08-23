@@ -55,7 +55,7 @@ const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
 
   return (
     <div className="artwork-owner-ranking">
-      <h2>Top Owners</h2>
+      <h2 className='mt5'>Top Owners</h2>
       <table>
         <thead>
           <tr>

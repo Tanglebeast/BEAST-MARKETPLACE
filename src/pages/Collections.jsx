@@ -5,11 +5,13 @@ import ShortenAddress from '../components/ShortenAddress';
 import SearchBar from '../components/SearchBar';
 import { getCollectionDetails } from '../components/utils';
 import CollectionFilter from '../components/CollectionFilter';
+import { getCurrentNetwork } from '../components/networkConfig'; // Stelle sicher, dass der Import korrekt ist
 
-const CollectionCards = ({ limit, showSearchBar, showFilter, selectedNetwork }) => {
+const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionDetails, setCollectionDetails] = useState({});
   const [filters, setFilters] = useState({ artists: [], networks: [] });
+  const [selectedNetwork, setSelectedNetwork] = useState(getCurrentNetwork()); // Nutze den aktuellen Netzwerkwert
 
   useEffect(() => {
     const fetchCollectionDetails = async () => {
@@ -29,7 +31,12 @@ const CollectionCards = ({ limit, showSearchBar, showFilter, selectedNetwork }) 
     fetchCollectionDetails();
   }, []);
 
-  const filteredCollections = nftCollections.filter(collection => 
+  useEffect(() => {
+    // Wenn selectedNetwork sich ändert, z.B. durch einen Netzwerkwechsel, führe eine Aktualisierung durch
+    setSelectedNetwork(getCurrentNetwork());
+  }, [selectedNetwork]);
+
+  const filteredCollections = nftCollections.filter(collection =>
     (collection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
      collection.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
      collection.address.toLowerCase().includes(searchQuery.toLowerCase())) &&
@@ -52,12 +59,12 @@ const CollectionCards = ({ limit, showSearchBar, showFilter, selectedNetwork }) 
         <div className='centered w95 column flex flex-start ml20 MediaGalleryUnderDiv'>
           <h2 className='text-align-left mt15 OnlyDesktop'>GALLERY</h2>
           <div className='SearchbarDesktop text-align-left w30 w100media'>
-          {showSearchBar && <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
+            {showSearchBar && <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
           </div>
           {collectionsToShow.length === 0 ? (
             <div className="no-nfts-container flex centered column">
               <h2 className="no-nfts-message">No collections found...</h2>
-              <img src="/no-nft.png" alt="No collections" className="no-nfts-image" />
+              <img src="/no-nft.png" alt="No collections" className="no-nft-image" />
             </div>
           ) : (
             <div className={`collection-cards ${collectionsToShow.length < 5 ? 'centered-cards' : ''}`}>
@@ -72,28 +79,28 @@ const CollectionCards = ({ limit, showSearchBar, showFilter, selectedNetwork }) 
 
                   <div className='text-align-left w90 mb5 collection-infoCardDiv'>
                     <div className='mb15'>
-                  <h3 className='mb10'>{collection.name}</h3>
-                  <span className='s18 grey'>{collection.artist}</span>
-                  </div>
-                  {collectionDetails[collection.address] && (
-                    <>
-                      <div className='centered space-between w100 border-top'>
-                        <div className='centered column'>
-                          <p className='mb5 mt10px'>FLOOR</p>
-                          <div className='centered s20'>
-                            {collectionDetails[collection.address].floorPrice}
-                            <img src={collection.currency} alt="currency logo" className="currency-logo-coll" />
+                      <h3 className='mb10'>{collection.name}</h3>
+                      <span className='s18 grey'>{collection.artist}</span>
+                    </div>
+                    {collectionDetails[collection.address] && (
+                      <>
+                        <div className='centered space-between w100 border-top'>
+                          <div className='centered column'>
+                            <p className='mb5 mt10px'>FLOOR</p>
+                            <div className='centered s20'>
+                              {collectionDetails[collection.address].floorPrice}
+                              <img src={collection.currency} alt="currency logo" className="currency-logo-coll" />
+                            </div>
+                          </div>
+                          <div className='centered column'>
+                            <p className='mb5 mt10px'>LISTED</p>
+                            <div className='s20'>
+                              {collectionDetails[collection.address].listedCount}
+                            </div>
                           </div>
                         </div>
-                        <div className='centered column'>
-                          <p className='mb5 mt10px'>LISTED</p>
-                          <div className='s20'>
-                            {collectionDetails[collection.address].listedCount}
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                      </>
+                    )}
                   </div>
                 </a>
               ))}

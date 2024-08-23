@@ -1,0 +1,96 @@
+.price-history {
+    padding: 15px;
+    background-color: black;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: auto;
+    color: #fff;
+    height: 95%;
+}
+
+.price-history h3 {
+    margin-bottom: 15px;
+}
+
+.price-history ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.price-history ul li {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.price-history ul li strong {
+    margin-right: 10px;
+}
+
+.collection-price-history {
+    margin-top: 20px;
+}
+
+.collection-price-history h4 {
+    margin-bottom: 10px;
+}
+
+.collection-price-history table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.collection-price-history table th,
+.collection-price-history table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.collection-price-history table th {
+    background-color: black;
+}
+
+.chart-container {
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.timeframe-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.timeframe-selector button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.timeframe-selector button:hover {
+    background-color: var(--branding-color-hover);
+    transform: translateY(-2px);
+}
+
+.timeframe-selector button.active {
+    background-color: var(--branding-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.timeframe-selector button:focus {
+    outline: none;
+}
+
+.custom-tooltip img {
+    width: 22px;
+    height: 22px;
+}

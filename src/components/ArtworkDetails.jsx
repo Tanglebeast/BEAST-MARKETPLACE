@@ -40,7 +40,7 @@ const ArtworkDetails = () => {
     <div className="artwork-details">
       <div className="ArtworkdetailsBody">
         <table>
-        <h2>Artwork details</h2>
+        <h2 className='mt5'>Artwork details</h2>
           <tbody>
             <tr>
               <td>Title</td>

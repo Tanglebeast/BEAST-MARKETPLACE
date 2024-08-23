@@ -55,6 +55,8 @@ const UserNFTs = () => {
     try {
       let userNFTs = [];
       let ownedCollectionsSet = new Set();
+      let seenNFTs = new Set(); // To track seen NFTs and avoid duplicates
+
       for (const collection of nftCollections) {
         const tokenIds = await getTokenIdsOfOwner(collection.address, account);
         console.log(`Token IDs for collection ${collection.address}:`, tokenIds);
@@ -66,8 +68,15 @@ const UserNFTs = () => {
         const nfts = await Promise.all(tokenIds.map(tokenId => fetchAllNFTs(collection.address, marketplace)
           .then(nfts => nfts.find(nft => nft.tokenId === tokenId))
         ));
-        userNFTs = userNFTs.concat(nfts.filter(nft => nft !== undefined));
+
+        nfts.forEach(nft => {
+          if (nft && !seenNFTs.has(`${nft.contractAddress}-${nft.tokenId}`)) {
+            seenNFTs.add(`${nft.contractAddress}-${nft.tokenId}`);
+            userNFTs.push(nft);
+          }
+        });
       }
+
       setAllNFTs(userNFTs);
       setOwnedCollections(Array.from(ownedCollectionsSet));
       setLoading(false);
@@ -88,7 +97,7 @@ const UserNFTs = () => {
   };
 
   const filteredNFTs = allNFTs.filter(nft => {
-    const matchesSearchQuery = 
+    const matchesSearchQuery =
       nft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       getCollectionName(nft.contractAddress).toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -154,7 +163,7 @@ const UserNFTs = () => {
                   </div>
                 ) : (
                   filteredNFTs.map(nft => (
-                    <div key={nft.tokenId} className="user-nft-card">
+                    <div key={`${nft.contractAddress}-${nft.tokenId}`} className="user-nft-card">
                       <Link to={`/collections/${nft.contractAddress}/${nft.tokenId}`}>
                         <div className='my-nft-image'>
                           <img src={nft.image} alt={nft.name} />

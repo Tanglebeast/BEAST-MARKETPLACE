@@ -24,6 +24,7 @@ import BlockExplorerLinks from '../components/BlockExplorerLinks';
 import ArtworkDetails from '../components/ArtworkDetails';
 import ArtworkOwnerRanking from '../components/ArtworkOwnerRanking';
 import ShortenAddress from '../components/ShortenAddress';
+import PriceHistory from '../components/PriceHistory';
 
 const web3 = new Web3(window.ethereum);
 
@@ -210,88 +211,92 @@ setMaxSupply(maxSupply);
   const slicePercentage = (1 / totalSupply) * 100;
 
   return (
-    <div className='MainDetailDivMedia'>
-      <h2 className="nft-DetailDiv">DETAILS</h2>
+    <div className='flex centered column'>
+      <div className='w100 flex column centered hauto mt15'>
+    <div className='w91 flex center-ho gap15 h700 mediacolumn2'>
+    <div className='MainDetailDivMedia w80 h100'>
       <div className="nft-detail">
+        <div className='flex'>
+        <div className='flex column w100'>
+        <h2 className='blue mt5 s28 text-align-left'>{nftDetails.name}</h2>
+
+        <div className='flex flex-start mediacolumn'>
+    <div className='w70'>
         <img src={nftDetails.image} alt={nftDetails.name} onClick={() => setIsFullscreen(true)} />
+        </div>
+
+        <div className='ml20'>
+
+              <div className='flex column detailLink'>
+                <span className='s16 grey'>COLLECTION</span>
+                <span className='s18 blue bold mb10'><Link to={collectionDetails.link}>{collectionDetails.name}</Link></span>
+              </div>
+
+              <div className='flex column detailLink'>
+                <span className='s16 grey'>ARTIST</span>
+                <span className='s18 blue bold mb10'><Link to={`/artists/${collectionDetails.artist}`}>{collectionDetails.artist}</Link></span>
+              </div>
+
+              <div className='flex column'>
+                <span className='s16 grey'>POSITION</span>
+                <span className='s18 blue bold mb10'>{nftDetails.position}</span>
+              </div>
+
+              <div className='flex column'>
+                <span className='s16 grey'>TOKEN-ID</span>
+                <span className='s18 blue bold mb10'>#{tokenid.toString()}</span>
+              </div>
+
+              <div className='flex column'>
+                <span className='s16 grey'>TOTAL SUPPLY</span>
+                <span className='s18 blue bold mb10'>{maxSupply} NFTs</span>
+              </div>
+
+              <div className='flex column'>
+                <span className='s16 grey'>YOUR OWNERSHIP</span>
+                <span className='s18 blue bold mb5'>{ownedNFTsCount} NFTs / {totalSupply > 0 ? ownershipPercentage.toFixed(2) : '0.00'}%</span>
+              </div>
+
+        </div>
+        </div>
+        </div>
+        </div>
         <div className="NFT-DetailDiv">
           <div className='flex column space-between h100'>
-            <div>
-              <h2 className='blue mb5'>{nftDetails.name}</h2>
-              <div className='flex center-ho grey s18'>
-                <span>Position: {nftDetails.position}</span>
-              </div>
 
-              <div className='flex center-ho grey s18 mt5'>
-                <span>Token-ID: #{tokenid.toString()}</span>
-              </div>
-            </div>
 
             <div className='mt20'>
-            <div className='flex center-ho Detail-Div-Cardx mb10'>
-                  <div className='flex column'>
-                    <p className='grey margin-0'>Collection:</p>
-                    <div className='flex center-ho mt5'>
-                      <img className='wh27 mr10' src='/artwork.png' alt='Collection' />
-                      <p className='VisibleLink margin-0 s16'>
-                        <Link to={collectionDetails.link}>{collectionDetails.name}</Link>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              <div className='flex center-ho gap10'>
-                <div className='flex center-ho Detail-Div-Cardx'>
-                  <div className='flex column'>
-                    <p className='grey margin-0'>Owner:</p>
-                    <div className='flex center-ho mt5'>
-                      <img className='wh27 mr10' src={ownerProfilePicture} alt='Owner' />
-                      <p className='VisibleLink margin-0 s16'>
-                        <Link to={`/users/${nftDetails.owner}`}><ShortenAddress address={ownerUsername} /></Link>
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              <div className='flex center-ho mb5'>
 
-                <div className='flex center-ho Detail-Div-Cardx Detail-Div-CardA'>
-                  <div className='flex column'>
-                    <p className='grey margin-0'>Artist:</p>
+
+                  <div className='flex column mb10'>
+                    <p className='grey margin-0 s16'>OWNER</p>
                     <div className='flex center-ho mt5'>
-                      <img className='wh27 mr10' src={collectionDetails.artistpfp} alt='Artist' />
-                      <p className='VisibleLink margin-0 s16'>
-                        <Link to={`/artists/${collectionDetails.artist}`}>{collectionDetails.artist}</Link>
+                      <img className='wh27 mr10 r50' src={ownerProfilePicture} alt='Owner' />
+                      <p className='VisibleLink margin-0 s16 w100'>
+                        <Link to={`/users/${nftDetails.owner}`}>{ownerUsername}</Link>
                       </p>
                     </div>
                   </div>
-                </div>
+
+
                 
               </div>
             </div>
-
-            <div className="ownership-details centered space-between">
-              <div>
-                <p className='grey mb5'>Ownership</p>
-                <h3 className='s24 mb0 mt5'>{ownedNFTsCount}/{maxSupply}</h3>
-              </div>
-
-              <div className="ownership-details centered space-between">
-                <div className='ownership-detailsinP'>
-                  <p className='grey mb5'>Ownership in %</p>
-                  <h3 className='s24 mb0 mt5'>{totalSupply > 0 ? ownershipPercentage.toFixed(2) : '0.00'}%</h3>
-                </div>
-              </div>
-            </div>
-
 
             <div className='BottomButtons'>
               <div className='w100'>
                 <div className='PriceDiv'>
                   {isForSale && (
+                    <div className='flex column'>
+                    <span className='s16 grey mb0'>LISTING PRICE</span>
+                    <div className='flex center-ho mb5'>
                     <img src={collectionDetails.currency} alt="Currency Icon" className="currency-icon" />
-                  )}
-                  {isForSale && (
-                    <p>
+                    <p className='mt5 mb5'>
                       {nftDetails.price}
                     </p>
+                    </div>
+                    </div>
                   )}
                 </div>
 
@@ -329,6 +334,7 @@ setMaxSupply(maxSupply);
             </div>
           </div>
         </div>
+        </div>
         {isPopupOpen && (
           <Popup
             listingPrice={listingPrice}
@@ -339,6 +345,12 @@ setMaxSupply(maxSupply);
           />
         )}
       </div>
+      <div className='w100 h100'>
+      <PriceHistory contractAddress={collectionaddress} marketplace={marketplace} currencyIcon={collectionDetails.currency} network={collectionDetails.network}/>
+      </div>
+      </div>
+      </div>
+
       <div className='w100 centered column'>
         <ArtworkDetails />
         <ArtworkOwnerRanking collectionAddress={collectionaddress} marketplace={marketplace} />

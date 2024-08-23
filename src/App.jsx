@@ -48,13 +48,13 @@ const App = () => {
 
   useEffect(() => {
     if (account !== '') {
-      console.log('Wallet connected');
+      // console.log('Wallet connected');
       setIsConnected(true);
       initializeMarketplace(setMarketplace, (marketplaceInstance) => {
         refreshData(marketplaceInstance, nftCollections[0].address, setNftsForSale, setAllNFTs, fetchAllNFTs);
       });
     } else {
-      console.log('Wallet disconnected');
+      // console.log('Wallet disconnected');
       setIsConnected(false);
     }
   }, [account]);

@@ -93,9 +93,10 @@ const MyNFTs = () => {
         try {
           let myNFTs = [];
           let ownedCollectionsSet = new Set();
+          let seenNFTs = new Set(); // To track seen NFTs and avoid duplicates
+
           for (const collection of nftCollections) {
             const tokenIds = await getTokenIdsOfOwner(collection.address, account);
-            console.log(`Token IDs for collection ${collection.address}:`, tokenIds);
 
             if (tokenIds.length > 0) {
               ownedCollectionsSet.add(collection.name);
@@ -104,8 +105,15 @@ const MyNFTs = () => {
             const nfts = await Promise.all(tokenIds.map(tokenId => fetchAllNFTs(collection.address, marketplace)
               .then(nfts => nfts.find(nft => nft.tokenId === tokenId))
             ));
-            myNFTs = myNFTs.concat(nfts.filter(nft => nft !== undefined));
+
+            nfts.forEach(nft => {
+              if (nft && !seenNFTs.has(`${nft.contractAddress}-${nft.tokenId}`)) {
+                seenNFTs.add(`${nft.contractAddress}-${nft.tokenId}`);
+                myNFTs.push(nft);
+              }
+            });
           }
+
           setAllNFTs(myNFTs);
           setOwnedCollections(Array.from(ownedCollectionsSet));
           setLoading(false);
@@ -181,11 +189,13 @@ const MyNFTs = () => {
     }
   };
 
-  getArtistWalletsAndFees().then((data) => {
-    console.log(data);
-  }).catch((error) => {
-    console.error('Error:', error);
-  });
+  useEffect(() => {
+    getArtistWalletsAndFees().then((data) => {
+      console.log(data);
+    }).catch((error) => {
+      console.error('Error:', error);
+    });
+  }, []);
 
   const filteredNFTs = allNFTs.filter(nft => {
     const matchesSearchQuery =
@@ -266,7 +276,7 @@ const MyNFTs = () => {
                   </div>
                 ) : (
                   filteredNFTs.map(nft => (
-                    <div key={nft.tokenId} className="my-nft-card">
+                    <div key={`${nft.contractAddress}-${nft.tokenId}`} className="my-nft-card">
                       <Link to={`/collections/${nft.contractAddress}/${nft.tokenId}`}>
                         <div className='my-nft-image'>
                           <img src={nft.image} alt={nft.name} />

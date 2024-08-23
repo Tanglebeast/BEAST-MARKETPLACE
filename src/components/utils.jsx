@@ -29,9 +29,9 @@ window.addEventListener('storage', (event) => {
 export const checkAccountInLocalStorage = () => {
   const account = localStorage.getItem('account');
   if (account) {
-    console.log(`Account gefunden im lokalen Speicher: ${account}`);
+    // console.log(`Connected ls Account: ${account}`);
   } else {
-    console.log('Kein Account im lokalen Speicher gefunden.');
+    // console.log('No Account connected ls.');
   }
 };
 
@@ -40,17 +40,17 @@ export const checkAccountInLocalStorage = () => {
 export const CONTRACT_OWNER_ADDRESS = '0x2FEA5b277e4a11406664691ac4A5315e6912ddC1';
 
 
-export const shimmerTestnet = {
-  chainId: '0x431',
-  chainName: 'Shimmer EVM Testnet',
-  rpcUrls: ['https://json-rpc.evm.testnet.shimmer.network'],
-  nativeCurrency: {
-    name: 'SMR',
-    symbol: 'SMR',
-    decimals: 18,
-  },
-  blockExplorerUrls: ['https://explorer.evm.shimmer.network'],
-};
+// export const shimmerTestnet = {
+//   chainId: '0x431',
+//   chainName: 'Shimmer EVM Testnet',
+//   rpcUrls: ['https://json-rpc.evm.testnet.shimmer.network'],
+//   nativeCurrency: {
+//     name: 'SMR',
+//     symbol: 'SMR',
+//     decimals: 18,
+//   },
+//   blockExplorerUrls: ['https://explorer.evm.shimmer.network'],
+// };
 
 export const iotaTestnet = {
   chainId: '0x433',
@@ -86,6 +86,18 @@ export const polygon = {
     decimals: 18,
   },
   blockExplorerUrls: ['https://amoy.polygonscan.com'],
+};
+
+export const ethereum = {
+  chainId: '0xaa36a7',
+  chainName: 'Ethereum Sepolia Testnet',
+  rpcUrls: ['wss://sepolia.drpc.org'],
+  nativeCurrency: {
+    name: 'ETH',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+  blockExplorerUrls: ['https://sepolia.etherscan.io'],
 };
 
 const showAlert = (message) => {
@@ -149,10 +161,11 @@ export const checkNetwork = async (expectedChainId) => {
 
 const getChainById = (chainId) => {
   const chains = {
-    '0x431': shimmerTestnet,
+    // '0x431': shimmerTestnet,
     '0x433': iotaTestnet,
     '0x61': bnbchain,
     '0x13882': polygon,
+    '0xaa36a7': ethereum,
   };
   return chains[chainId] || null;
 };
@@ -162,14 +175,16 @@ const getChainById = (chainId) => {
 
 const getNetworkConfig = (network) => {
   switch (network) {
-    case 'shimmerevm':
-      return shimmerTestnet;
+    // case 'shimmerevm':
+    //   return shimmerTestnet;
     case 'iotaevm':
       return iotaTestnet;
     case 'bnbchain':
       return bnbchain;
     case 'polygon':
       return polygon;
+      case 'ethereum':
+      return ethereum;
     default:
       throw new Error('Unknown network');
   }
@@ -244,7 +259,7 @@ export const initializeMarketplace = async (setMarketplace, refreshData) => {
     const web3Instance = account ? web3 : web3OnlyRead;
 
     // Logge, welche Web3-Instanz verwendet wird
-    console.log(`Using Web3 instance: ${account ? 'web3' : 'web3OnlyRead'}`);
+    // console.log(`Using Web3 instance: ${account ? 'web3' : 'web3OnlyRead'}`);
 
     const networkId = await web3Instance.eth.net.getId();
     const marketplaceData = nftMarketplaceAbi.networks[networkId];
@@ -274,7 +289,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace) => {
     const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
     const totalSupply = await contract.methods.MAX_SUPPLY().call();
 
-    console.log('Total supply of NFTs in collection:', totalSupply);
+    // console.log('Total supply of NFTs in collection:', totalSupply);
 
     // Funktion zum Abrufen der NFT-Daten
     const fetchNFTData = async (index) => {
@@ -313,7 +328,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace) => {
           position: position,
         };
       } catch (error) {
-        console.error(`Error fetching NFT data for index ${index}:`, error);
+        // console.error(`Error fetching NFT data for index ${index}:`, error);
         return null;
       }
     };
@@ -329,11 +344,11 @@ export const fetchAllNFTs = async (collectionAddress, marketplace) => {
     // Filtern Sie alle NFTs heraus, die null sind (aufgrund von Fehlern)
     allNFTs = allNFTs.filter(nft => nft !== null);
 
-    console.log('All NFTs fetched:', allNFTs);
+    // console.log('All NFTs fetched:', allNFTs);
 
     return allNFTs;
   } catch (error) {
-    console.error("Error fetching NFTs:", error);
+    // console.error("Error fetching NFTs:", error);
     return [];
   }
 };
@@ -350,7 +365,7 @@ export const getMaxSupply = async (collectionAddress) => {
     const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
     const maxSupply = await contract.methods.MAX_SUPPLY().call();
 
-    console.log(`TOTAL SUPPLY IS EXACTLY ${maxSupply}`);
+    // console.log(`TOTAL SUPPLY IS EXACTLY ${maxSupply}`);
 
     return maxSupply;
   } catch (error) {
@@ -396,7 +411,7 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
       position: position,
     };
   } catch (error) {
-    console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
+    // console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
     return null;
   }
 };
@@ -767,3 +782,96 @@ export const getTokenIdsOfOwner = async (contractAddress, ownerAddress) => {
 };
 
 
+export const getLiveFloorPrice = async (collectionAddress, marketplace) => {
+  try {
+    if (!collectionAddress || !marketplace) {
+      console.error("Collection address or marketplace is not provided");
+      return 0;
+    }
+
+    const nftsForSale = await marketplace.methods.getNFTsForSale().call();
+    let minPrice = Infinity;
+    for (const nft of nftsForSale) {
+      if (nft.contractAddress.toLowerCase() === collectionAddress.toLowerCase()) {
+        const priceInEther = web3.utils.fromWei(nft.price, 'ether'); 
+        const priceInFloat = parseFloat(priceInEther); 
+        if (priceInFloat > 0 && priceInFloat < minPrice) {
+          minPrice = priceInFloat;
+        }
+      }
+    }
+
+    return minPrice === Infinity ? 0 : minPrice;
+  } catch (error) {
+    console.error("Error fetching live floor price:", error);
+    return 0;
+  }
+};
+
+
+
+
+
+
+
+
+export const getAveragePriceInPeriod = async (contractAddress, startTime, endTime, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    const averagePrice = await marketplace.methods.getAveragePriceInPeriod(contractAddress, startTime, endTime).call();
+    console.log("Average Price:", averagePrice); // Debugging
+    return web3.utils.fromWei(averagePrice, 'ether');
+  } catch (error) {
+    console.error("Error fetching average price in period:", error);
+    throw error;
+  }
+};
+
+
+export const getFloorPriceInPeriod = async (contractAddress, startTime, endTime, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    const floorPrice = await marketplace.methods.getFloorPriceInPeriod(contractAddress, startTime, endTime).call();
+    return web3.utils.fromWei(floorPrice, 'ether');
+  } catch (error) {
+    console.error("Error fetching floor price in period:", error);
+    throw error;
+  }
+};
+
+export const getTotalSalesInPeriod = async (contractAddress, startTime, endTime, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    const totalSales = await marketplace.methods.getTotalSalesInPeriod(contractAddress, startTime, endTime).call();
+    return Number(totalSales);
+  } catch (error) {
+    console.error("Error fetching total sales in period:", error);
+    throw error;
+  }
+};
+
+export const updatePriceHistory = async (contractAddress, price, account, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.updatePriceHistory(contractAddress, web3.utils.toWei(price, 'ether')),
+      {},
+      account
+    );
+
+    await marketplace.methods.updatePriceHistory(contractAddress, web3.utils.toWei(price, 'ether')).send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    console.log("Price history updated successfully");
+  } catch (error) {
+    console.error("Error updating price history:", error);
+    throw error;
+  }
+};
