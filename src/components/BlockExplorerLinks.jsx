@@ -15,6 +15,8 @@ const BlockExplorerLinks = () => {
     explorerUrl = `https://testnet.bscscan.com/token/${collectionaddress}?a=${tokenid}`;
   } else if (network === 'polygon') {
     explorerUrl = `https://amoy.polygonscan.com/token/${collectionaddress}?a=${tokenid}`;
+  } else if (network === 'ethereum') {
+    explorerUrl = `https://sepolia.etherscan.io/token/${collectionaddress}?a=${tokenid}`;
   } else {
     explorerUrl = `https://explorer.evm.testnet.shimmer.network/token/${collectionaddress}/instance/${tokenid}`;
   }
