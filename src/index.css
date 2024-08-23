@@ -470,6 +470,14 @@ p,span {
   height: auto;
 }
 
+.gap50 {
+  gap: 50px;
+}
+
+.initialwidth {
+  width: initial;
+}
+
 .h700 {
   height: 700px;
 }
