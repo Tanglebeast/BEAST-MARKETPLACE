@@ -826,7 +826,7 @@ const ABI = [
       networkid: '0x433',
       rpcurl: 'https://json-rpc.evm.testnet.iotaledger.net',
       currency: '/currency-iota.png',
-      address: '0xd5963c795e1C2b35588853Ad38CADdA97675Bf78',
+      address: '0x25E4E6EAA886f8AD969D34D0ee9f9c045Fc81032',
       abi: ABI,
     },
     {
