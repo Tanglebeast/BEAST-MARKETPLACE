@@ -29,11 +29,11 @@ const FairMintCollections = () => {
 
   useEffect(() => {
     const fetchCollectionDetails = async () => {
-      if (!window.ethereum) {
-        console.error('MetaMask is not installed');
-        setLoading(false); // Setze loading auf false, wenn MetaMask nicht installiert ist
-        return;
-      }
+      // if (!window.ethereum) {
+      //   console.error('MetaMask is not installed');
+      //   setLoading(false); // Setze loading auf false, wenn MetaMask nicht installiert ist
+      //   return;
+      // }
 
       const web3 = web3OnlyRead;
 
