@@ -50,7 +50,7 @@ export const PhysicalItems = [
       size: '70 X 40 cm',
       medium: '3D textured Canvas',
       certificate: '/testcertificate.png',
-      contractaddress: '0xd5963c795e1C2b35588853Ad38CADdA97675Bf78',
+      contractaddress: '0x25E4E6EAA886f8AD969D34D0ee9f9c045Fc81032',
       images: [
         '/auction-test.png',
         '/lmos1.png',
