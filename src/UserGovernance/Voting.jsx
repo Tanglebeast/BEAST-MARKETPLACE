@@ -260,7 +260,7 @@ const PollDetails = () => {
             });
             console.log('Transaktionsbeleg:', receipt);
             if (receipt.status) {
-                setModalMessage('Vote erfolgreich entfernt!');
+                setModalMessage('Vote removed successfully!');
                 setShowModal(true);
                 await fetchPoll(contract, connectedAccount);
             } else {
