@@ -2,6 +2,7 @@
 import Web3 from 'web3';
 import axios from 'axios';
 import { nftCollections } from '../NFTCollections';
+import { artistList } from '../ArtistList';
 import nftMarketplaceAbi from '../ABI.json';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -38,6 +39,8 @@ export const checkAccountInLocalStorage = () => {
 
 
 export const CONTRACT_OWNER_ADDRESS = '0x2FEA5b277e4a11406664691ac4A5315e6912ddC1';
+
+export const artistwalletAddresses = artistList.map(artist => artist.walletaddress);
 
 
 // export const shimmerTestnet = {

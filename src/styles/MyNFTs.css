@@ -88,6 +88,7 @@
 
 .ChangeNamebutton,
 .SetArtistWalletButton,
+.CreatePollButton,
 .ChangeProfilePicturebutton,
 .PauseToggleButton {
     background-color: var(--branding-color);
@@ -104,6 +105,7 @@
 
 .ChangeNamebutton:hover,
 .ChangeProfilePicturebutton:hover,
+.CreatePollButton:hover,
 .SetArtistWalletButton:hover {
     background-color: var(--branding-color-hover);
 }

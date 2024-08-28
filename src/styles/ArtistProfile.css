@@ -80,6 +80,12 @@
     transform: scale(1.07);
 }
 
+.toggle-buttons button{
+  border: none;
+  background-color: transparent;
+  font-size: 18px;
+}
+
 @media (max-width: 768px) {
   .profile-content {
     flex-direction: column;

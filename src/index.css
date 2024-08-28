@@ -292,6 +292,10 @@ p,span {
   width: 100%;
 }
 
+.w98 {
+  width: 98%;
+}
+
 .mb60 {
   margin-bottom: 60px;
 }
@@ -323,6 +327,10 @@ p,span {
 
 .w90 {
   width: 90%;
+}
+
+.fit-content {
+  width: fit-content;
 }
 
 .cover {

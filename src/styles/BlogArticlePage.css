@@ -1,0 +1,23 @@
+.blog-article-page {
+    /* Style for the blog article page container */
+    padding: 20px;
+  }
+  
+  .blog-image {
+    /* Style for the blog article image */
+    max-width: 100%;
+    height: auto;
+  }
+  
+
+  .Blogbanner {
+    height: 350px;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .Blogbanner img{
+    height: 100%;
+    width: 100%;
+  }
+  

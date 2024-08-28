@@ -1,0 +1,85 @@
+/* src/styles/Voting.css */
+
+/* Grundlegende Container-Stile für das PollsList */
+.polls-list-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 15px;
+  }
+  
+  .polls-list-heading {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .polls-list-container p {
+    text-align: center;
+  }
+
+  .view-details-button.disabled {
+    color: black; /* Grau für den ausgegrauten Zustand */
+    background-color: grey; /* Heller Hintergrund für Deaktivierung */
+  }
+
+  .view-details-button.disabled:hover {
+    color: black; /* Grau für den ausgegrauten Zustand */
+    background-color: rgb(87, 87, 87); /* Heller Hintergrund für Deaktivierung */
+  }
+  
+  /* Flexbox-Container für die Poll-Karten */
+  .polls-list-container > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Abstand zwischen den Karten */
+    justify-content: center; /* Zentriert die Karten horizontal */
+  }
+  
+  /* Einzelne Poll-Karten */
+  .poll-container {
+    background-color: black;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: calc(33.333% - 20px); /* Drei Karten pro Reihe, minus Abstand */
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .poll-container:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .poll-question {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+  }
+  
+  .view-details-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1em;
+    color: #fff;
+    background-color: var(--branding-color);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+  
+  .view-details-button:hover {
+    background-color: var(--branding-color-hover);
+  }
+
+    /* Responsive styles */
+    @media (max-width: 950px) {
+        .poll-container {
+            width: 100%;
+        }
+
+        .mediacolumn3 {
+            flex-direction: column;
+        }
+      }
+  

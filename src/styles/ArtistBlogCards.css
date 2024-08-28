@@ -1,0 +1,74 @@
+.artist-blog-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .blog-card {
+    background: black;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 250px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: flex;
+    flex-direction: column; /* Ensure content is stacked vertically */
+    height: 300px; /* Make sure the height is flexible */
+    flex: 1; /* Allow the card to grow and fill available space */
+    transition: all 0.25s;
+  }
+  
+  .blog-card a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .blog-card:hover {
+    transform: scale(1.01);
+}
+  
+.blog-card:active {
+    transform: scale(0.95) rotateZ(1.1deg);
+}
+
+  .blog-image {
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .blogimagediv {
+    height: 200px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .blogimagediv img{
+    height: 200px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  
+  .blog-content {
+    padding: 15px;
+    flex: 1; /* Allow content to expand and push the footer down */
+  }
+  
+  .blog-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 5px;
+  }
+  
+  .blog-date {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 10px;
+  }
+  
+  .blog-summary {
+    font-size: 16px;
+    color: #333;
+  }
+  

@@ -14,7 +14,8 @@ import {
   pauseContract,
   unpauseContract,
   isContractPaused,
-  getTokenIdsOfOwner
+  getTokenIdsOfOwner,
+  artistwalletAddresses
 } from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import '../styles/MyNFTs.css';
@@ -24,6 +25,7 @@ import ProfilePicturePopup from '../components/ProfilePicturePopup';
 import SearchBar from '../components/SearchBar';
 import MyNFTsFilter from '../components/MyNFTsFilter';
 import SetArtistWalletPopup from '../components/SetartistWalletPopup';
+import CreatePoll from '../UserGovernance/CreatePoll';
 
 const MyNFTs = () => {
   const [account, setAccount] = useState('');
@@ -37,6 +39,7 @@ const MyNFTs = () => {
   const [bannerPicture, setBannerPicture] = useState('/placeholder-PFP-banner.png');
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
   const [isArtistWalletPopupOpen, setIsArtistWalletPopupOpen] = useState(false);
+  const [isCreatePollPopupOpen, setIsCreatePollPopupOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isContractPausedState, setIsContractPausedState] = useState(false);
   const [filters, setFilters] = useState({
@@ -45,6 +48,11 @@ const MyNFTs = () => {
     artwork: []
   });
   const [ownedCollections, setOwnedCollections] = useState([]);
+
+  const isAddressInArtistWallets = () => {
+    return artistwalletAddresses.some(walletAddress => walletAddress.toLowerCase() === account.toLowerCase());
+  };
+  
 
   useEffect(() => {
     const checkContractPaused = async () => {
@@ -241,19 +249,23 @@ const MyNFTs = () => {
                 </h2>
               </div>
               <div className="user-name-section">
-                <div className='flex column'>
-                  <button className='ChangeNamebutton' onClick={openUsernamePopup}>CHANGE USERNAME</button>
-                  <button className='ChangeProfilePicturebutton' onClick={openProfilePicturePopup}>CHANGE PROFILE PICTURE</button>
-                  {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
-                    <>
-                      <button className='SetArtistWalletButton' onClick={openArtistWalletPopup}>SET ARTIST WALLET</button>
-                      <button className='PauseToggleButton alert-color' onClick={handlePauseToggle}>
-                        {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
-                      </button>
-                    </>
-                  )}
+                  <div className='flex column'>
+                    <button className='ChangeNamebutton' onClick={openUsernamePopup}>CHANGE USERNAME</button>
+                    <button className='ChangeProfilePicturebutton' onClick={openProfilePicturePopup}>CHANGE PROFILE PICTURE</button>
+                    {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
+                      <>
+                        <button className='SetArtistWalletButton' onClick={openArtistWalletPopup}>SET ARTIST WALLET</button>
+                        <button className='PauseToggleButton alert-color' onClick={handlePauseToggle}>
+                          {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
+                        </button>
+                      </>
+                    )}
+                    {isAddressInArtistWallets() && (
+                      <button className='CreatePollButton' onClick={() => setIsCreatePollPopupOpen(true)}>CREATE POLL</button>
+                    )}
+                  </div>
                 </div>
-              </div>
+
               <MyNFTsFilter onFilterChange={setFilters} ownedCollections={ownedCollections} />
             </div>
             <div className='w80 flex column ml20 w100media'>
@@ -329,6 +341,10 @@ const MyNFTs = () => {
           closePopup={closeArtistWalletPopup}
         />
       )}
+      {isCreatePollPopupOpen && (
+        <CreatePoll onClose={() => setIsCreatePollPopupOpen(false)} />
+      )}
+
     </div>
   );
 };

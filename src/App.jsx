@@ -34,6 +34,10 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importieren Sie BrowserRouter
 import NotFound from './components/Error404';
 import TestnetFaucets from './pages/TestnetFaucets';
+import BlogArticlePage from './components/BlogArticlePage';
+import Voting from './UserGovernance/Voting';
+import PollsList from './UserGovernance/Pollslist';
+import PollDetails from './UserGovernance/Voting';
 
 const App = () => {
   const [account, setAccount] = useState(localStorage.getItem('account') || '');
@@ -82,7 +86,10 @@ const App = () => {
         <Route path="/collections" element={<CollectionCards showSearchBar={true} showFilter={true} selectedNetwork={selectedNetwork} />} />
         <Route path="/wallet" element={<MyNFTs />} />
         <Route path="/artists" element={<ArtistPage />} />
+        <Route path="/artist/:artistname/blog/:blogtitle" element={<BlogArticlePage />} />
         <Route path="/nfts" element={<AllNFTs />} />
+        <Route path="/fairvote" element={<PollsList />} />
+        <Route path="/fairvote/:id" element={<PollDetails />} />
         <Route path="/fairmint" element={<FairMintCollections />} />
         <Route path="/fairmint/:collectionaddress" element={<MintNFT />} />
         <Route path="/users" element={<AllUsers />} />
