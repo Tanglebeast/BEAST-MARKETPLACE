@@ -39,6 +39,7 @@ const Footer = () => {
                         <li><a href="https://fractalz.xyz">Homepage</a></li>
                         <li><a href="/faucet">Faucets</a></li>
                         <li><a href="/collections">Gallery</a></li>
+                        <li><a href="https://fractalz.xyz/?artistmodalopen=true">Become Artist</a></li>
                         <li><a href="/contact">Contact Us</a></li>
                         <li><a href="/faq">FAQ</a></li>
                     </ul>
