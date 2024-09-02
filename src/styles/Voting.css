@@ -160,6 +160,20 @@
     font-size: 1.2em;
     margin: 20px 0;
   }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+}
+
+input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  color: white;
+}
+
+
+
   
   /* Responsive styles */
   @media (max-width: 600px) {

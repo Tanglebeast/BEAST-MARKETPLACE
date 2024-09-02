@@ -72,6 +72,8 @@ const PollDetails = () => {
     const { id: pollId } = useParams();
     const [showModal, setShowModal] = useState(false); // Status für das Anzeigen des Modals
     const [modalMessage, setModalMessage] = useState('');
+    const [isPollEnded, setIsPollEnded] = useState(false);
+
 
     const pollIdInt = parseInt(pollId);
 
@@ -133,6 +135,7 @@ const PollDetails = () => {
     
                 if (remainingTime <= 0) {
                     setTimeLeft('TIME OVER');
+                    setIsPollEnded(true); // Umfrage als abgelaufen markieren
                     clearInterval(intervalId);
                 } else {
                     const days = Math.floor(remainingTime / (3600 * 24));
@@ -147,6 +150,7 @@ const PollDetails = () => {
             return () => clearInterval(intervalId);
         }
     }, [poll]);
+    
     
 
     const fetchPoll = async (contract, account = null) => {
@@ -173,10 +177,10 @@ const PollDetails = () => {
                     await fetchAvailableVotes(contract, account);
                 }
             } else {
-                console.error(`Keine Umfragedaten für ID gefunden: ${pollIdInt}`);
+                // console.error(`Keine Umfragedaten für ID gefunden: ${pollIdInt}`);
             }
         } catch (error) {
-            console.error(`Fehler beim Laden der Umfrage mit ID ${pollIdInt}:`, error);
+            // console.error(`Fehler beim Laden der Umfrage mit ID ${pollIdInt}:`, error);
         }
     };
     
@@ -194,7 +198,7 @@ const PollDetails = () => {
     
             setUserVotes(votesMap);
         } catch (error) {
-            console.error('Fehler beim Abrufen der Benutzervotes:', error);
+            console.error('Error getting user vote', error);
         }
     };
     
@@ -204,7 +208,7 @@ const PollDetails = () => {
             const nftBalance = await contract.methods.getNFTBalance(account, pollIdInt).call();
             setAvailableVotes(nftBalance.toString());
         } catch (error) {
-            console.error('Fehler beim Abrufen der verfügbaren Stimmen:', error);
+            console.error('Error getting voices', error);
         }
     };
 
@@ -221,7 +225,7 @@ const PollDetails = () => {
 
     const handleVote = async () => {
         if (!contract || !connectedAccount) {
-            setModalMessage('Wallet nicht verbunden oder nicht autorisiert.');
+            setModalMessage('Wallet not connected or authorized');
             setShowModal(true);
             return;
         }
@@ -231,16 +235,16 @@ const PollDetails = () => {
                 gas: 3000000,
                 gasPrice: Web3.utils.toWei('20', 'gwei')
             });
-            console.log('Transaktionsbeleg:', receipt);
+            console.log('Transaction:', receipt);
             if (receipt.status) {
                 setModalMessage('Vote submitted successfully!');
                 setShowModal(true);
                 await fetchPoll(contract, connectedAccount);
             } else {
-                throw new Error('Transaktion fehlgeschlagen');
+                throw new Error('Transaction failed');
             }
         } catch (error) {
-            console.error('Fehler beim Abstimmen', error);
+            console.error('Error voting', error);
             setModalMessage('Error submitting Vote. Do you own enough voting rights?');
             setShowModal(true);
         }
@@ -248,7 +252,7 @@ const PollDetails = () => {
 
     const handleRemoveVote = async () => {
         if (!contract || !connectedAccount) {
-            setModalMessage('Wallet nicht verbunden oder nicht autorisiert.');
+            setModalMessage('Wallet not connected or authorized.');
             setShowModal(true);
             return;
         }
@@ -258,17 +262,17 @@ const PollDetails = () => {
                 gas: 3000000,
                 gasPrice: Web3.utils.toWei('20', 'gwei')
             });
-            console.log('Transaktionsbeleg:', receipt);
+            console.log('Transactio:', receipt);
             if (receipt.status) {
                 setModalMessage('Vote removed successfully!');
                 setShowModal(true);
                 await fetchPoll(contract, connectedAccount);
             } else {
-                throw new Error('Transaktion fehlgeschlagen');
+                throw new Error('Transaction failed');
             }
         } catch (error) {
-            console.error('Fehler beim Entfernen der Stimme', error);
-            setModalMessage('Fehler beim Entfernen der Stimme');
+            console.error('Error removing voice', error);
+            setModalMessage('Error removing voice');
             setShowModal(true);
         }
     };
@@ -451,6 +455,7 @@ const PollDetails = () => {
             <div className='centered column'>
                 <label className='mb15' htmlFor="voteCount">VOTE AMOUNT:</label>
                 <input
+                    disabled={isPollEnded}
                     type="number"
                     id="voteCount"
                     value={voteCount}
@@ -462,10 +467,10 @@ const PollDetails = () => {
             <div className='column centered w100'>
                 {connectedAccount ? (
                     <>
-                        <button onClick={handleVote} className="vote-button mb10 mt15 w50">
+                        <button onClick={handleVote} disabled={isPollEnded} className="vote-button mb10 mt15 w50">
                             <h2 className='mt5 mb5 s16'>SUBMIT VOTES</h2>
                         </button>
-                        <button onClick={handleRemoveVote} className="remove-vote-button w50">
+                        <button onClick={handleRemoveVote} disabled={isPollEnded} className="remove-vote-button w50">
                             <h2 className='mt5 mb5 s16'>REMOVE VOTES</h2>
                         </button>
                     </>

@@ -16,7 +16,7 @@ const Footer = () => {
             </a>
             <div className='footerdescription'>
                     <p>
-                        We are merging the digital and physical art worlds, enabling everyone to discover and collect physical art NFTs.
+                    Bridging the digital and physical art worlds, empowering everyone to easily discover, collect, and trade physical art, anywhere at any time.
                     </p>
             </div>
 
@@ -26,9 +26,6 @@ const Footer = () => {
                         </a>
                         <a href="https://discord.com/invite/zeMwbxhJuU">
                         <img className="social-icons" src="/discord.png" alt="discord" />
-                        </a>
-                        <a href="https://beast-art.xyz">
-                        <img className="social-icons" src="/beast-art-logo.png" alt="beast-art" />
                         </a>
                     </div>
 
@@ -46,7 +43,7 @@ const Footer = () => {
                 </div>
                 <div className="footer-section contact">
                     <h2>Contact Us</h2>
-                    <p>Email: info@fractalz.xyz</p>
+                    <p><a href="https://fractalz.xyz/contact">Contact us</a></p>
                 </div>
             </div>
             <div className="footer-bottom VisibleLink">
