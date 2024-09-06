@@ -102,7 +102,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
             <a href="/users" className="nav-link">USERS</a>
             <a href="/fairmint" className="nav-link">FAIRMINT</a>
             <a href="/fairvote" className="nav-link">FAIRVOTE</a>
-            <a href="/about" className="nav-link">ABOUT</a>
+            <a href="/articles" className="nav-link">ARTICLES</a>
           </div>
           <div className='flex centered burder-account-network'>
             <NetworkselectionDropdown />

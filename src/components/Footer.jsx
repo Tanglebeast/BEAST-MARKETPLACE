@@ -31,19 +31,20 @@ const Footer = () => {
 
                 </div>
                 <div className="footer-section links">
-                    <h2>Quick Links</h2>
+                    <h2>Information</h2>
                     <ul>
                         <li><a href="https://fractalz.xyz">Homepage</a></li>
+                        <li><a href="/about">About</a></li>
                         <li><a href="/faucet">Faucets</a></li>
-                        <li><a href="/collections">Gallery</a></li>
                         <li><a href="https://fractalz.xyz/?artistmodalopen=true">Become Artist</a></li>
-                        <li><a href="/contact">Contact Us</a></li>
                         <li><a href="/faq">FAQ</a></li>
                     </ul>
                 </div>
-                <div className="footer-section contact">
+                <div className="footer-section contact VisibleLink">
                     <h2>Contact Us</h2>
-                    <p><a href="https://fractalz.xyz/contact">Contact us</a></p>
+                    <ul>
+                    <li><a href="https://fractalz.xyz/contact">Contact us</a></li>
+                    </ul>
                 </div>
             </div>
             <div className="footer-bottom VisibleLink">

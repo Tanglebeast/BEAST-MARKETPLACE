@@ -26,6 +26,10 @@ import SearchBar from '../components/SearchBar';
 import MyNFTsFilter from '../components/MyNFTsFilter';
 import SetArtistWalletPopup from '../components/SetartistWalletPopup';
 import CreatePoll from '../UserGovernance/CreatePoll';
+import BlogFormPopup from '../Blog/BlogFormPupup';
+import BlogListPage from '../Blog/Bloglistpage';
+import PopupContainer from '../Blog/BlogFormPupup';
+import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
 
 const MyNFTs = () => {
   const [account, setAccount] = useState('');
@@ -42,6 +46,10 @@ const MyNFTs = () => {
   const [isCreatePollPopupOpen, setIsCreatePollPopupOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isContractPausedState, setIsContractPausedState] = useState(false);
+  const [isBloglistpageOpen, setIsBloglistpageOpen] = useState(false);
+  const [isSubmitCollectionPopupOpen, setIsSubmitCollectionPopupOpen] = useState(false);
+
+
   const [filters, setFilters] = useState({
     availability: [],
     artist: [],
@@ -52,6 +60,18 @@ const MyNFTs = () => {
   const isAddressInArtistWallets = () => {
     return artistwalletAddresses.some(walletAddress => walletAddress.toLowerCase() === account.toLowerCase());
   };
+
+  const openBlogListPagePopup = () => {
+    setIsBloglistpageOpen(true);
+  };
+
+  const closeBlogListPagePopup = () => {
+    setIsBloglistpageOpen(false);
+  };
+
+  const openSubmitCollectionPopup = () => setIsSubmitCollectionPopupOpen(true);
+const closeSubmitCollectionPopup = () => setIsSubmitCollectionPopupOpen(false);
+
   
 
   useEffect(() => {
@@ -252,17 +272,29 @@ const MyNFTs = () => {
                   <div className='flex column'>
                     <button className='ChangeNamebutton' onClick={openUsernamePopup}>CHANGE USERNAME</button>
                     <button className='ChangeProfilePicturebutton' onClick={openProfilePicturePopup}>CHANGE PROFILE PICTURE</button>
+
+
                     {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
                       <>
-                        <button className='SetArtistWalletButton' onClick={openArtistWalletPopup}>SET ARTIST WALLET</button>
+                        <button className='SetArtistWalletButton yellow' onClick={openArtistWalletPopup}>SET ARTIST WALLET</button>
                         <button className='PauseToggleButton alert-color' onClick={handlePauseToggle}>
                           {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
                         </button>
                       </>
                     )}
                     {isAddressInArtistWallets() && (
-                      <button className='CreatePollButton' onClick={() => setIsCreatePollPopupOpen(true)}>CREATE POLL</button>
+                    <div className='b-top mb15'>
+                      </div>
+                      )}
+                    {isAddressInArtistWallets() && (
+                      <button className='CreatePollButton yellow' onClick={() => setIsCreatePollPopupOpen(true)}>CREATE POLL</button>
                     )}
+                    {isAddressInArtistWallets() && (
+                    <button className='CreateBlogButton yellow' onClick={() => setIsBloglistpageOpen(true)}>CREATE BLOG ARTICLE</button>
+                  )}
+                  {isAddressInArtistWallets() && (
+                    <button className='SubmitCollectionButton yellow' onClick={openSubmitCollectionPopup}>SUBMIT COLLECTION</button>
+                  )}
                   </div>
                 </div>
 
@@ -335,6 +367,11 @@ const MyNFTs = () => {
           closePopup={closeProfilePicturePopup}
         />
       )}
+      {isSubmitCollectionPopupOpen && (
+            <SubmitCollectionPopup 
+            isOpen={isSubmitCollectionPopupOpen} 
+            onClose={closeSubmitCollectionPopup} />
+          )}
       {isArtistWalletPopupOpen && (
         <SetArtistWalletPopup
           handleSave={handleSetArtistWallet}
@@ -344,6 +381,20 @@ const MyNFTs = () => {
       {isCreatePollPopupOpen && (
         <CreatePoll onClose={() => setIsCreatePollPopupOpen(false)} />
       )}
+       {isBloglistpageOpen && (
+        <PopupContainer onClose={closeBlogListPagePopup}>
+          <BlogListPage
+            onClose={closeBlogListPagePopup}
+            onSave={(newPost) => {
+              // Hier können Sie die Logik zum Speichern des neuen Blogposts hinzufügen
+              console.log('New blog post:', newPost);
+              setIsBloglistpageOpen(false);
+            }}
+          />
+
+        </PopupContainer>
+      )}
+
 
     </div>
   );

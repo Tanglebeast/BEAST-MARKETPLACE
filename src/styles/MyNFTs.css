@@ -90,7 +90,9 @@
 .SetArtistWalletButton,
 .CreatePollButton,
 .ChangeProfilePicturebutton,
-.PauseToggleButton {
+.PauseToggleButton,
+.CreateBlogButton,
+.SubmitCollectionButton {
     background-color: var(--branding-color);
     font-family: 'Josefin Sans', sans-serif !important;
     border: none;
@@ -106,8 +108,14 @@
 .ChangeNamebutton:hover,
 .ChangeProfilePicturebutton:hover,
 .CreatePollButton:hover,
-.SetArtistWalletButton:hover {
+.SetArtistWalletButton:hover,
+.CreateBlogButton:hover,
+.SubmitCollectionButton:hover {
     background-color: var(--branding-color-hover);
+}
+
+.b-top {
+    border: 1px solid rgba(128, 128, 128, 0.584);
 }
 
 .UserData {

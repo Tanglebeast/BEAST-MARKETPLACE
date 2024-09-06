@@ -34,10 +34,14 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importieren Sie BrowserRouter
 import NotFound from './components/Error404';
 import TestnetFaucets from './pages/TestnetFaucets';
-import BlogArticlePage from './components/BlogArticlePage';
+// import BlogArticlePage from './components/BlogArticlePage';
 import Voting from './UserGovernance/Voting';
 import PollsList from './UserGovernance/Pollslist';
 import PollDetails from './UserGovernance/Voting';
+import BlogListPage from './Blog/Bloglistpage';
+import BlogArticlePage from './Blog/BlogArticlepage';
+import PublicBlogPage from './Blog/Publicblogpage';
+import NFTCollectionForm from './components/UploadNFTCollectionForm';
 
 const App = () => {
   const [account, setAccount] = useState(localStorage.getItem('account') || '');
@@ -45,7 +49,8 @@ const App = () => {
   const [nftsForSale, setNftsForSale] = useState([]);
   const [allNFTs, setAllNFTs] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [selectedNetwork, setSelectedNetwork] = useState(localStorage.getItem('selectedNetwork') || 'shimmerevm');
+  const [selectedNetwork, setSelectedNetwork] = useState(localStorage.getItem('selectedNetwork') || 'iotaevm');
+  const [blogPosts, setBlogPosts] = useState([]);
 
   const web3 = new Web3(window.ethereum);
   checkAccountInLocalStorage();
@@ -85,24 +90,37 @@ const App = () => {
         <Route path="/" element={<Navigate to="/collections" replace />} />
         <Route path="/collections" element={<CollectionCards showSearchBar={true} showFilter={true} selectedNetwork={selectedNetwork} />} />
         <Route path="/wallet" element={<MyNFTs />} />
+
         <Route path="/artists" element={<ArtistPage />} />
         <Route path="/artist/:artistname/blog/:blogtitle" element={<BlogArticlePage />} />
         <Route path="/nfts" element={<AllNFTs />} />
+
         <Route path="/fairvote" element={<PollsList />} />
         <Route path="/fairvote/:id" element={<PollDetails />} />
+
         <Route path="/fairmint" element={<FairMintCollections />} />
         <Route path="/fairmint/:collectionaddress" element={<MintNFT />} />
+
         <Route path="/users" element={<AllUsers />} />
+
         <Route path="/faq" element={<Accordion />} />
         <Route path="/about" element={<About />} />
         <Route path="/imprint" element={<Imprint />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+
         <Route path="/faucet" element={<TestnetFaucets />} />
+
         <Route path="/artists/:artistname" element={<ArtistProfile />} />
         <Route path="/users/:walletAddress" element={<UserNFTs />} />
         <Route path="/collections/:collectionaddress" element={<CollectionDetail />} />
         <Route path="/collections/:collectionaddress/:tokenid" element={<NFTDetail />} />
+
+        <Route path="/upload" element={<NFTCollectionForm />} />
+
+        <Route path="/articles" element={<PublicBlogPage blogPosts={blogPosts} />} /> {/* Öffentliche Blog-Seite */}
+        <Route path="/articles/:blogId" element={<BlogArticlePage blogPosts={blogPosts} />} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

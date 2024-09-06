@@ -1,11 +1,13 @@
+// ArtistProfile.jsx
+
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import '../styles/ArtistProfile.css'; // Import the corresponding CSS file
 import { artistList } from '../ArtistList';
 import ArtistCollectionCards from '../components/ArtistCollections';
-import ArtistBlogCards from '../components/ArtistBlogCards'; // Import the new component
 import PollsList from '../UserGovernance/Pollslist'; // Import PollsList component
 import { nftCollections } from '../NFTCollections';
+import PublicBlogPage from '../Blog/Publicblogpage';
 
 const ArtistProfile = () => {
   const { artistname } = useParams();
@@ -78,7 +80,7 @@ const ArtistProfile = () => {
           <a>GALLERY</a>
         </button>
         <button onClick={() => setSelectedComponent('blog')} className={selectedComponent === 'blog' ? 'active' : ''}>
-          <a>BLOG</a>
+          <a>ARTICLES</a>
         </button>
         <button onClick={() => setSelectedComponent('polls')} className={selectedComponent === 'polls' ? 'active' : ''}>
           <a>POLLS</a>
@@ -86,7 +88,7 @@ const ArtistProfile = () => {
       </div>
       <div className="component-display">
         {selectedComponent === 'gallery' && <ArtistCollectionCards />}
-        {selectedComponent === 'blog' && <ArtistBlogCards />}
+        {selectedComponent === 'blog' && <PublicBlogPage author={artist.name} />} {/* Pass author to PublicBlogPage */}
         {selectedComponent === 'polls' && <PollsList artistName={artist.name} />} {/* Pass artistName to PollsList */}
       </div>
     </div>

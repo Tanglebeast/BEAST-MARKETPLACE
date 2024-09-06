@@ -1,0 +1,101 @@
+/* PublicBlogPage.css */
+
+.blogPageWrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: transparent;
+    margin-top: 15px;
+}
+
+.pageHeader {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
+.noPostsMessage {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.blogPostCradBannerimg {
+    height: 150px;
+    overflow: hidden;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.blogPostCradBannerimg img{
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.postsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.blogCard {
+    background-color: black;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; /* Ensures padding is included in width calculation */
+    justify-content: space-between;
+}
+
+.blogCard:hover {
+    transform: scale(1.02);
+}
+
+.blogTitle {
+    font-size: 1.5rem;
+    color: white;
+    margin: 0 0 10px;
+}
+
+.blogAuthor {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.blogExcerpt {
+    font-size: 1rem;
+    color: #999999;
+    margin-bottom: 15px;
+    overflow-wrap: break-word; /* Ensures long words break to fit within the card */
+    margin: 0px;
+    margin-bottom: 10px;
+}
+
+.blogTimestamps p{
+    font-size: 0.9rem;
+    color: #727272;
+    margin-top: 5px;
+}
+
+
+.viewPostButton {
+    background-color: var(--branding-color);
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.viewPostButton:hover {
+    background-color: var(--branding-color-hover);
+}

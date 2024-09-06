@@ -1,0 +1,77 @@
+/* Container des Formulars */
+.nft-form-container {
+    background-color: black;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    margin: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: scroll;
+}
+
+.nft-form-container input,
+.nft-form-container textarea,
+.nft-form-container select {
+    width: 90%;
+    padding: 10px !important;
+    margin-bottom: 15px;
+    border-radius: 25px;
+    border: 2px solid transparent !important;
+    background-color: #121212;
+    transition: border 0.3s ease;
+    color: white;
+    margin-top: 5px;
+}
+
+.nft-form-container input:hover,
+.nft-form-container textarea:hover,
+.nft-form-container select:hover {
+    border: 2px solid #404375;
+}
+
+.nft-form-container select {
+    width: 93%;
+}
+
+
+.nft-form-container input[type="checkbox"] {
+    accent-color: #404375; /* Für moderne Browser */
+    height: 15px;
+    width: 15px;
+}
+
+
+
+/* Stile für Labels */
+.nft-form-container label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #404375;
+}
+
+/* Checkbox und Radio Inputs */
+.nft-form-container input[type="checkbox"],
+.nft-form-container input[type="radio"] {
+    margin-right: 10px;
+}
+
+/* Beschreibungsfelder */
+.nft-form-container textarea {
+    height: 100px;
+    resize: none;
+}
+
+.numberInputSubmitCollection input{
+    width: 90% !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1100px) {
+    .nft-form-container {
+        width: 90%;
+    }
+}

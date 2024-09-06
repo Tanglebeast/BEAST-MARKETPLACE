@@ -147,14 +147,14 @@ const PollsList = ({ artistName }) => {
     }
 
     const headingText = location.pathname.includes('/fairvote')
-    ? 'Available Fairvotes'
-    : `${artistName.toUpperCase()}'S POLLS`;
+    ? 'FAIRVOTE'
+    : `${artistName.toUpperCase()}' S POLLS`;
   
     return (
         <div className="polls-list-container">
         <h2 className="polls-list-heading s24">{headingText}</h2>
         <div className="mediacolumn3">
-          {polls.length === 0 && <p>No polls available.</p>}
+          {polls.length === 0 && <p className='noPostsMessage'>No polls available</p>}
           {polls.map((poll, index) => (
             <div key={index} className="poll-container">
               <h2 className="poll-question-card">{poll[0]}</h2>

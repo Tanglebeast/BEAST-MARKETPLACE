@@ -15,6 +15,7 @@
   
   .polls-list-container p {
     text-align: center;
+    text-align: left;
   }
 
   .view-details-button.disabled {
@@ -45,6 +46,7 @@
     box-sizing: border-box;
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
+    text-align: left;
   }
   
   .poll-container:hover {
