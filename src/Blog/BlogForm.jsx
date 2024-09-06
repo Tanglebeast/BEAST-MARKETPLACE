@@ -120,7 +120,7 @@ const BlogForm = ({ onSave, initialData = {}, isEditing = false }) => {
           onChange={handleImageUpload}
         />
 
-        <div className='mb10 w60 h200 imageContainerDiv'>
+        <div className='mb10 w60 h200 imageContainerDiv clean'>
           {uploading ? (
             <img src="basic-loading.gif" alt="Loading..." style={{ height: '100px', width: 'auto' }} />
           ) : formData.banner ? (
