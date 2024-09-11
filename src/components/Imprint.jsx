@@ -19,7 +19,7 @@ const Imprint = () => {
           Herrenbergstr. 30<br />
           77815, Bühl<br />
           Phone: +49 152 5412 7399<br />
-          <div className='VisibleLink'>Email: <a href="mailto:info@fractalz.com">info@fractalz.com</a></div>
+          <div className='VisibleLink'>Email: <a href="mailto:support@fractalz.xyz">support@fractalz.xyz</a></div>
         </p>
       </section>
 
