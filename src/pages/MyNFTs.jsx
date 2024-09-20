@@ -30,6 +30,7 @@ import BlogFormPopup from '../Blog/BlogFormPupup';
 import BlogListPage from '../Blog/Bloglistpage';
 import PopupContainer from '../Blog/BlogFormPupup';
 import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
+import RedeemPopup from '../components/RedeemPopup';
 
 const MyNFTs = () => {
   const [account, setAccount] = useState('');
@@ -48,6 +49,12 @@ const MyNFTs = () => {
   const [isContractPausedState, setIsContractPausedState] = useState(false);
   const [isBloglistpageOpen, setIsBloglistpageOpen] = useState(false);
   const [isSubmitCollectionPopupOpen, setIsSubmitCollectionPopupOpen] = useState(false);
+  const [isRedeemPopupOpen, setIsRedeemPopupOpen] = useState(false);
+
+
+  const openRedeemPopup = () => setIsRedeemPopupOpen(true);
+  const closeRedeemPopup = () => setIsRedeemPopupOpen(false);
+
 
 
   const [filters, setFilters] = useState({
@@ -272,6 +279,7 @@ const closeSubmitCollectionPopup = () => setIsSubmitCollectionPopupOpen(false);
                   <div className='flex column'>
                     <button className='ChangeNamebutton' onClick={openUsernamePopup}>CHANGE USERNAME</button>
                     <button className='ChangeProfilePicturebutton' onClick={openProfilePicturePopup}>CHANGE PROFILE PICTURE</button>
+                    <button className='ChangeProfilePicturebutton' onClick={openRedeemPopup}>REDEEM ARTWORK</button>
 
 
                     {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
@@ -380,6 +388,13 @@ const closeSubmitCollectionPopup = () => setIsSubmitCollectionPopupOpen(false);
       )}
       {isCreatePollPopupOpen && (
         <CreatePoll onClose={() => setIsCreatePollPopupOpen(false)} />
+      )}
+                 {isRedeemPopupOpen && (
+        <RedeemPopup
+          isOpen={isRedeemPopupOpen}
+          onClose={closeRedeemPopup}
+          account={account}
+        />
       )}
        {isBloglistpageOpen && (
         <PopupContainer onClose={closeBlogListPagePopup}>

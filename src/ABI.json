@@ -95,6 +95,25 @@
 				{
 					"indexed": true,
 					"internalType": "address",
+					"name": "contractAddress",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "newFloorPrice",
+					"type": "uint256"
+				}
+			],
+			"name": "FloorPriceUpdated",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"internalType": "address",
 					"name": "seller",
 					"type": "address"
 				},
@@ -143,6 +162,31 @@
 				}
 			],
 			"name": "NFTListingCancelled",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "user",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "contractAddress",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "string",
+					"name": "message",
+					"type": "string"
+				}
+			],
+			"name": "NFTRedeemed",
 			"type": "event"
 		},
 		{
@@ -239,6 +283,19 @@
 			],
 			"name": "ProfilePictureChanged",
 			"type": "event"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "nftCollectionAddress",
+					"type": "address"
+				}
+			],
+			"name": "redeem",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
 		},
 		{
 			"inputs": [],
@@ -348,6 +405,25 @@
 		{
 			"inputs": [
 				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "allRedeemedCollections",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
 					"internalType": "address",
 					"name": "",
 					"type": "address"
@@ -417,6 +493,19 @@
 					"internalType": "address",
 					"name": "",
 					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getAllRedeemedCollections",
+			"outputs": [
+				{
+					"internalType": "address[]",
+					"name": "",
+					"type": "address[]"
 				}
 			],
 			"stateMutability": "view",
@@ -606,6 +695,25 @@
 			"inputs": [
 				{
 					"internalType": "address",
+					"name": "_user",
+					"type": "address"
+				}
+			],
+			"name": "getRedeemedCollections",
+			"outputs": [
+				{
+					"internalType": "address[]",
+					"name": "",
+					"type": "address[]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
 					"name": "_contractAddress",
 					"type": "address"
 				},
@@ -658,6 +766,49 @@
 					"internalType": "uint256",
 					"name": "",
 					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_user",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_contractAddress",
+					"type": "address"
+				}
+			],
+			"name": "isCollectionRedeemed",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_contractAddress",
+					"type": "address"
+				}
+			],
+			"name": "isRedeemed",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
 				}
 			],
 			"stateMutability": "view",
@@ -753,6 +904,30 @@
 					"internalType": "address",
 					"name": "",
 					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "redeemedCollections",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
 				}
 			],
 			"name": "userNames",
@@ -801,7 +976,8 @@
 	  },
 	  "//": "IOTA EVM",
 	  "1075": {
-		"address": "0xDC446Da886cF98ac5b910392d41D19BF3AAeCEbe"
+		"address": "0xec09a4b15CD7b2D53951c5d759C7D3D7b909bCFC",
+		"testcampaign address": "0xDC446Da886cF98ac5b910392d41D19BF3AAeCEbe"
 	  },
 	  "//": "SHIMMER EVM",
 	  "1073": {

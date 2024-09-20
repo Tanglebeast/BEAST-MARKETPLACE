@@ -43,6 +43,7 @@ import BlogArticlePage from './Blog/BlogArticlepage';
 import PublicBlogPage from './Blog/Publicblogpage';
 import NFTCollectionForm from './components/UploadNFTCollectionForm';
 
+
 const App = () => {
   const [account, setAccount] = useState(localStorage.getItem('account') || '');
   const [marketplace, setMarketplace] = useState(null);

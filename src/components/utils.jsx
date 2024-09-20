@@ -878,3 +878,177 @@ export const updatePriceHistory = async (contractAddress, price, account, market
     throw error;
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+export const redeem = async (nftCollectionAddress, account, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      marketplace.methods.redeem(nftCollectionAddress),
+      {},
+      account
+    );
+
+    const result = await marketplace.methods.redeem(nftCollectionAddress).send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    showAlert("Successfully redeemed physical item! Check your Emails.");
+    return result;
+  } catch (error) {
+    showAlert(`Failed to redeem: ${error.message}`);
+    throw error;
+  }
+};
+
+export const getRedeemedCollections = async (userAddress, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    const redeemedCollections = await marketplace.methods.getRedeemedCollections(userAddress).call();
+    return redeemedCollections;
+  } catch (error) {
+    console.error("Error fetching redeemed collections:", error);
+    throw error;
+  }
+};
+
+export const isCollectionRedeemed = async (userAddress, contractAddress, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    const isRedeemed = await marketplace.methods.isCollectionRedeemed(userAddress, contractAddress).call();
+    return isRedeemed;
+  } catch (error) {
+    console.error("Error checking if collection is redeemed:", error);
+    throw error;
+  }
+};
+
+export const isRedeemed = async (contractAddress, marketplace) => {
+  if (!marketplace) throw new Error("Marketplace not initialized");
+
+  try {
+    console.log(`Checking redeemed status for contract address: ${contractAddress}`);
+    const isRedeemed = await marketplace.methods.isRedeemed(contractAddress).call();
+    return isRedeemed;
+  } catch (error) {
+    console.error("Error checking if contract is redeemed:", error);
+    throw error;
+  }
+};
+
+
+
+
+// export const getNFTHistory = async (contractAddress, tokenId) => {
+//   try {
+//     console.log('Fetching NFT history for contract address:', contractAddress, 'and token ID:', tokenId);
+    
+//     const selectedCollection = nftCollections.find(collection => 
+//       collection.address.toLowerCase() === contractAddress.toLowerCase()
+//     );
+//     if (!selectedCollection) {
+//       console.log('Collection not found for address:', contractAddress);
+//       return [];
+//     }
+    
+//     const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, contractAddress);
+//     const latestBlock = BigInt(await web3OnlyRead.eth.getBlockNumber());
+//     console.log('Latest block number:', latestBlock.toString());
+    
+//     // Start from a recent block, e.g., 1 month ago (assuming 15s block time)
+//     let fromBlock = latestBlock - BigInt(172800); // ~30 days worth of blocks
+//     fromBlock = fromBlock > 0 ? fromBlock : BigInt(0);
+//     let blockRange = BigInt(10000);
+//     let history = [];
+//     let retryCount = 0;
+//     const maxRetries = 5;
+    
+//     const eventTypes = ['NFTListed', 'NFTSold', 'NFTListingCancelled'];
+    
+//     while (fromBlock <= latestBlock && retryCount < maxRetries) {
+//       const toBlock = (fromBlock + blockRange <= latestBlock) ? fromBlock + blockRange : latestBlock;
+      
+//       try {
+//         console.log(`Fetching events from block ${fromBlock.toString()} to ${toBlock.toString()}`);
+        
+//         for (const eventType of eventTypes) {
+//           try {
+//             const events = await contract.getPastEvents(eventType, {
+//               fromBlock: fromBlock.toString(),
+//               toBlock: toBlock.toString(),
+//               filter: { tokenId: tokenId }
+//             });
+            
+//             console.log(`Found ${events.length} ${eventType} events.`);
+            
+//             for (const event of events) {
+//               const block = await web3OnlyRead.eth.getBlock(event.blockNumber);
+//               history.push({
+//                 type: eventType,
+//                 from: event.returnValues.seller,
+//                 to: event.returnValues.buyer || null,
+//                 transactionHash: event.transactionHash,
+//                 blockNumber: event.blockNumber,
+//                 date: new Date(block.timestamp * 1000).toLocaleDateString(),
+//                 price: event.returnValues.price || null
+//               });
+//             }
+//           } catch (err) {
+//             if (err.message.includes("Event not found")) {
+//               console.warn(`Event ${eventType} not found for contract ${contractAddress}.`);
+//             } else {
+//               console.error('Error fetching events:', err);
+//             }
+//           }
+//         }
+        
+//         fromBlock = toBlock + BigInt(1);
+//         retryCount = 0; // Reset retry count on successful fetch
+//       } catch (err) {
+//         console.error('Error fetching events:', err);
+//         if (err.message.includes("timeout") || err.message.includes("rate limit")) {
+//           blockRange = blockRange / BigInt(2);
+//           retryCount++;
+//           console.warn(`Reducing block range to ${blockRange} and retrying. Attempt ${retryCount}`);
+//         } else {
+//           console.error('Unrecoverable error fetching NFT history:', err);
+//           break;
+//         }
+//       }
+//     }
+    
+//     // Sort history by block number
+//     history.sort((a, b) => a.blockNumber - b.blockNumber);
+    
+//     console.log('NFT history fetching complete, total records:', history.length);
+//     return history;
+//   } catch (error) {
+//     console.error('Error in getNFTHistory:', error);
+//     return [];
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,122 @@
+.RedeemMainDiv {
+    height: 600px;
+  }
+  
+  .menu {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .menu button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    background-color: var(--branding-color-hover);;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .IMGcardDivRedeem {
+    height: 200px;
+    width: 95%;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .IMGcardDivRedeem img{
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .menu button.active {
+    background-color: var(--branding-color);
+    border-radius: 20px;;
+  }
+  
+  .redeemable-section,
+  .redeemed-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    overflow-y: auto; /* Allows vertical scrolling */
+    max-height: 87%; /* Adjust based on your needs */
+  }
+  
+  .redeemable-section div,
+  .redeemed-section div {
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 5px;
+    background-color: #121212;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .redeemable-section img,
+  .redeemed-section img {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 8px;
+  }
+  
+  .redeemable-section h3,
+  .redeemed-section h3 {
+    margin: 10px 0;
+  }
+  
+  .redeemable-section button {
+    background-color: var(--branding-color);
+    border: none;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+  .redeemable-section button:hover {
+    background-color: var(--branding-color-hover);
+  }
+
+  .RedeemSectionDiv {
+    width: 30%;
+    border-left: 1px solid rgba(255, 255, 255, 0.395);
+    padding: 15px;
+    overflow: scroll;
+  }
+
+  .selectedCollDiv img {
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .selectedCollDiv input,
+  .selectedCollDiv select {
+    background-color: #121212;
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    width: 50%;
+    color: rgb(255, 255, 255);
+  }
+
+  .checkboxinput {
+    margin-bottom: 0px !important;
+    width: auto !important;
+    margin-bottom: 10px !important;
+    margin-top: 10px;
+  }
+
+  .selectedCollDiv {
+    padding: 10px;
+  }
+
+  .CountryInput {
+    width: 100% !important;
+  }
+  
+  

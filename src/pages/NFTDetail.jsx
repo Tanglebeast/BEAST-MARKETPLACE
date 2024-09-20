@@ -25,6 +25,7 @@ import ArtworkDetails from '../components/ArtworkDetails';
 import ArtworkOwnerRanking from '../components/ArtworkOwnerRanking';
 import ShortenAddress from '../components/ShortenAddress';
 import PriceHistory from '../components/PriceHistory';
+// import NFTHistory from '../components/NFTHistory';
 
 const web3 = new Web3(window.ethereum);
 
@@ -352,8 +353,9 @@ setMaxSupply(maxSupply);
       </div>
 
       <div className='w100 centered column'>
-        <ArtworkDetails />
+        <ArtworkDetails marketplace={marketplace} account={account}/>
         <ArtworkOwnerRanking collectionAddress={collectionaddress} marketplace={marketplace} />
+        {/* <NFTHistory collectionAddress={collectionaddress} tokenId={tokenid} marketplace={marketplace} /> */}
       </div>
       {isFullscreen && (
         <div className="fullscreen-overlay" onClick={() => setIsFullscreen(false)}>

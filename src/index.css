@@ -354,6 +354,10 @@ p,span {
   height: 220px;
 }
 
+.w93 {
+  width: 93% !important;
+}
+
 .bold {
   font-weight: bold;
 }
