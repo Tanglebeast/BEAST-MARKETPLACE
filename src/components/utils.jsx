@@ -222,11 +222,19 @@ const getNetworkConfig = (network) => {
 export const connectWallet = async (setAccount) => {
   if (typeof window.ethereum !== 'undefined') {
     try {
-      const selectedNetwork = localStorage.getItem('selectedNetwork');
-      if (!selectedNetwork) throw new Error('No network selected');
+      // Überprüfen, ob ein Netzwerk im lokalen Speicher vorhanden ist
+      let selectedNetwork = localStorage.getItem('selectedNetwork');
+      
+      // Wenn kein Netzwerk gespeichert ist, setze das Standardnetzwerk auf IOTA Testnet
+      if (!selectedNetwork) {
+        selectedNetwork = 'iotaevm'; // oder was auch immer dein Bezeichner ist
+        localStorage.setItem('selectedNetwork', selectedNetwork);
+      }
 
       const networkConfig = getNetworkConfig(selectedNetwork);
       const chainId = networkConfig.chainId;
+
+      console.log('Connected Chain ID:', chainId);
 
       await checkNetwork(chainId);
 
@@ -247,6 +255,7 @@ export const connectWallet = async (setAccount) => {
     showAlert("Please install MetaMask!");
   }
 };
+
 
 
 export const disconnectWallet = (setAccount, setIsConnected) => {

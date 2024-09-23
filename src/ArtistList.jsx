@@ -26,7 +26,7 @@ export const artistList = [
       },
       {
         name: 'Bob',
-        walletaddress: '0xF140c6BDe20ee59dA75C593d47289Cd37e8a2e37',
+        walletaddress: '0x0f6d5A27b56934C4624d61E2239450bE398563E0',
         email: 'marvguellier1999@gmail.com',
         banner: '/Artist-3.png',
         profilepicture: '/Artist-3.png',
