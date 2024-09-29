@@ -390,10 +390,11 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
 
         // Logik für die Bilddarstellung
         let imageUri = metadata.image;
-        if (!imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
+        if (tokenURI && (tokenURI.startsWith('ipfs://') || tokenURI.startsWith('https://ipfs.io/ipfs/'))) {
           imageUri = `https://ipfs.io/ipfs/${imageUri}`;
         } else if (imageUri.startsWith('ipfs://')) {
           imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+          console.warn('tokenURI ist undefiniert oder hat ein ungültiges Format:', tokenURI);
         }
 
         // Bereinigen der imageUri
