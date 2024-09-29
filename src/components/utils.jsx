@@ -426,7 +426,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
     const endIndex = Math.min(parseInt(totalSupply), startIndex + limit);
 
     // Anzahl der gleichzeitigen Anfragen begrenzen
-    const concurrencyLimit = 10; // Sie können diesen Wert anpassen
+    const concurrencyLimit = 100; // Sie können diesen Wert anpassen
     let allNFTs = [];
 
     for (let i = startIndex; i < endIndex; i += concurrencyLimit) {
