@@ -463,9 +463,12 @@ export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) =>
     let tokenURI = await contract.methods.tokenURI(tokenId).call();
 
     // Bereinigen der tokenURI
-    if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
+    if (tokenURI && !tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
       tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
-    }
+  } else if (!tokenURI) {
+      console.error(`tokenURI is undefined for tokenId ${tokenId} in collection ${collectionAddress}`);
+      return null; // Return null if tokenURI is undefined
+  }
 
     // Spezielle Behandlung für bestimmte Contract-Adressen
     if (isSpecialContract(collectionAddress)) {
