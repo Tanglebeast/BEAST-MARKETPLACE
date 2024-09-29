@@ -108,7 +108,7 @@ const networkConfigs = {
                         await fetchPoll(nftVotingContract, currentAccount, web3Instance);
                     }
                 } catch (error) {
-                    console.error('Fehler bei der Initialisierung von Web3 oder dem Vertrag:', error);
+                    console.error('Error initializing we3 or contract.', error);
                     setErrorMessage('Fehler bei der Initialisierung von Web3 oder dem Vertrag.');
                 }
             } else {
