@@ -1,10 +1,11 @@
+// src/components/Header.jsx
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';  // Importieren Sie useLocation
-import '../styles/Header.css';  // Verweisen Sie auf Ihre einzige CSS-Datei
+import { useLocation } from 'react-router-dom';
+import '../styles/Header.css';
 import ShortenAddress from './ShortenAddress';
 import { getUserName, getProfilePicture, initializeMarketplace } from '../components/utils';
-import NetworkselectionDropdown from './NetworkselectionDropdown';
-import '/fractalz-logo-black.svg';
+import BeastPrice from './BeastPrice';
+import FetchTokenAmount from './FetchTokenAmount'; // Import der neuen Komponente
 
 const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -12,10 +13,10 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
   const [profilePicture, setProfilePicture] = useState('/placeholder-PFP.png');
   const [marketplace, setMarketplace] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
-  const [showMobileMenu, setShowMobileMenu] = useState(false); // Zustand für das Hamburger-Menü
-  const [isScrolled, setIsScrolled] = useState(true); // Standardmäßig `true` setzen
-  
-  const location = useLocation(); // Verwenden Sie useLocation, um den aktuellen Pfad zu erhalten
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(true);
+
+  const location = useLocation();
 
   useEffect(() => {
     const setupMarketplace = async () => {
@@ -53,10 +54,8 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
   useEffect(() => {
     const handleScroll = () => {
       if (location.pathname === '/') {
-        // Auf der Homepage, scrolled nur auf Basis des Scrollens
         setIsScrolled(window.scrollY > 0);
       } else {
-        // Auf anderen Seiten immer scrolled
         setIsScrolled(true);
       }
     };
@@ -85,49 +84,58 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
     <header className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <nav className="nav-container">
         <a href="https://fractalz.xyz" className="title">
-          <img src="/fractalz-logo-black.svg" alt="NFT Marketplace Logo" className="logo" />
+          <img src="/beast-art-neu.svg" alt="NFT Marketplace Logo" className="logo" />
         </a>
         <label className="hamburger">
-          <input type="checkbox" checked={showMobileMenu} onChange={() => setShowMobileMenu(!showMobileMenu)} />
+          <input
+            type="checkbox"
+            checked={showMobileMenu}
+            onChange={() => setShowMobileMenu(!showMobileMenu)}
+          />
           <svg viewBox="0 0 32 32">
-            <path className="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+            <path
+              className="line line-top-bottom"
+              d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+            ></path>
             <path className="line" d="M7 16 27 16"></path>
           </svg>
         </label>
 
         <div className={`nav-links ${showMobileMenu ? 'active' : ''}`}>
-          <div className='ml200'>
-            <a href="/collections" className="nav-link">GALLERY</a>
-            <a href="/artists" className="nav-link">ARTISTS</a>
-            <a href="/users" className="nav-link">USERS</a>
+          <div className="ml200">
+            <a href="/collections" className="nav-link">COLLECTIONS</a>
+            <a href="/projects" className="nav-link">PROJECTS</a>
             <a href="/fairmint" className="nav-link">FAIRMINT</a>
             <a href="/fairvote" className="nav-link">FAIRVOTE</a>
-            <a href="/articles" className="nav-link">ARTICLES</a>
+            <a href="/beast-faucet" className="nav-link">MINT TEST TOKENS!</a>
           </div>
-          <div className='flex centered burder-account-network'>
-            <NetworkselectionDropdown />
+          <div className="flex centered burder-account-network gap30">
+            <BeastPrice />
             {isInitializing ? (
-              <img src='/basic-loading.gif' alt='loading-spinner' className="loading-spinner" />
+              <img src="/basic-loading.gif" alt="loading-spinner" className="loading-spinner" />
             ) : isConnected ? (
-              <div className="connected-container flex center-ho"
+              <div
+                className="connected-container flex center-ho"
                 onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                <div className='PFPImage flex centered'>
-                  <img 
-                    src={profilePicture} 
-                    alt="Profile" 
-                    className="profile-picture" 
-                  />
+                onMouseLeave={handleMouseLeave}
+              >
+                <div className="PFPImage flex centered">
+                  <img src={profilePicture} alt="Profile" className="profile-picture" />
                 </div>
                 <p className="account">
                   {username ? username : <ShortenAddress address={account} />}
                 </p>
                 {showDropdown && (
                   <div className="dropdown">
+                    {/* Einfügen der FetchTokenAmount Komponente */}
+                    <FetchTokenAmount account={account} />
+
                     <div className="dropdown-hover">
                       <a href="/wallet" className="dropdown-link">MY ACCOUNT</a>
                     </div>
-                    <button className="button-disconnect" onClick={handleDisconnect}>DISCONNECT</button>
+                    <button className="button-disconnect" onClick={handleDisconnect}>
+                      DISCONNECT
+                    </button>
                   </div>
                 )}
               </div>

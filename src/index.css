@@ -193,6 +193,10 @@ p,span {
   font-size: 20px;
 }
 
+.h20px {
+  height: 20px;
+}
+
 .s14 {
   font-size: 14px;
 }
@@ -279,6 +283,26 @@ p,span {
 
 .mb15 {
   margin-bottom: 15px;
+}
+
+.align-items-end {
+  align-items: end;
+}
+
+.justify-content-end {
+  justify-content: end;
+}
+
+.gold {
+  color: #BBA14F;
+}
+
+.p0imp {
+  padding: 0px !important;
+}
+
+.mb200 {
+  margin-bottom: 200px;
 }
 
 .h40 {
@@ -459,6 +483,11 @@ p,span {
   margin-right: 15px;
 }
 
+.wh100px {
+  width: 100px;
+  height: 100px;
+}
+
 .mr10 {
   margin-right: 10px;
 }
@@ -470,6 +499,10 @@ p,span {
 
 .w50 {
   width: 50%;
+}
+
+.h500px {
+  height: 500px;
 }
 
 .w60 {
@@ -527,16 +560,32 @@ p,span {
   gap: 50px;
 }
 
+.gap30 {
+  gap: 30px;
+}
+
 .initialwidth {
   width: initial;
+}
+
+.baseline {
+  align-items: baseline;
 }
 
 .h700 {
   height: 700px;
 }
 
+.h750 {
+  height: 800px;
+}
+
 .w91 {
   width: 91%;
+}
+
+.mt10r {
+  margin-top: 10px;
 }
 
 .h4-margin h4{

@@ -9,7 +9,7 @@ const Imprint = () => {
 
       <section className='imprint-link mb30 mt10'>
         <h3 className='mb5'>Website</h3>
-        <p className='mt5'>This imprint applies to all offers under the domain <a href="https://fractalz.xyz">https://fractalz.xyz</a> including all subdomains.</p>
+        <p className='mt5'>This imprint applies to all offers under the domain <a href="https://beast-art.xyz">https://beast-art.xyz</a> including all subdomains.</p>
       </section>
 
       <section className='mb30'>
@@ -19,7 +19,7 @@ const Imprint = () => {
           Herrenbergstr. 30<br />
           77815, Bühl<br />
           Phone: +49 152 5412 7399<br />
-          <div className='VisibleLink'>Email: <a href="mailto:support@fractalz.xyz">support@fractalz.xyz</a></div>
+          <div className='VisibleLink'>Email: <a href="mailto:support@beast-art.xyz">support@beast-art.xyz</a></div>
         </p>
       </section>
 

@@ -1,9 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/CollectionFilter.css';
 
-const CollectionDetailFilter = ({ onFilterChange }) => {
-    const [activeIndices, setActiveIndices] = useState([]);
-    const [selectedWords, setSelectedWords] = useState({ price: [], availability: [] });
+const CollectionDetailFilter = ({ onFilterChange, allAttributes, totalNFTsCount }) => {
+    const contentRef = useRef([]);
+
+    // Initialisieren von activeIndices mit Indizes 0 und 1 (PRICE und AVAILABILITY)
+    const [activeIndices, setActiveIndices] = useState(() => {
+        if (typeof window !== 'undefined' && window.innerWidth > 768) {
+            return [0, 1]; // PRICE und AVAILABILITY geöffnet
+        } else {
+            return []; // Alle Filter eingeklappt
+        }
+    });
+
+    const [selectedWords, setSelectedWords] = useState({ price: [], availability: [], attributes: {} });
 
     const toggleAccordion = (index) => {
         setActiveIndices(prevState =>
@@ -13,18 +23,37 @@ const CollectionDetailFilter = ({ onFilterChange }) => {
         );
     };
 
-    const handleWordToggle = (type, word) => {
+    const handleWordToggle = (type, word, traitType) => {
         setSelectedWords(prevState => {
-            const updatedWords = prevState[type].includes(word)
-                ? prevState[type].filter(w => w !== word)
-                : [...prevState[type], word];
+            let updatedWords;
+            if (type === 'attributes') {
+                const currentTraitValues = prevState.attributes[traitType] || [];
+                updatedWords = currentTraitValues.includes(word)
+                    ? currentTraitValues.filter(w => w !== word)
+                    : [...currentTraitValues, word];
 
-            const newSelectedWords = { ...prevState, [type]: updatedWords };
-            onFilterChange(newSelectedWords);
-            return newSelectedWords;
+                const newSelectedWords = {
+                    ...prevState,
+                    attributes: {
+                        ...prevState.attributes,
+                        [traitType]: updatedWords,
+                    },
+                };
+                onFilterChange(newSelectedWords);
+                return newSelectedWords;
+            } else {
+                updatedWords = prevState[type].includes(word)
+                    ? prevState[type].filter(w => w !== word)
+                    : [...prevState[type], word];
+
+                const newSelectedWords = { ...prevState, [type]: updatedWords };
+                onFilterChange(newSelectedWords);
+                return newSelectedWords;
+            }
         });
     };
 
+    // FAQ-Items für PRICE und AVAILABILITY
     const faqItems = [
         {
             question: 'PRICE',
@@ -38,22 +67,44 @@ const CollectionDetailFilter = ({ onFilterChange }) => {
         }
     ];
 
-    const contentRef = useRef([]);
+    // Dynamisch Attribute hinzufügen mit Zählungen
+    const attributeItems = Object.keys(allAttributes).map(traitType => ({
+        question: traitType.toUpperCase(),
+        words: Object.keys(allAttributes[traitType]),
+        counts: allAttributes[traitType], // Map von Wert zu Anzahl
+        type: 'attributes',
+        traitType: traitType,
+    }));
+
+    const allFaqItems = [
+        ...faqItems,
+        ...attributeItems
+    ];
 
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth <= 768) {
-                setActiveIndices([]); // Standardmäßig alle Akkordeons schließen
-            } else {
-                setActiveIndices([0, 1]); // Beide Felder standardmäßig geöffnet
-            }
+            setActiveIndices(prevActiveIndices => {
+                if (window.innerWidth <= 768) {
+                    // Auf mobilen Geräten alle Filter einklappen
+                    return [];
+                } else {
+                    // Auf Desktop: PRICE und AVAILABILITY offen lassen, ohne Benutzerinteraktionen zu überschreiben
+                    const indicesToKeepOpen = [0, 1];
+                    const combinedIndices = Array.from(new Set([...prevActiveIndices, ...indicesToKeepOpen]));
+                    return combinedIndices;
+                }
+            });
         };
 
-        handleResize(); // Initiale Überprüfung
         window.addEventListener('resize', handleResize);
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    useEffect(() => {
+        // Wenn neue Attribute geladen werden, nicht die activeIndices überschreiben
+        // Benutzerinteraktionen bleiben erhalten
+    }, [allFaqItems.length]);
 
     useEffect(() => {
         contentRef.current.forEach((el, index) => {
@@ -68,7 +119,7 @@ const CollectionDetailFilter = ({ onFilterChange }) => {
     return (
         <div className='accordion-filterContainer centered'>
             <div className="accordion-container">
-                {faqItems.map((item, index) => (
+                {allFaqItems.map((item, index) => (
                     <div className="accordion-item" key={index}>
                         <button
                             className={`accordion-header ${activeIndices.includes(index) ? 'active' : ''}`}
@@ -80,17 +131,31 @@ const CollectionDetailFilter = ({ onFilterChange }) => {
                             ref={el => contentRef.current[index] = el}
                             className="accordion-filterContent"
                         >
-                            {item.words.map((word, i) => (
-                                <label key={i} className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedWords[item.type].includes(word)}
-                                        onChange={() => handleWordToggle(item.type, word)}
-                                    />
-                                    <span className="custom-checkbox"></span>
-                                    {word}
-                                </label>
-                            ))}
+                            {item.words.map((word, i) => {
+                                let isChecked = false;
+                                if (item.type === 'attributes') {
+                                    isChecked = selectedWords.attributes[item.traitType]?.includes(word);
+                                } else {
+                                    isChecked = selectedWords[item.type].includes(word);
+                                }
+                                let percentage = '';
+                                if (item.type === 'attributes' && item.counts[word]) {
+                                    const count = item.counts[word];
+                                    const percent = ((count / totalNFTsCount) * 100).toFixed(2);
+                                    percentage = `(${percent}%)`;
+                                }
+                                return (
+                                    <label key={i} className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={() => handleWordToggle(item.type, word, item.traitType)}
+                                        />
+                                        <span className="custom-checkbox"></span>
+                                        {word} <span className='grey s16 ml5'>{percentage}</span>
+                                    </label>
+                                );
+                            })}
                         </div>
                     </div>
                 ))}

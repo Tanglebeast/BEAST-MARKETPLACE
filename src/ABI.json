@@ -55,6 +55,11 @@
 					"internalType": "uint256",
 					"name": "_price",
 					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "_paymentToken",
+					"type": "address"
 				}
 			],
 			"name": "listNFT",
@@ -95,25 +100,6 @@
 				{
 					"indexed": true,
 					"internalType": "address",
-					"name": "contractAddress",
-					"type": "address"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256",
-					"name": "newFloorPrice",
-					"type": "uint256"
-				}
-			],
-			"name": "FloorPriceUpdated",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "address",
 					"name": "seller",
 					"type": "address"
 				},
@@ -134,6 +120,12 @@
 					"internalType": "uint256",
 					"name": "price",
 					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "paymentToken",
+					"type": "address"
 				}
 			],
 			"name": "NFTListed",
@@ -170,31 +162,6 @@
 				{
 					"indexed": true,
 					"internalType": "address",
-					"name": "user",
-					"type": "address"
-				},
-				{
-					"indexed": true,
-					"internalType": "address",
-					"name": "contractAddress",
-					"type": "address"
-				},
-				{
-					"indexed": false,
-					"internalType": "string",
-					"name": "message",
-					"type": "string"
-				}
-			],
-			"name": "NFTRedeemed",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "address",
 					"name": "buyer",
 					"type": "address"
 				},
@@ -221,6 +188,12 @@
 					"internalType": "uint256",
 					"name": "price",
 					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "paymentToken",
+					"type": "address"
 				}
 			],
 			"name": "NFTSold",
@@ -285,19 +258,6 @@
 			"type": "event"
 		},
 		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "nftCollectionAddress",
-					"type": "address"
-				}
-			],
-			"name": "redeem",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
 			"inputs": [],
 			"name": "renounceOwnership",
 			"outputs": [],
@@ -308,7 +268,7 @@
 			"inputs": [
 				{
 					"internalType": "address",
-					"name": "_contractAddress",
+					"name": "_collectionAddress",
 					"type": "address"
 				},
 				{
@@ -405,64 +365,6 @@
 		{
 			"inputs": [
 				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"name": "allRedeemedCollections",
-			"outputs": [
-				{
-					"internalType": "address",
-					"name": "",
-					"type": "address"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "",
-					"type": "address"
-				},
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"name": "collectionPriceHistory",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "timestamp",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "averagePrice",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "totalSales",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "floorPrice",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
 					"internalType": "address",
 					"name": "",
 					"type": "address"
@@ -493,77 +395,6 @@
 					"internalType": "address",
 					"name": "",
 					"type": "address"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [],
-			"name": "getAllRedeemedCollections",
-			"outputs": [
-				{
-					"internalType": "address[]",
-					"name": "",
-					"type": "address[]"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "_contractAddress",
-					"type": "address"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_startTime",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_endTime",
-					"type": "uint256"
-				}
-			],
-			"name": "getAveragePriceInPeriod",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "_contractAddress",
-					"type": "address"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_startTime",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_endTime",
-					"type": "uint256"
-				}
-			],
-			"name": "getFloorPriceInPeriod",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
 				}
 			],
 			"stateMutability": "view",
@@ -608,6 +439,11 @@
 					"internalType": "uint256",
 					"name": "price",
 					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "paymentToken",
+					"type": "address"
 				}
 			],
 			"stateMutability": "view",
@@ -662,6 +498,11 @@
 							"internalType": "uint256",
 							"name": "price",
 							"type": "uint256"
+						},
+						{
+							"internalType": "address",
+							"name": "paymentToken",
+							"type": "address"
 						}
 					],
 					"internalType": "struct NFTMarketplace.NFT[]",
@@ -695,54 +536,6 @@
 			"inputs": [
 				{
 					"internalType": "address",
-					"name": "_user",
-					"type": "address"
-				}
-			],
-			"name": "getRedeemedCollections",
-			"outputs": [
-				{
-					"internalType": "address[]",
-					"name": "",
-					"type": "address[]"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "_contractAddress",
-					"type": "address"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_startTime",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_endTime",
-					"type": "uint256"
-				}
-			],
-			"name": "getTotalSalesInPeriod",
-			"outputs": [
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
 					"name": "user",
 					"type": "address"
 				}
@@ -760,55 +553,12 @@
 		},
 		{
 			"inputs": [],
-			"name": "HISTORY_HOURS",
+			"name": "NATIVE_TOKEN_ADDRESS",
 			"outputs": [
 				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
 					"internalType": "address",
-					"name": "_user",
-					"type": "address"
-				},
-				{
-					"internalType": "address",
-					"name": "_contractAddress",
-					"type": "address"
-				}
-			],
-			"name": "isCollectionRedeemed",
-			"outputs": [
-				{
-					"internalType": "bool",
 					"name": "",
-					"type": "bool"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "_contractAddress",
 					"type": "address"
-				}
-			],
-			"name": "isRedeemed",
-			"outputs": [
-				{
-					"internalType": "bool",
-					"name": "",
-					"type": "bool"
 				}
 			],
 			"stateMutability": "view",
@@ -867,6 +617,11 @@
 					"internalType": "uint256",
 					"name": "price",
 					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "paymentToken",
+					"type": "address"
 				}
 			],
 			"stateMutability": "view",
@@ -899,19 +654,8 @@
 			"type": "function"
 		},
 		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "",
-					"type": "address"
-				},
-				{
-					"internalType": "uint256",
-					"name": "",
-					"type": "uint256"
-				}
-			],
-			"name": "redeemedCollections",
+			"inputs": [],
+			"name": "SPECIAL_TOKEN_ADDRESS",
 			"outputs": [
 				{
 					"internalType": "address",
@@ -976,7 +720,7 @@
 	  },
 	  "//": "IOTA EVM",
 	  "1075": {
-		"address": "0xec09a4b15CD7b2D53951c5d759C7D3D7b909bCFC",
+		"address": "0x5B5DCBac5D73126dB9ca6EbCd16DD6a24EB9dD91",
 		"testcampaign address": "0xDC446Da886cF98ac5b910392d41D19BF3AAeCEbe"
 	  },
 	  "//": "SHIMMER EVM",

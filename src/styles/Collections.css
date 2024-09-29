@@ -10,13 +10,20 @@
 .collection-infoCardDiv {
     display: flex;
     flex-direction: column;
-    height: 170px;
+    height: auto;
     justify-content: space-between;
+}
+
+.card-footer-infoDiv {
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    height: 100px;
 }
 
 .collection-banner,
 .collectionbannerDiv {
-    height: 200px;
+    height: auto;
     width: 250px;
     display: flex;
     justify-content: center;

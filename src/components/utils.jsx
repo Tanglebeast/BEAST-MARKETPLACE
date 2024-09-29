@@ -290,7 +290,48 @@ export const initializeMarketplace = async (setMarketplace, refreshData) => {
 
 
 
-export const fetchAllNFTs = async (collectionAddress, marketplace) => {
+/**
+ * Bereinigt die gegebene URI, indem doppelte Schrägstriche (//) durch einen einfachen Schrägstrich (/) ersetzt werden,
+ * außer wenn die URI mit "ipfs://" beginnt.
+ * 
+ * @param {string} uri - Die zu bereinigende URI.
+ * @returns {string} - Die bereinigte URI.
+ */
+const sanitizeURI = (uri) => {
+  if (uri.startsWith('ipfs://')) {
+    // Teile die URI nach dem Protokoll
+    const parts = uri.split('ipfs://');
+    if (parts.length > 1) {
+      // Ersetze doppelte Schrägstriche im Pfadteil
+      const sanitizedPath = parts[1].replace(/\/\//g, '/');
+      return `ipfs://${sanitizedPath}`;
+    }
+    return uri;
+  } else {
+    // Ersetze alle doppelten Schrägstriche durch einen einfachen Schrägstrich
+    return uri.replace(/\/\//g, '/');
+  }
+};
+
+
+
+
+// 1. Definieren Sie die Liste der speziellen Contract-Adressen in Kleinbuchstaben
+const specialContracts = [
+  "0xa05135cc395b8e60aebe418594b2551b3b943960",
+  "0xa05135cc395b8e60adad418584b2551b3b942220",
+  "0xa05135ca120p8e60aehE091594b2551b3b943960" // Bitte überprüfen Sie diese Adresse auf Richtigkeit
+].map(addr => addr.toLowerCase());
+
+// 2. Hilfsfunktion zur Überprüfung, ob eine Adresse speziell ist
+const isSpecialContract = (address) => {
+  return specialContracts.includes(address.toLowerCase());
+};
+
+
+
+
+export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 0, limit = Infinity) => {
   try {
     const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
     if (!selectedCollection) {
@@ -301,69 +342,204 @@ export const fetchAllNFTs = async (collectionAddress, marketplace) => {
     const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
     const totalSupply = await contract.methods.MAX_SUPPLY().call();
 
-    // console.log('Total supply of NFTs in collection:', totalSupply);
-
     // Funktion zum Abrufen der NFT-Daten
     const fetchNFTData = async (index) => {
       try {
         const tokenId = await contract.methods.tokenByIndex(index).call();
-        const tokenURI = await contract.methods.tokenURI(tokenId).call();
+        let tokenURI = await contract.methods.tokenURI(tokenId).call();
+
+        // Bereinigen der tokenURI
+        if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
+          tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
+        }
+
+        // Spezielle Behandlung für bestimmte Contract-Adressen
+        if (isSpecialContract(collectionAddress)) {
+          // Entferne das .json Suffix, falls vorhanden
+          if (tokenURI.endsWith('.json')) {
+            tokenURI = tokenURI.slice(0, -5);
+          }
+        }
 
         // Entferne den ersten Abschnitt der URI bis zum "/"
         const splitURI = tokenURI.split('/');
-        const newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}.json`;
+        let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
+
+        // Für nicht-spezielle Contracts, füge .json hinzu
+        if (!isSpecialContract(collectionAddress)) {
+          newURI += '.json';
+        }
+
+        // Bereinigen der newURI
+        newURI = sanitizeURI(newURI);
 
         // Abrufen der JSON-Daten
         const response = await axios.get(newURI);
         const metadata = response.data;
 
-
         const owner = await contract.methods.ownerOf(tokenId).call();
         const uid = `${selectedCollection.address}-${tokenId}`;
 
         // Extract position from attributes
-        const positionAttr = metadata.attributes.find(attr => attr.trait_type === 'position');
+        const positionAttr = metadata.attributes?.find(attr => attr.trait_type === 'position');
         const position = positionAttr ? positionAttr.value : '0-0'; // Default position if not found
 
         // Fetch price from marketplace
         const nftDetails = await getNFTDetails(selectedCollection.address, tokenId, marketplace);
         const priceInEther = nftDetails ? nftDetails.price : '0';
 
+        // Logik für die Bilddarstellung
+        let imageUri = metadata.image;
+        if (!imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
+          imageUri = `https://ipfs.io/ipfs/${imageUri}`;
+        } else if (imageUri.startsWith('ipfs://')) {
+          imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+        }
+
+        // Bereinigen der imageUri
+        imageUri = sanitizeURI(imageUri);
+
+        // Sicherstellen, dass paymentToken vorhanden ist
+        const paymentToken = nftDetails?.paymentToken || 'N/A'; // Standardwert, falls paymentToken fehlt
+
         return {
           uid: uid,
-          contractAddress: selectedCollection.address,
-          tokenId: tokenId,
-          owner: owner,
+          contractAddress: selectedCollection.address.toLowerCase(),
+          tokenId: tokenId.toString(), // Sicherstellen, dass tokenId als String behandelt wird
+          owner: owner.toLowerCase(),
           name: metadata.name,
-          image: metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/'),
+          description: metadata.description || 'No description available',
+          image: imageUri,
           price: priceInEther,
           position: position,
+          attributes: metadata.attributes,
+          stats: metadata.stats,
+          paymentToken: paymentToken, // Füge paymentToken hier hinzu
         };
       } catch (error) {
-        // console.error(`Error fetching NFT data for index ${index}:`, error);
+        console.error(`Error fetching NFT data for index ${index}:`, error);
         return null;
       }
     };
 
-    // Paralleles Abrufen aller NFTs
-    const allNFTsPromises = [];
-    for (let i = 0; i < totalSupply; i++) {
-      allNFTsPromises.push(fetchNFTData(i));
+    const endIndex = Math.min(parseInt(totalSupply), startIndex + limit);
+
+    // Anzahl der gleichzeitigen Anfragen begrenzen
+    const concurrencyLimit = 10; // Sie können diesen Wert anpassen
+    let allNFTs = [];
+
+    for (let i = startIndex; i < endIndex; i += concurrencyLimit) {
+      const batchPromises = [];
+      for (let j = i; j < i + concurrencyLimit && j < endIndex; j++) {
+        batchPromises.push(fetchNFTData(j));
+      }
+      const batchResults = await Promise.all(batchPromises);
+      allNFTs = allNFTs.concat(batchResults.filter(nft => nft !== null)); // Entfernt null-Einträge
     }
 
-    // Warten auf alle Promises
-    let allNFTs = await Promise.all(allNFTsPromises);
-    // Filtern Sie alle NFTs heraus, die null sind (aufgrund von Fehlern)
-    allNFTs = allNFTs.filter(nft => nft !== null);
-
-    // console.log('All NFTs fetched:', allNFTs);
+    console.log(`Fetched ${allNFTs.length} NFTs from collection ${collectionAddress}`);
 
     return allNFTs;
   } catch (error) {
-    // console.error("Error fetching NFTs:", error);
+    console.error("Error fetching NFTs:", error);
     return [];
   }
 };
+
+
+// Neue Funktion zum Abrufen eines einzelnen NFT basierend auf tokenId
+export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) => {
+  try {
+    console.log(`Fetching single NFT for Collection: ${collectionAddress}, Token ID: ${tokenId}`);
+
+    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
+    if (!selectedCollection) {
+      console.log('Collection not found for address:', collectionAddress);
+      return null;
+    }
+
+    const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
+
+    let tokenURI = await contract.methods.tokenURI(tokenId).call();
+
+    // Bereinigen der tokenURI
+    if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
+      tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
+    }
+
+    // Spezielle Behandlung für bestimmte Contract-Adressen
+    if (isSpecialContract(collectionAddress)) {
+      // Entferne das .json Suffix, falls vorhanden
+      if (tokenURI.endsWith('.json')) {
+        tokenURI = tokenURI.slice(0, -5);
+      }
+    }
+
+    // Entferne den ersten Abschnitt der URI bis zum "/"
+    const splitURI = tokenURI.split('/');
+    let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
+
+    // Für nicht-spezielle Contracts, füge .json hinzu
+    if (!isSpecialContract(collectionAddress)) {
+      newURI += '.json';
+    }
+
+    // Bereinigen der newURI
+    newURI = sanitizeURI(newURI);
+
+    // Abrufen der JSON-Daten
+    const response = await axios.get(newURI);
+    const metadata = response.data;
+
+    const owner = await contract.methods.ownerOf(tokenId).call();
+    const uid = `${selectedCollection.address}-${tokenId}`;
+
+    // Extract position from attributes
+    const positionAttr = metadata.attributes.find(attr => attr.trait_type === 'position');
+    const position = positionAttr ? positionAttr.value : '0-0'; // Default position if not found
+
+    // Fetch price from marketplace
+    const nftDetails = await getNFTDetails(selectedCollection.address, tokenId, marketplace);
+    const priceInEther = nftDetails ? nftDetails.price : '0';
+
+    // Logik für die Bilddarstellung
+    let imageUri = metadata.image;
+    if (!imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
+      imageUri = `https://ipfs.io/ipfs/${imageUri}`;
+    } else if (imageUri.startsWith('ipfs://')) {
+      imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    }
+
+    // Bereinigen der imageUri
+    imageUri = sanitizeURI(imageUri);
+
+    const structuredNFT = {
+      uid: uid,
+      contractAddress: selectedCollection.address.toLowerCase(),
+      tokenId: tokenId.toString(), // Sicherstellen, dass tokenId als String behandelt wird
+      owner: owner.toLowerCase(),
+      name: metadata.name,
+      description: metadata.description || 'No description available',
+      image: imageUri,
+      price: priceInEther,
+      position: position,
+      attributes: metadata.attributes,
+      stats: metadata.stats,
+      paymentToken: nftDetails.paymentToken, // Füge paymentToken hier hinzu
+    };
+
+    console.log('Fetched Single NFT Data:', structuredNFT);
+
+    return structuredNFT;
+  } catch (error) {
+    console.error(`Error fetching single NFT for tokenId ${tokenId} in collection ${collectionAddress}:`, error);
+    return null;
+  }
+};
+
+
+
+
 
 
 export const getMaxSupply = async (collectionAddress) => {
@@ -389,7 +565,9 @@ export const getMaxSupply = async (collectionAddress) => {
 
 export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
   try {
-    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === contractAddress.toLowerCase());
+    const selectedCollection = nftCollections.find(
+      (collection) => collection.address.toLowerCase() === contractAddress.toLowerCase()
+    );
     if (!selectedCollection) {
       console.log('Collection not found for address:', contractAddress);
       return null;
@@ -397,18 +575,52 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
 
     const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, contractAddress);
     const owner = await contract.methods.ownerOf(tokenId).call();
-    const tokenURI = await contract.methods.tokenURI(tokenId).call();
+    let tokenURI = await contract.methods.tokenURI(tokenId).call();
+
+    // Bereinigen der tokenURI
+    if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
+      tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
+    }
+
+    // Spezielle Behandlung für bestimmte Contract-Adressen
+    if (isSpecialContract(contractAddress)) {
+      // Entferne das .json Suffix, falls vorhanden
+      if (tokenURI.endsWith('.json')) {
+        tokenURI = tokenURI.slice(0, -5); // Entfernt die letzten 5 Zeichen ('.json')
+      }
+    }
 
     // Entferne den ersten Abschnitt der URI bis zum "/"
     const splitURI = tokenURI.split('/');
-    const newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}.json`;
+    let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
+
+    // Für nicht-spezielle Contracts, füge .json hinzu
+    if (!isSpecialContract(contractAddress)) {
+      newURI += '.json';
+    }
+
+    // Bereinigen der newURI
+    newURI = sanitizeURI(newURI);
+
+    // console.log(`Formatted IPFS URI: ${newURI} (Contract: ${contractAddress})`);
 
     const metadataResponse = await axios.get(newURI);
     const metadata = metadataResponse.data;
 
+    // console.log(`Original image URI: ${metadata.image} (Contract: ${contractAddress})`);
+
+    // Überprüfen und Formatierung der image URI anpassen
+    let imageURI = metadata.image;
+    if (!imageURI.startsWith('ipfs://') && !imageURI.startsWith('https://ipfs.io/ipfs/')) {
+      imageURI = `https://ipfs.io/ipfs/${imageURI}`;
+    }
+    imageURI = imageURI.replace('ipfs://', 'https://ipfs.io/ipfs/');
+
+    // Bereinigen der imageURI
+    imageURI = sanitizeURI(imageURI);
+
     const nftDetails = await marketplace.methods.getNFTDetails(contractAddress, tokenId).call();
     const priceInEther = web3OnlyRead.utils.fromWei(nftDetails.price, 'ether');
-
 
     const positionAttr = metadata.attributes.find(attr => attr.trait_type === 'position');
     const position = positionAttr ? positionAttr.value : '0-0';
@@ -418,15 +630,40 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
       tokenId: tokenId,
       owner: owner,
       name: metadata.name,
-      image: metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/'),
+      description: metadata.description || 'No description available',
+      image: imageURI,
       price: priceInEther,
       position: position,
+      attributes: metadata.attributes,
+      stats: metadata.stats,
+      paymentToken: nftDetails.paymentToken, // Füge paymentToken hier hinzu
     };
   } catch (error) {
     // console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
     return null;
   }
 };
+
+
+
+export const getOwnedNFTsCount = async (collectionAddress, account, marketplace) => {
+  try {
+    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
+    if (!selectedCollection) {
+      console.log('Collection not found for address:', collectionAddress);
+      return 0;
+    }
+
+    const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, collectionAddress);
+    const balance = await contract.methods.balanceOf(account).call();
+    return parseInt(balance, 10);
+  } catch (error) {
+    console.error('Error fetching owned NFTs count:', error);
+    return 0;
+  }
+};
+
+
 
 
 
@@ -463,18 +700,74 @@ export const checkApproval = async (contractAddress, account, marketplace) => {
 
 
 // Funktion zur Schätzung der Gasgebühren mit Sicherheitsaufschlag
-const getGasEstimate = async (method, params, fromAddress) => {
+export const getGasEstimate = async (method, params, fromAddress) => {
   try {
+    // Versuche, die Gasabschätzung mit der Methode durchzuführen
     const gasEstimate = await method.estimateGas({ ...params, from: fromAddress });
     const gasPrice = await web3.eth.getGasPrice();
     
-    // Konvertiere Gaspreis zu Zahlen und füge 15% Sicherheitsaufschlag hinzu
+    // Konvertiere Gaspreis zu einer Zahl und füge 15% Sicherheitsaufschlag hinzu
     const gasPriceInWei = parseFloat(gasPrice);
     const gasPriceWithMarkup = gasPriceInWei * 1.15; // 15% Aufschlag
     
     return { gasEstimate, gasPrice: gasPriceWithMarkup.toString() };
   } catch (error) {
     console.error('Error estimating gas:', error);
+    
+    try {
+      // Hole den aktuellen Gaspreis, auch wenn die ursprüngliche Abschätzung fehlgeschlagen ist
+      const gasPrice = await web3.eth.getGasPrice();
+      const gasPriceInWei = parseFloat(gasPrice);
+      const gasPriceWithMarkup = gasPriceInWei * 1.15; // 15% Aufschlag
+      
+      // Verwende einen manuellen Gasbetrag von 3000
+      const manualGasEstimate = 300000;
+      
+      return { gasEstimate: manualGasEstimate, gasPrice: gasPriceWithMarkup.toString() };
+    } catch (innerError) {
+      console.error('Error fetching gas price for manual estimate:', innerError);
+      throw innerError; // Optional: Du kannst hier auch einen spezifischen Fehler werfen
+    }
+  }
+};
+
+
+
+const ERC20_ADDRESS = '0x6852f7B4ba44667F2Db80E6f3A9f8A173b03cD15';
+const ERC20_ABI = [ { "inputs": [ { "internalType": "address", "name": "initialOwner", "type": "address" } ], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "ECDSAInvalidSignature", "type": "error" }, { "inputs": [ { "internalType": "uint256", "name": "length", "type": "uint256" } ], "name": "ECDSAInvalidSignatureLength", "type": "error" }, { "inputs": [ { "internalType": "bytes32", "name": "s", "type": "bytes32" } ], "name": "ECDSAInvalidSignatureS", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "allowance", "type": "uint256" }, { "internalType": "uint256", "name": "needed", "type": "uint256" } ], "name": "ERC20InsufficientAllowance", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "uint256", "name": "balance", "type": "uint256" }, { "internalType": "uint256", "name": "needed", "type": "uint256" } ], "name": "ERC20InsufficientBalance", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "approver", "type": "address" } ], "name": "ERC20InvalidApprover", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "receiver", "type": "address" } ], "name": "ERC20InvalidReceiver", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "sender", "type": "address" } ], "name": "ERC20InvalidSender", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" } ], "name": "ERC20InvalidSpender", "type": "error" }, { "inputs": [ { "internalType": "uint256", "name": "deadline", "type": "uint256" } ], "name": "ERC2612ExpiredSignature", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "signer", "type": "address" }, { "internalType": "address", "name": "owner", "type": "address" } ], "name": "ERC2612InvalidSigner", "type": "error" }, { "inputs": [], "name": "EnforcedPause", "type": "error" }, { "inputs": [], "name": "ExpectedPause", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "currentNonce", "type": "uint256" } ], "name": "InvalidAccountNonce", "type": "error" }, { "inputs": [], "name": "InvalidShortString", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" } ], "name": "OwnableInvalidOwner", "type": "error" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" } ], "name": "OwnableUnauthorizedAccount", "type": "error" }, { "inputs": [ { "internalType": "string", "name": "str", "type": "string" } ], "name": "StringTooLong", "type": "error" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "spender", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [], "name": "EIP712DomainChanged", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" } ], "name": "OwnershipTransferred", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "account", "type": "address" } ], "name": "Paused", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "from", "type": "address" }, { "indexed": true, "internalType": "address", "name": "to", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "address", "name": "account", "type": "address" } ], "name": "Unpaused", "type": "event" }, { "inputs": [], "name": "DOMAIN_SEPARATOR", "outputs": [ { "internalType": "bytes32", "name": "", "type": "bytes32" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "MINT_AMOUNT", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" } ], "name": "allowance", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "approve", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" } ], "name": "balanceOf", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "burn", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "burnFrom", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "decimals", "outputs": [ { "internalType": "uint8", "name": "", "type": "uint8" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "eip712Domain", "outputs": [ { "internalType": "bytes1", "name": "fields", "type": "bytes1" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "version", "type": "string" }, { "internalType": "uint256", "name": "chainId", "type": "uint256" }, { "internalType": "address", "name": "verifyingContract", "type": "address" }, { "internalType": "bytes32", "name": "salt", "type": "bytes32" }, { "internalType": "uint256[]", "name": "extensions", "type": "uint256[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "mint", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "name", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" } ], "name": "nonces", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "pause", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "paused", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "value", "type": "uint256" }, { "internalType": "uint256", "name": "deadline", "type": "uint256" }, { "internalType": "uint8", "name": "v", "type": "uint8" }, { "internalType": "bytes32", "name": "r", "type": "bytes32" }, { "internalType": "bytes32", "name": "s", "type": "bytes32" } ], "name": "permit", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "symbol", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "totalSupply", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "to", "type": "address" }, { "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "from", "type": "address" }, { "internalType": "address", "name": "to", "type": "address" }, { "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "newOwner", "type": "address" } ], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "unpause", "outputs": [], "stateMutability": "nonpayable", "type": "function" } ];
+
+
+// const getGasEstimate = async (method, options, from) => {
+//   const manualGasLimit = 1000000; // Setze hier den gewünschten festen Gaswert
+//   const gasPrice = await web3.eth.getGasPrice();
+  
+//   return { gasEstimate: manualGasLimit, gasPrice };
+// };
+
+
+const approveERC20 = async (account, amount, marketplace, paymentToken) => {
+  const web3 = new Web3(window.ethereum);
+  const erc20Contract = new web3.eth.Contract(ERC20_ABI, paymentToken);
+
+  try {
+    console.log("Marketplace Address:", marketplace.options.address);
+    console.log("Payment Token Address:", paymentToken);
+    
+    const { gasEstimate, gasPrice } = await getGasEstimate(
+      erc20Contract.methods.approve(marketplace.options.address, amount),
+      {},
+      account
+    );
+
+    await erc20Contract.methods.approve(marketplace.options.address, amount).send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    showAlert("ERC20 token approval successful!");
+  } catch (error) {
+    showAlert("Failed to approve ERC20 token transfer. Please try again.");
     throw error;
   }
 };
@@ -482,49 +775,102 @@ const getGasEstimate = async (method, params, fromAddress) => {
 
 
 
-export const buyNFT = async (index, price, account, marketplace, refreshData) => {
+
+export const buyNFT = async (index, price, account, marketplace, nftDetails, refreshData) => {
   try {
+    const isNativePayment = nftDetails.paymentToken === "0x0000000000000000000000000000000000000000";
+    
+    // Wenn es sich um einen ERC20-Token handelt, erfordert dies eine Genehmigung
+    if (!isNativePayment) {
+      const priceInWei = web3.utils.toWei(price.toString(), 'ether'); // Nur für ERC20-Token umrechnen
+      await approveERC20(account, priceInWei, marketplace, nftDetails.paymentToken);
+    }
+
     const { gasEstimate, gasPrice } = await getGasEstimate(
       marketplace.methods.buyNFT(index),
-      { value: price },
+      { from: account },
       account
     );
 
-    await marketplace.methods.buyNFT(index).send({ from: account, value: price, gas: gasEstimate, gasPrice: gasPrice });
+    const txOptions = {
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice,
+    };
 
+    if (isNativePayment) {
+      // Wenn es eine native Währung ist, setze den Preis direkt
+      txOptions.value = price; 
+    }
+
+    const result = await marketplace.methods.buyNFT(index).send(txOptions);
+
+    console.log("Transaction result:", result);
     showAlert("NFT successfully purchased!");
     await refreshData(marketplace);
   } catch (error) {
-    showAlert("Failed to buy NFT. Please try again.");
+    console.error("Detailed error:", error);
+    if (error.message.includes("revert")) {
+      const reason = await getRevertReason(error.transactionHash);
+      showAlert(`Transaction reverted: ${reason}`);
+    } else {
+      showAlert(`Failed to buy NFT: ${error.message || "Unknown error occurred"}`);
+    }
+    throw error;
   }
 };
 
 
-export const listNFT = async (contractAddress, tokenId, price, account, marketplace, checkApproval, approveMarketplace, refreshData) => {
-  try {
-    const isApproved = await checkApproval(contractAddress, account, marketplace);
-    if (!isApproved) {
-      await approveMarketplace(contractAddress, tokenId, marketplace, account);
-    }
 
+// Funktion zum Abrufen des Revert-Grundes
+async function getRevertReason(txHash) {
+  try {
+    const tx = await web3.eth.getTransaction(txHash);
+    const result = await web3.eth.call(tx, tx.blockNumber);
+    return result;
+  } catch (err) {
+    return "Unable to get revert reason";
+  }
+}
+
+
+
+
+
+export const listNFT = async (contractAddress, tokenId, price, paymentToken, account, marketplace, refreshData) => {
+  try {
+    // Preis in Wei umwandeln
+    const priceInWei = web3.utils.toWei(price.toString(), 'ether');
+    console.log("Converting price to Wei:", { price, priceInWei });
+
+    // Gasabschätzung erhalten
     const { gasEstimate, gasPrice } = await getGasEstimate(
-      marketplace.methods.listNFT(contractAddress, tokenId, web3.utils.toWei(price, 'ether')),
+      marketplace.methods.listNFT(contractAddress, tokenId, priceInWei, paymentToken),
       {},
       account
     );
+    console.log("Gas Estimate and Gas Price:", { gasEstimate, gasPrice });
 
+    // NFT auflisten
     const tx = await marketplace.methods
-      .listNFT(contractAddress, tokenId, web3.utils.toWei(price, 'ether'))
+      .listNFT(contractAddress, tokenId, priceInWei, paymentToken)
       .send({ from: account, gas: gasEstimate, gasPrice: gasPrice });
+
+    console.log("Transaction successful:", { tx });
 
     showAlert("NFT listed successfully!");
     await refreshData(marketplace);
     return tx;
   } catch (error) {
-    showAlert(`Failed to list NFT: ${error.message}`);
+    console.error("Error listing NFT:", error);
+    showAlert(`Failed to list NFT: ${error.message || error}`);
     throw error;
   }
 };
+
+
+
+
 
 
 export const cancelListing = async (index, account, marketplace, refreshData) => {
@@ -781,8 +1127,22 @@ export const getTokenIdsOfOwner = async (contractAddress, ownerAddress) => {
     // Erstelle eine Instanz des Contracts
     const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, contractAddress);
 
-    // Rufe die Token-IDs des Besitzers ab
-    const tokenIds = await contract.methods.tokenIdsOfOwner(ownerAddress).call();
+    // Prüfe, ob der Contract die ERC-721 Enumerable Erweiterung unterstützt
+    const supportsEnumerable = await contract.methods.supportsInterface('0x780e9d63').call();
+    if (!supportsEnumerable) {
+      console.error('Contract does not support ERC-721 Enumerable interface');
+      return [];
+    }
+
+    // Rufe die Anzahl der Tokens des Besitzers ab
+    const balance = await contract.methods.balanceOf(ownerAddress).call();
+    const tokenIds = [];
+
+    // Rufe jede Token-ID des Besitzers ab
+    for (let i = 0; i < balance; i++) {
+      const tokenId = await contract.methods.tokenOfOwnerByIndex(ownerAddress, i).call();
+      tokenIds.push(tokenId.toString()); // Konvertierung zu String
+    }
 
     console.log(`Token IDs for owner ${ownerAddress}:`, tokenIds);
 

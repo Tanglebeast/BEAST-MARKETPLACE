@@ -77,11 +77,11 @@ const ArtistProfile = () => {
       </div>
       <div className="toggle-buttons flex centered mt15 VisibleLink gap15">
         <button onClick={() => setSelectedComponent('gallery')} className={selectedComponent === 'gallery' ? 'active' : ''}>
-          <a>GALLERY</a>
+          <a>COLLECTIONS</a>
         </button>
-        <button onClick={() => setSelectedComponent('blog')} className={selectedComponent === 'blog' ? 'active' : ''}>
+        {/* <button onClick={() => setSelectedComponent('blog')} className={selectedComponent === 'blog' ? 'active' : ''}>
           <a>ARTICLES</a>
-        </button>
+        </button> */}
         <button onClick={() => setSelectedComponent('polls')} className={selectedComponent === 'polls' ? 'active' : ''}>
           <a>POLLS</a>
         </button>

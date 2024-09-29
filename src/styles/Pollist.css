@@ -3,7 +3,6 @@
 /* Grundlegende Container-Stile für das PollsList */
 .polls-list-container {
     padding: 20px;
-    max-width: 1200px;
     margin: 0 auto;
     margin-top: 15px;
   }
@@ -16,6 +15,7 @@
   .polls-list-container p {
     text-align: center;
     text-align: left;
+    margin-bottom: 0px !important;
   }
 
   .view-details-button.disabled {
@@ -27,6 +27,13 @@
     color: black; /* Grau für den ausgegrauten Zustand */
     background-color: rgb(87, 87, 87); /* Heller Hintergrund für Deaktivierung */
   }
+
+  .view-details-button.expired {
+    background-color: #535bf2; /* Beispiel: Grauer Hintergrund für abgelaufene Umfragen */
+    cursor: pointer;
+    /* Weitere gewünschte Stile */
+}
+
   
   /* Flexbox-Container für die Poll-Karten */
   .polls-list-container > div {
@@ -48,9 +55,30 @@
     transition: transform 0.3s, box-shadow 0.3s;
     text-align: left;
   }
+
+  .poll-card {
+    background-color: black;
+    border-radius: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: left;
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .poll-Collection-Div{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 0fr));
+    max-width: 100%;
+    justify-content: center;
+    gap: 10px;
+  }
   
-  .poll-container:hover {
-    transform: translateY(-10px);
+  .poll-card:hover {
+    transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   }
   
@@ -74,6 +102,11 @@
     background-color: var(--branding-color-hover);
   }
 
+  .artist-profile-image-poll {
+    width: 70px;
+    height: auto;
+    border-radius: 50%;;
+  }
     /* Responsive styles */
     @media (max-width: 950px) {
         .poll-container {

@@ -26,7 +26,7 @@
 }
 
 .logo {
-  height: 60px;
+  height: 70px;
 }
 
 .nav-container {
@@ -130,7 +130,6 @@
 
 .dropdown-hover:hover {
   background-color: var(--branding-color);
-  border-radius: 5px 5px 0 0;
 }
 
 .dropdown-hover:hover a{
@@ -193,6 +192,44 @@
 .ml200 {
   margin-left: 5%;
 }
+
+/* src/styles/Header.css */
+
+/* Styling für die Token-Anzeige */
+.token-amount {
+  padding: 10px;
+  background-color: black;
+  border-bottom: 1px solid #eaeaea74;
+}
+
+.native-balance,
+.erc20-balance {
+  margin: 10px 0;
+  font-size: 16px;
+  color: white;
+}
+
+.token-amount-error {
+  color: red;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.native-balance img,
+.erc20-balance img,
+.token-amount-loading img {
+  height: 23px;
+  width: auto;
+  margin-right: 5px;
+}
+
+.token-amount-loading {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 
 
 /* @media (max-width: 768px) { */

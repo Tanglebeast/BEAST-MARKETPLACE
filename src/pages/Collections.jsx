@@ -49,7 +49,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
 
   return (
     <div className='CollectionDiv'>
-      <h2 className='text-align-left mt15 onlymedia'>GALLERY</h2>
+      <h2 className='text-align-left mt15 onlymedia'>COLLECTIONS</h2>
       <div className='w95 space-between flex MediaGalleryDiv'>
         {showFilter && (
           <div className='w20 Coll-FilterDiv'>
@@ -57,7 +57,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
           </div>
         )}
         <div className='centered w95 column flex flex-start ml20 MediaGalleryUnderDiv'>
-          <h2 className='text-align-left mt15 OnlyDesktop'>GALLERY</h2>
+          <h2 className='text-align-left mt15 OnlyDesktop'>COLLECTIONS</h2>
           <div className='SearchbarDesktop text-align-left w30 w100media'>
             {showSearchBar && <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
           </div>
@@ -72,19 +72,19 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
                 <a href={`/collections/${collection.address}`} key={index} className="collection-card">
                   <div className='collection-banner'>
                     <img src={collection.banner} alt={collection.name} />
-                    <div className='networklogo'>
+                    {/* <div className='networklogo'>
                       <img src={collection.currency} alt="currency logo" className="currency-logo-coll" />
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className='text-align-left w90 mb5 collection-infoCardDiv'>
-                    <div className='mb15'>
+                    <div className='mb5 card-footer-infoDiv'>
                       <h3 className='mb10'>{collection.name}</h3>
                       <span className='s18 grey'>{collection.artist}</span>
                     </div>
                     {collectionDetails[collection.address] && (
                       <>
-                        <div className='centered space-between w100 border-top'>
+                        {/* <div className='centered space-between w100 border-top'>
                           <div className='centered column'>
                             <p className='mb5 mt10px'>FLOOR</p>
                             <div className='centered s20'>
@@ -98,7 +98,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
                               {collectionDetails[collection.address].listedCount}
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                       </>
                     )}
                   </div>

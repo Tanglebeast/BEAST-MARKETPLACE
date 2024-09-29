@@ -31,7 +31,7 @@ const CollectionFilter = ({ onFilterChange }) => {
 
     const faqItems = [
         {
-            question: 'ARTIST',
+            question: 'PROJECT',
             words: uniqueArtists,
             type: 'artists'
         }

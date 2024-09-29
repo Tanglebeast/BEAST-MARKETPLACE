@@ -29,6 +29,11 @@
   margin-top: 10px;
 }
 
+.placeholder-image-loading-gif {
+  width: 250px !important;
+  height: 250px !important;
+}
+
 .nft-image {
   width: 270px;
   height: auto;

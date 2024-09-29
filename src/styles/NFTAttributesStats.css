@@ -1,0 +1,44 @@
+/* src/styles/NFTAttributesStats.css */
+.nft-attributes-stats {
+    margin-top: 20px;
+  }
+  
+  .nft-attributes-stats h3 {
+    margin-bottom: 10px;
+    color: white;
+  }
+  
+  .attributes, .stats {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .attributes {
+    display: flex;
+  }
+  
+  .attribute, .stat {
+    width: 45%;
+    margin: 5px;
+    padding: 10px;
+    background-color: black;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .trait-type, .stat-key {
+    margin-right: 5px;
+    color: #858585;
+  }
+  
+  .value, .stat-value {
+    color: var(--branding-color);
+    margin-top: 7px;
+  }
+
+  .nft-attributes-stats {
+    overflow: scroll;
+    height: 100%;
+  }
+  

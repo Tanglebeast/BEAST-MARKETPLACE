@@ -15,7 +15,8 @@ import {
   checkNetwork,
   getProfilePicture,
   connectWallet,
-  getMaxSupply
+  getMaxSupply,
+  getOwnedNFTsCount
 } from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import Web3 from 'web3';
@@ -25,6 +26,9 @@ import ArtworkDetails from '../components/ArtworkDetails';
 import ArtworkOwnerRanking from '../components/ArtworkOwnerRanking';
 import ShortenAddress from '../components/ShortenAddress';
 import PriceHistory from '../components/PriceHistory';
+import BeastToIotaPrice from '../components/BeastToIotaPrice';
+import NFTAttributesStats from '../components/NFTAttributesStats';
+
 // import NFTHistory from '../components/NFTHistory';
 
 const web3 = new Web3(window.ethereum);
@@ -45,6 +49,14 @@ const NFTDetail = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ownerUsername, setOwnerUsername] = useState('');
   const [ownerProfilePicture, setOwnerProfilePicture] = useState('/owner.png');
+  const [currency, setCurrency] = useState(''); // currency definieren
+  const [paymentToken, setPaymentToken] = useState(null);
+  const [convertedIotaPrice, setConvertedIotaPrice] = useState(null);
+
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
+  };
   
 
   useEffect(() => {
@@ -53,29 +65,24 @@ const NFTDetail = () => {
         if (marketplaceInstance) {
           const details = await getNFTDetails(collectionaddress, tokenid, marketplaceInstance);
           setNftDetails(details);
-
-          const allNFTs = await fetchAllNFTs(collectionaddress, marketplaceInstance);
-          setTotalSupply(allNFTs.length);
-
+  
           const maxSupply = Number(await getMaxSupply(collectionaddress, marketplaceInstance));
-console.log('Max Supply:', maxSupply);
-setMaxSupply(maxSupply);
-
-          const ownedNFTs = allNFTs.filter(nft => nft.owner.toLowerCase() === account.toLowerCase());
-          const ownershipPercentage = maxSupply > 0 ? (ownedNFTs.length / maxSupply) * 100 : 0;
-
-          setOwnershipPercentage(ownershipPercentage);
-
-          setOwnedNFTsCount(ownedNFTs.length);
-
+          setMaxSupply(maxSupply);
+          setTotalSupply(maxSupply); // Direkt von Smart Contract abgerufen
+  
+          // Anzahl der vom Benutzer gehaltenen NFTs
+          const ownedNFTsCount = await getOwnedNFTsCount(collectionaddress, account, marketplaceInstance);
+          setOwnedNFTsCount(ownedNFTsCount);
+  
+          setOwnershipPercentage(maxSupply > 0 ? (ownedNFTsCount / maxSupply) * 100 : 0);
           setIsForSale(parseFloat(details.price) > 0);
-
+  
           const username = await getUserName(details.owner, marketplaceInstance);
           setOwnerUsername(username || details.owner);
-
+  
           const profilePicture = await getProfilePicture(details.owner, marketplaceInstance);
           setOwnerProfilePicture(profilePicture || '/owner.png');
-
+  
           setIsLoading(false);
         }
       } catch (error) {
@@ -83,11 +90,12 @@ setMaxSupply(maxSupply);
         setIsLoading(false);
       }
     };
-
+  
     initializeMarketplace(setMarketplace, async (marketplace) => {
       await fetchNFTData(marketplace);
     });
-  }, [collectionaddress, tokenid, totalSupply]);
+  }, [collectionaddress, tokenid, totalSupply]); // Korrekte Schließung der useEffect-Hook
+  
 
   useEffect(() => {
     if (marketplace) {
@@ -100,30 +108,16 @@ setMaxSupply(maxSupply);
       if (marketplaceInstance) {
         const details = await getNFTDetails(collectionaddress, tokenid, marketplaceInstance);
         setNftDetails(details);
-
-        const allNFTs = await fetchAllNFTs(collectionaddress, marketplaceInstance);
-        setTotalSupply(allNFTs.length);
-
-        const maxSupply = Number(await getMaxSupply(collectionaddress, marketplaceInstance));
-setMaxSupply(maxSupply);
-
-
-
-        const ownedNFTs = allNFTs.filter(nft => nft.owner.toLowerCase() === account.toLowerCase());
-        const ownershipPercentage = maxSupply > 0 ? (ownedNFTs.length / maxSupply) * 100 : 0;
-
-        setOwnershipPercentage(ownershipPercentage);
-
-        setOwnedNFTsCount(ownedNFTs.length);
-
+  
+        // Aktualisiere nur die für diesen NFT relevanten Daten
         setIsForSale(parseFloat(details.price) > 0);
-
+  
         const username = await getUserName(details.owner, marketplaceInstance);
         setOwnerUsername(username || details.owner);
-
+  
         const profilePicture = await getProfilePicture(details.owner, marketplaceInstance);
         setOwnerProfilePicture(profilePicture || '/owner.png');
-
+  
         setIsLoading(false);
       }
     } catch (error) {
@@ -131,39 +125,100 @@ setMaxSupply(maxSupply);
       setIsLoading(false);
     }
   };
+  
 
   const handleBuy = async () => {
     try {
       if (marketplace && account) {
         const index = await marketplace.methods.getNFTIndex(collectionaddress, tokenid).call();
-        await buyNFT(index, web3.utils.toWei(nftDetails.price, 'ether'), account, marketplace, async () => {
+        const nftDetails = await marketplace.methods.getNFTDetails(collectionaddress, tokenid).call();
+        console.log('NFT Details:', nftDetails);
+  
+        // Nur für ERC20-Token in Wei umrechnen
+        let price = nftDetails.price;
+        if (nftDetails.paymentToken !== "0x0000000000000000000000000000000000000000") {
+          // price = web3.utils.toWei(nftDetails.price.toString(), 'ether');
+        }
+  
+        await buyNFT(index, price, account, marketplace, nftDetails, async () => {
           await refreshNFTData(marketplace);
         });
       }
     } catch (error) {
       console.error("Error buying NFT:", error);
-      alert(`Failed to buy NFT: ${error.message}`);
+      // alert(`Failed to buy NFT: ${error.message}`);
     }
   };
+  
+  
 
-  const handleList = async () => {
+  
+
+  const handleList = async (paymentToken) => {
     try {
+      console.log("handleList called with paymentToken:", paymentToken);
+  
       if (marketplace && account) {
+        console.log("Marketplace and account are valid.");
+  
+        // Überprüfe die Genehmigung
         const isApproved = await checkApproval(collectionaddress, account, marketplace);
+        console.log("Approval status:", isApproved);
+  
+        // Genehmige den Marketplace, wenn erforderlich
         if (!isApproved) {
-          await approveMarketplace(collectionaddress, tokenid, marketplace, setAccount);
+          console.log("Marketplace not approved, requesting approval...");
+          const approvalTx = await approveMarketplace(collectionaddress, tokenid, marketplace, account);
+          
+          // Hier könnte man auf das Event warten, falls du sicherstellen willst, dass die Genehmigung vollständig abgeschlossen ist
+          console.log("Marketplace approval transaction completed.");
+        } else {
+          console.log("Marketplace already approved.");
         }
-        await listNFT(collectionaddress, tokenid, listingPrice, account, marketplace, checkApproval, approveMarketplace, async () => {
-          await refreshNFTData(marketplace);
+  
+        // Überprüfe, ob der listingPrice gültig ist
+        if (!listingPrice || isNaN(listingPrice) || parseFloat(listingPrice) <= 0) {
+          alert("Bitte einen gültigen Preis angeben.");
+          console.log("Invalid listing price:", listingPrice);
+          return;
+        }
+  
+        // Logging aller relevanten Parameter ohne Umwandlung in Wei
+        console.log("Listing NFT with parameters:", {
+          contractAddress: collectionaddress,
+          tokenId: tokenid,
+          price: listingPrice, // Originalpreis verwenden
+          paymentToken,
+          account
         });
+  
+        // NFT auflisten (Originalpreis wird hier verwendet)
+        const listTx = await listNFT(collectionaddress, tokenid, listingPrice, paymentToken, account, marketplace, refreshNFTData);
+  
+        // Warten Sie nicht auf die `wait()`-Methode
+        console.log("NFT listed successfully:", listTx);
+  
         setListingPrice('');
+        setPaymentToken(null);
         setIsPopupOpen(false);
+      } else {
+        console.log("Marketplace or account is invalid.");
       }
     } catch (error) {
       console.error("Error listing NFT:", error);
       alert(`Failed to list NFT: ${error.message}`);
     }
   };
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
 
   const handleCancelListing = async () => {
     try {
@@ -180,20 +235,21 @@ setMaxSupply(maxSupply);
   };
 
   const getCollectionDetails = (address) => {
-    const collection = nftCollections.find(col => col.address === address);
+    const collection = nftCollections.find(col => col.address.toLowerCase() === address.toLowerCase());
     if (collection) {
-        const artist = artistList.find(a => a.name === collection.artist);
-        return {
-            name: collection.name,
-            link: `/collections/${address}`,
-            artist: collection.artist,
-            currency: collection.currency,
-            artistpfp: artist ? artist.profilepicture : '/default-artist.png'
-        };
+      const artist = artistList.find(a => a.name === collection.artist);
+      return {
+        name: collection.name,
+        link: `/collections/${address}`,
+        artist: collection.artist,
+        currency: collection.currency,
+        artistpfp: artist ? artist.profilepicture : '/default-artist.png'
+      };
     } else {
-        return { name: 'Unknown Collection', link: '#', artist: 'Unknown Artist', currency: '', artistpfp: '/default-artist.png' };
+      return { name: 'Unknown Collection', link: '#', artist: 'Unknown Artist', currency: '', artistpfp: '/default-artist.png' };
     }
   };
+  
 
   const handleConnectWallet = async () => {
     await connectWallet(setAccount);
@@ -214,7 +270,7 @@ setMaxSupply(maxSupply);
   return (
     <div className='flex centered column'>
       <div className='w100 flex column centered hauto mt15'>
-    <div className='w91 flex center-ho gap15 h700 mediacolumn2'>
+    <div className='w91 flex center-ho gap15 h750 mediacolumn2 baseline'>
     <div className='MainDetailDivMedia w80 h100'>
       <div className="nft-detail">
         <div className='flex'>
@@ -222,11 +278,11 @@ setMaxSupply(maxSupply);
         <h2 className='blue mt5 s28 text-align-left'>{nftDetails.name}</h2>
 
         <div className='flex flex-start mediacolumn'>
-    <div className='w70'>
+    <div className='h500px'>
         <img src={nftDetails.image} alt={nftDetails.name} onClick={() => setIsFullscreen(true)} />
         </div>
 
-        <div className='ml20'>
+        <div className='ml20 nftdetailDivScroll'>
 
               <div className='flex column detailLink'>
                 <span className='s16 grey'>COLLECTION</span>
@@ -234,13 +290,8 @@ setMaxSupply(maxSupply);
               </div>
 
               <div className='flex column detailLink'>
-                <span className='s16 grey'>ARTIST</span>
-                <span className='s18 blue bold mb10'><Link to={`/artists/${collectionDetails.artist}`}>{collectionDetails.artist}</Link></span>
-              </div>
-
-              <div className='flex column'>
-                <span className='s16 grey'>POSITION</span>
-                <span className='s18 blue bold mb10'>{nftDetails.position}</span>
+                <span className='s16 grey'>PROJECT</span>
+                <span className='s18 blue bold mb10'><Link to={`/projects/${collectionDetails.artist}`}>{collectionDetails.artist}</Link></span>
               </div>
 
               <div className='flex column'>
@@ -253,9 +304,14 @@ setMaxSupply(maxSupply);
                 <span className='s18 blue bold mb10'>{maxSupply} NFTs</span>
               </div>
 
-              <div className='flex column'>
-                <span className='s16 grey'>YOUR OWNERSHIP</span>
-                <span className='s18 blue bold mb5'>{ownedNFTsCount} NFTs / {totalSupply > 0 ? ownershipPercentage.toFixed(2) : '0.00'}%</span>
+              {/* <div className='flex column'>
+                <span className='s16 grey'>YOUR SUPPLY</span>
+                <span className='s18 blue bold mb5'>{ownedNFTsCount} NFTs</span>
+              </div> */}
+
+<div className='flex column detailLink mt15'>
+                <span className='s16 mb5'>DESCRIPTION</span>
+                <span className='s18 grey'>{nftDetails.description}</span>
               </div>
 
         </div>
@@ -288,17 +344,41 @@ setMaxSupply(maxSupply);
             <div className='BottomButtons'>
               <div className='w100'>
                 <div className='PriceDiv'>
-                  {isForSale && (
+                {isForSale && (
                     <div className='flex column'>
-                    <span className='s16 grey mb0'>LISTING PRICE</span>
-                    <div className='flex center-ho mb5'>
-                    <img src={collectionDetails.currency} alt="Currency Icon" className="currency-icon" />
-                    <p className='mt5 mb5'>
-                      {nftDetails.price}
-                    </p>
-                    </div>
+                      <span className='s16 grey mb0'>LISTING PRICE</span>
+                      <div className='flex center-ho mb5'>
+
+                        
+                      {nftDetails.paymentToken !== '0x0000000000000000000000000000000000000000' ? (
+              <>
+                <img src="/currency-beast.webp" alt="ERC20 Currency Icon" className="currency-icon" />
+                <p className='mt5 mb5'>{nftDetails.price} BEAST</p>
+                <BeastToIotaPrice
+                  listingPrice={parseFloat(nftDetails.price)}
+                  onConversion={(convertedPrice) => {
+                    console.log('Converted Price in IOTA:', convertedPrice);
+                    setConvertedIotaPrice(convertedPrice);
+                  }}
+                />
+                {convertedIotaPrice && (
+                  <span className='mt5 mb5 ml10 grey s16'>
+                    ( ≈{convertedIotaPrice} IOTA )
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                <img src={collectionDetails.currency} alt="Currency Icon" className="currency-icon" />
+                <p className='mt5 mb5'>{nftDetails.price} IOTA</p>
+                {/* Zeige den IOTA-Preis nicht an */}
+              </>
+            )}
+
+</div>
                     </div>
                   )}
+
                 </div>
 
                 {account ? (
@@ -337,23 +417,30 @@ setMaxSupply(maxSupply);
         </div>
         </div>
         {isPopupOpen && (
-          <Popup
-            listingPrice={listingPrice}
-            setListingPrice={setListingPrice}
-            handleList={handleList}
-            closePopup={() => setIsPopupOpen(false)}
-            currency={collectionDetails.currency}
-          />
-        )}
+  <Popup
+    listingPrice={listingPrice}
+    setListingPrice={setListingPrice}
+    handleList={handleList}
+    closePopup={closePopup}
+    currency={currency}
+    paymentToken={paymentToken} // paymentToken übergeben
+    setPaymentToken={setPaymentToken} // Setzen der Funktion übergeben
+  />
+)}
+
       </div>
-      <div className='w100 h100'>
-      <PriceHistory contractAddress={collectionaddress} marketplace={marketplace} currencyIcon={collectionDetails.currency} network={collectionDetails.network}/>
+      <div className='w70 h100'>
+      {/* <PriceHistory contractAddress={collectionaddress} marketplace={marketplace} currencyIcon={collectionDetails.currency} network={collectionDetails.network}/> */}
+      <NFTAttributesStats
+                  attributes={nftDetails.attributes}
+                  stats={nftDetails.stats}
+                />
       </div>
       </div>
       </div>
 
       <div className='w100 centered column'>
-        <ArtworkDetails marketplace={marketplace} account={account}/>
+        {/* <ArtworkDetails marketplace={marketplace} account={account}/> */}
         <ArtworkOwnerRanking collectionAddress={collectionaddress} marketplace={marketplace} />
         {/* <NFTHistory collectionAddress={collectionaddress} tokenId={tokenid} marketplace={marketplace} /> */}
       </div>

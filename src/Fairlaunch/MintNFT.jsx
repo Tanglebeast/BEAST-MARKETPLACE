@@ -360,7 +360,7 @@ const MintNFT = () => {
                                         <div className='flex center-ho'>
                                             <img className='w25 mr10' src='/artist.png' alt='Artist' />
                                             <p className='VisibleLink'>
-                                                <Link to={`/artists/${selectedCollection.artist}`}>{selectedCollection.artist}</Link>
+                                                <Link to={`/projects/${selectedCollection.artist}`}>{selectedCollection.artist}</Link>
                                             </p>
                                         </div>
                                         </div>

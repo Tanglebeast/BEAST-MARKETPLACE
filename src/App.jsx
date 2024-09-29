@@ -42,6 +42,8 @@ import BlogListPage from './Blog/Bloglistpage';
 import BlogArticlePage from './Blog/BlogArticlepage';
 import PublicBlogPage from './Blog/Publicblogpage';
 import NFTCollectionForm from './components/UploadNFTCollectionForm';
+import BeastToIotaPrice from './components/BeastToIotaPrice';
+import BEASTFaucet from './components/Test-Beast-Faucet';
 
 
 const App = () => {
@@ -92,8 +94,8 @@ const App = () => {
         <Route path="/collections" element={<CollectionCards showSearchBar={true} showFilter={true} selectedNetwork={selectedNetwork} />} />
         <Route path="/wallet" element={<MyNFTs />} />
 
-        <Route path="/artists" element={<ArtistPage />} />
-        <Route path="/artist/:artistname/blog/:blogtitle" element={<BlogArticlePage />} />
+        <Route path="/projects" element={<ArtistPage />} />
+        <Route path="/projects/:artistname/blog/:blogtitle" element={<BlogArticlePage />} />
         <Route path="/nfts" element={<AllNFTs />} />
 
         <Route path="/fairvote" element={<PollsList />} />
@@ -102,7 +104,7 @@ const App = () => {
         <Route path="/fairmint" element={<FairMintCollections />} />
         <Route path="/fairmint/:collectionaddress" element={<MintNFT />} />
 
-        <Route path="/users" element={<AllUsers />} />
+        {/* <Route path="/users" element={<AllUsers />} /> */}
 
         <Route path="/faq" element={<Accordion />} />
         <Route path="/about" element={<About />} />
@@ -110,14 +112,17 @@ const App = () => {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
 
+        <Route path="/beast-faucet" element={<BEASTFaucet />} />
+
         <Route path="/faucet" element={<TestnetFaucets />} />
 
-        <Route path="/artists/:artistname" element={<ArtistProfile />} />
+        <Route path="/projects/:artistname" element={<ArtistProfile />} />
         <Route path="/users/:walletAddress" element={<UserNFTs />} />
         <Route path="/collections/:collectionaddress" element={<CollectionDetail />} />
         <Route path="/collections/:collectionaddress/:tokenid" element={<NFTDetail />} />
 
         <Route path="/upload" element={<NFTCollectionForm />} />
+        {/* <Route path="/price" element={<BeastToIotaPrice />} /> */}
 
         <Route path="/articles" element={<PublicBlogPage blogPosts={blogPosts} />} /> {/* Öffentliche Blog-Seite */}
         <Route path="/articles/:blogId" element={<BlogArticlePage blogPosts={blogPosts} />} />

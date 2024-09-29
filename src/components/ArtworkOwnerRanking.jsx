@@ -61,7 +61,6 @@ const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
           <tr>
             <th>Owner</th>
             <th>Owned</th>
-            <th>Ownership</th>
           </tr>
         </thead>
         <tbody>
@@ -73,8 +72,7 @@ const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
                   {username || <ShortenAddress address={owner} />}
                 </a>
               </td>
-              <td>{count} Fractalz</td>
-              <td>{percentage.toFixed(2)}%</td>
+              <td>{count} NFTs</td>
             </tr>
           ))}
         </tbody>

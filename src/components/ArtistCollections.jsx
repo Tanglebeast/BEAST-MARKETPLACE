@@ -36,13 +36,14 @@ const ArtistCollectionCards = () => {
             <div className='collectionbannerDiv'>
               <img src={collection.banner} alt={`${collection.name}`} className="collection-banner" />
             </div>
-            <div className='text-align-left'>
+            <div className='text-align-left w95 mb5'>
               <h3 className='mb5'>{collection.name}</h3>
-              <span className='grey mb10'>{collection.artist}</span>
-              <div className='img25 flex center-ho text-uppercase mt15'>
+              {/* <span className='grey mb10'>{collection.artist}</span> */}
+              
+              {/* <div className='img25 flex center-ho text-uppercase mt15'>
                 <img src={collection.currency} alt={`currency icon`} className="network-icon mr5" />
                 <span className=''>{collection.network}</span>
-              </div>
+              </div> */}
             </div>
           </a>
         ))}

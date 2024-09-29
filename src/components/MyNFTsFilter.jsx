@@ -1,9 +1,11 @@
+// src/components/MyNFTsFilter.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/CollectionFilter.css';
 import { nftCollections } from '../NFTCollections';
 
 const MyNFTsFilter = ({ onFilterChange, ownedCollections }) => {
-    const [activeIndices, setActiveIndices] = useState([]);
+    // Initialisiere activeIndices mit [0], um den ersten Filter (AVAILABILITY) geöffnet zu haben
+    const [activeIndices, setActiveIndices] = useState([0]);
     const [selectedWords, setSelectedWords] = useState({ artist: [], availability: [], artwork: [] });
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -30,12 +32,14 @@ const MyNFTsFilter = ({ onFilterChange, ownedCollections }) => {
     const faqItems = [
         {
             question: 'AVAILABILITY',
-            words: ['LISTED'],
+            words: ['LISTED', 'NOT LISTED'], // "NOT LISTED" hinzugefügt
             type: 'availability'
         },
         {
             question: 'ARTIST',
-            words: [...new Set(nftCollections.filter(collection => ownedCollections.includes(collection.name)).map(collection => collection.artist))],
+            words: [...new Set(nftCollections
+                .filter(collection => ownedCollections.includes(collection.name))
+                .map(collection => collection.artist))],
             type: 'artist'
         },
         {
@@ -61,12 +65,9 @@ const MyNFTsFilter = ({ onFilterChange, ownedCollections }) => {
     }, []);
 
     useEffect(() => {
-        if (isMobile) {
-            setActiveIndices([]);
-        } else {
-            setActiveIndices([0, 1, 2]);
-        }
-    }, [isMobile]);
+        // Behalte den ersten Filter (AVAILABILITY) geöffnet, unabhängig von der Bildschirmgröße
+        setActiveIndices([0]);
+    }, [isMobile]); // Optional: Wenn du möchtest, dass sich das Verhalten bei der Bildschirmgröße ändert, passe dies entsprechend an
 
     useEffect(() => {
         contentRef.current.forEach((el, index) => {
@@ -93,17 +94,21 @@ const MyNFTsFilter = ({ onFilterChange, ownedCollections }) => {
                             ref={el => contentRef.current[index] = el}
                             className="accordion-filterContent"
                         >
-                            {item.words.map((word, i) => (
-                                <label key={i} className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedWords[item.type].includes(word)}
-                                        onChange={() => handleWordToggle(item.type, word)}
-                                    />
-                                    <span className="custom-checkbox"></span>
-                                    {word}
-                                </label>
-                            ))}
+                            {item.words.length === 0 ? (
+                                <p className="no-options">Keine Optionen verfügbar</p>
+                            ) : (
+                                item.words.map((word, i) => (
+                                    <label key={i} className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedWords[item.type].includes(word)}
+                                            onChange={() => handleWordToggle(item.type, word)}
+                                        />
+                                        <span className="custom-checkbox"></span>
+                                        {word}
+                                    </label>
+                                ))
+                            )}
                         </div>
                     </div>
                 ))}
