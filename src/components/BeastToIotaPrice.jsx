@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 const BeastToIotaPrice = ({ listingPrice, onConversion }) => {
-  const [beastPrice, setBeastPrice] = useState(null);
+//   const [beastPrice, setBeastPrice] = useState(null);
+  const [beastPrice, setBeastPrice] = useState(0.002);
   const [iotaPrice, setIotaPrice] = useState(null);
   const [convertedPrice, setConvertedPrice] = useState(null);
   const [error, setError] = useState(null);

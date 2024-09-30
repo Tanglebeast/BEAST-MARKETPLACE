@@ -71,7 +71,8 @@ const BeastPrice = () => {
         id="price"
         style={{ fontSize: '17px', marginRight: '-8px' }}
       >
-        {error || (price ? `$${price}` : 'Loading...')}
+        {/* {error || (price ? `$${price}` : 'Loading...')} */}
+        {error || (price ? `$0.002` : 'Loading...')}
       </span>
     </div>
   );
