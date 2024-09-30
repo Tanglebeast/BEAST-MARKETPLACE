@@ -24,21 +24,55 @@ const BeastPrice = () => {
     fetchTokenPrice();
   }, []);
 
+  const addTokenToMetaMask = async () => {
+    const tokenAddress = '0x6852f7B4ba44667F2Db80E6f3A9f8A173b03cD15';
+    const tokenSymbol = 'BEASTT'; // Ersetze dies durch das tatsächliche Symbol deines Tokens
+    const tokenDecimals = 18; // Ersetze dies durch die tatsächliche Dezimalstellenanzahl deines Tokens
+    const tokenImage = 'https://firebasestorage.googleapis.com/v0/b/fractalz-blog.appspot.com/o/banner_images%2Fcurrency-beast-black-white-2.png?alt=media&token=21000b64-92a0-4761-81f3-ee23f9535336'; // Ersetze dies durch die tatsächliche URL deines Token-Bildes
+
+    if (window.ethereum) {
+      try {
+        // Anfrage an MetaMask, den Token hinzuzufügen
+        const wasAdded = await window.ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20', // Ändere dies, falls dein Token einen anderen Standard verwendet
+            options: {
+              address: tokenAddress,
+              symbol: tokenSymbol,
+              decimals: tokenDecimals,
+              image: tokenImage,
+            },
+          },
+        });
+
+        if (wasAdded) {
+          console.log('Token wurde zu MetaMask hinzugefügt!');
+        } else {
+          console.log('Token wurde nicht hinzugefügt.');
+        }
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen des Tokens zu MetaMask:', error);
+      }
+    } else {
+      alert('MetaMask ist nicht installiert. Bitte installiere MetaMask und versuche es erneut.');
+    }
+  };
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={addTokenToMetaMask}>
       <img
         id="tokenimage"
         style={{ width: '25px', height: '25px', marginRight: '6px' }}
         src="/currency-beast.webp"
         alt="Token"
       />
-      <a
+      <span
         id="price"
         style={{ fontSize: '17px', marginRight: '-8px' }}
-        href="https://explorer.evm.shimmer.network/token/0x4198FE32EbF3a7dE5274C3c570531c2fcB09C634"
       >
         {error || (price ? `$${price}` : 'Loading...')}
-      </a>
+      </span>
     </div>
   );
 };
