@@ -368,10 +368,10 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
         const splitURI = tokenURI.split('/');
         let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
 
-        // Für nicht-spezielle Contracts, füge .json hinzu
-        if (!isSpecialContract(collectionAddress)) {
-          newURI += '.json';
-        }
+        // // Für nicht-spezielle Contracts, füge .json hinzu
+        // if (!isSpecialContract(collectionAddress)) {
+        //   newURI += '.json';
+        // }
 
         // Log the processed tokenURI
         console.log(`Processed tokenURI for tokenId ${tokenId}:`, newURI);
