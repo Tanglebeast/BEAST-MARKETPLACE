@@ -482,12 +482,12 @@ const networkConfigs = {
                 <span className='grey'>Description</span>
                 <p className='mb0 mt0'>{poll.description}</p>
             </div>
-            <div className='flex center-ho mt5 space-between'>
+            <div className='flex center-ho mt5 space-between align-items-end'>
                 <div>
                     <span className='grey'>Question</span>
                     <h2 className="poll-question-1 mt0 mb0">{poll.question}</h2>
                 </div>
-                <div>
+                <div className='text-align-right w30 blue bold'>
                     AVAILABLE VOTES: {poll.isERC20Poll 
                         ? `${remainingVotes} / ${availableERC20Votes}` 
                         : `${remainingVotes} / ${availableNFTVotes}`}
