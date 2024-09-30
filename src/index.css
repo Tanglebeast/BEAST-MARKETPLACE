@@ -240,6 +240,10 @@ p,span {
   width: 30%;
 }
 
+.pointer {
+  cursor: pointer;
+}
+
 .absolute {
   position: absolute;
 }
@@ -303,6 +307,10 @@ p,span {
 
 .p0imp {
   padding: 0px !important;
+}
+
+.padding2 {
+  padding: 2px;
 }
 
 .mb200 {
