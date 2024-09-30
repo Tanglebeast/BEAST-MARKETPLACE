@@ -444,17 +444,13 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
 
     const endIndex = Math.min(parseInt(totalSupply), startIndex + limit);
 
-    // Anzahl der gleichzeitigen Anfragen begrenzen
-    const concurrencyLimit = 10; // Sie können diesen Wert anpassen
+    // NFTs nacheinander abrufen (keine gleichzeitigen Anfragen)
     let allNFTs = [];
-
-    for (let i = startIndex; i < endIndex; i += concurrencyLimit) {
-      const batchPromises = [];
-      for (let j = i; j < i + concurrencyLimit && j < endIndex; j++) {
-        batchPromises.push(fetchNFTData(j));
+    for (let i = startIndex; i < endIndex; i++) {
+      const nftData = await fetchNFTData(i);
+      if (nftData !== null) {
+        allNFTs.push(nftData);
       }
-      const batchResults = await Promise.all(batchPromises);
-      allNFTs = allNFTs.concat(batchResults.filter(nft => nft !== null)); // Entfernt null-Einträge
     }
 
     console.log(`Fetched ${allNFTs.length} NFTs from collection ${collectionAddress}`);
