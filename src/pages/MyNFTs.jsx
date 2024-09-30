@@ -173,7 +173,10 @@ const MyNFTs = () => {
       // Lade die NFTs für die aktuelle Seite
       const nftPromises = paginatedTokenIds.map(async ({ collection, tokenId }) => {
         const nft = await fetchSingleNFT(collection.address, marketplace, tokenId);
-        return nft;
+        return {
+          ...nft,
+          collectionName: getCollectionName(collection.address) // Hinzufügen des collectionName-Feldes
+        };
       });
 
       const nfts = await Promise.all(nftPromises);
@@ -274,7 +277,10 @@ const MyNFTs = () => {
       // Lade die NFTs für die Seite
       const nftPromises = paginatedTokenIds.map(async ({ collection, tokenId }) => {
         const nft = await fetchSingleNFT(collection.address, marketplace, tokenId);
-        return nft;
+        return {
+          ...nft,
+          collectionName: getCollectionName(collection.address) // Hinzufügen des collectionName-Feldes
+        };
       });
 
       const nfts = await Promise.all(nftPromises);

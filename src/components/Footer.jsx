@@ -9,7 +9,7 @@ const Footer = () => {
             <div className='footerDiv'>
             <div className="footer-content">
                 <div className="footer-section about">
-                <a href="https://fractalz.xyz">
+                <a href="/">
               <div className="logo-footer">
                 <img src="/beast-art-neu.svg" alt="Logo" />
               </div>

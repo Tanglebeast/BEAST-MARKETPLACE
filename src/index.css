@@ -232,6 +232,10 @@ p,span {
   margin-bottom: 10px;
 }
 
+.mb50 {
+  margin-bottom: 50px;
+}
+
 .w30 {
   width: 30%;
 }
