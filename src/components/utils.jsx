@@ -366,6 +366,9 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
           newURI += '.json';
         }
 
+        // Entferne doppelte Schrägstriche aus der URI
+        newURI = newURI.replace(/([^:]\/)\/+/g, "$1");
+
         // Log the processed newURI
         console.log(`Processed tokenURI for tokenId ${tokenId}:`, newURI);
 
@@ -402,6 +405,9 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
         } else if (imageUri && imageUri.startsWith('ipfs://')) {
           imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
         }
+
+        // Entferne doppelte Schrägstriche aus der imageUri
+        imageUri = imageUri.replace(/([^:]\/)\/+/g, "$1");
 
         // Log the processed imageUri
         console.log(`Processed imageUri for tokenId ${tokenId}:`, imageUri);
@@ -452,6 +458,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
     return [];
   }
 };
+
 
 
 
