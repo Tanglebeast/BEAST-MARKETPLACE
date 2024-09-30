@@ -348,6 +348,9 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
         const tokenId = await contract.methods.tokenByIndex(index).call();
         let tokenURI = await contract.methods.tokenURI(tokenId).call();
 
+        // Log the original tokenURI
+        console.log(`Original tokenURI for tokenId ${tokenId}:`, tokenURI);
+
         // Bereinigen der tokenURI
         if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
           tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
@@ -370,6 +373,9 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
           newURI += '.json';
         }
 
+        // Log the processed tokenURI
+        console.log(`Processed tokenURI for tokenId ${tokenId}:`, newURI);
+
         // Bereinigen der newURI
         newURI = sanitizeURI(newURI);
 
@@ -390,6 +396,10 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
 
         // Logik für die Bilddarstellung
         let imageUri = metadata.image;
+
+        // Log the original imageUri
+        console.log(`Original imageUri for tokenId ${tokenId}:`, imageUri);
+
         if (!imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
           imageUri = `https://ipfs.io/ipfs/${imageUri}`;
         } else if (imageUri.startsWith('ipfs://')) {
@@ -398,6 +408,9 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
 
         // Bereinigen der imageUri
         imageUri = sanitizeURI(imageUri);
+
+        // Log the processed imageUri
+        console.log(`Processed imageUri for tokenId ${tokenId}:`, imageUri);
 
         // Sicherstellen, dass paymentToken vorhanden ist
         const paymentToken = nftDetails?.paymentToken || 'N/A'; // Standardwert, falls paymentToken fehlt
@@ -447,6 +460,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
 };
 
 
+
 // Neue Funktion zum Abrufen eines einzelnen NFT basierend auf tokenId
 export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) => {
   try {
@@ -463,12 +477,9 @@ export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) =>
     let tokenURI = await contract.methods.tokenURI(tokenId).call();
 
     // Bereinigen der tokenURI
-    if (tokenURI && !tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
+    if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
       tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
-  } else if (!tokenURI) {
-      console.error(`tokenURI is undefined for tokenId ${tokenId} in collection ${collectionAddress}`);
-      return null; // Return null if tokenURI is undefined
-  }
+    }
 
     // Spezielle Behandlung für bestimmte Contract-Adressen
     if (isSpecialContract(collectionAddress)) {
