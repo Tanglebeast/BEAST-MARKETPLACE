@@ -356,31 +356,14 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
           tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
         }
 
-        // Spezielle Behandlung für bestimmte Contract-Adressen
-        if (isSpecialContract(collectionAddress)) {
-          // Entferne das .json Suffix, falls vorhanden
-          if (tokenURI.endsWith('.json')) {
-            tokenURI = tokenURI.slice(0, -5);
-          }
-        }
-
-        // Entferne den ersten Abschnitt der URI bis zum "/"
         const splitURI = tokenURI.split('/');
-        let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
-
-        // Für nicht-spezielle Contracts, füge .json hinzu
-        if (!isSpecialContract(collectionAddress)) {
-          newURI += '.json';
-        }
-
-        // Log the processed tokenURI
-        console.log(`Processed tokenURI for tokenId ${tokenId}:`, newURI);
+        let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}.json`;
 
         // Bereinigen der newURI
         newURI = sanitizeURI(newURI);
 
-        // Abrufen der JSON-Daten
-        const response = await axios.get(newURI);
+        // Abrufen der JSON-Daten mit Timeout
+        const response = await axios.get(newURI, { timeout: 15000 }); // 15 Sekunden Timeout
         const metadata = response.data;
 
         const owner = await contract.methods.ownerOf(tokenId).call();
@@ -395,24 +378,19 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
         const priceInEther = nftDetails ? nftDetails.price : '0';
 
         // Logik für die Bilddarstellung
-        let imageUri = metadata.image;
-
-        // Zusätzliche Überprüfung und Loggen der imageUri
-        if (!imageUri) {
-          console.error(`No imageUri found in metadata for tokenId ${tokenId}`);
-        }
+        let imageUri = metadata.image || '';
 
         // Log the original imageUri
         console.log(`Original imageUri for tokenId ${tokenId}:`, imageUri);
 
-        if (imageUri && !imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
+        if (!imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
           imageUri = `https://ipfs.io/ipfs/${imageUri}`;
-        } else if (imageUri && imageUri.startsWith('ipfs://')) {
+        } else if (imageUri.startsWith('ipfs://')) {
           imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
         }
 
         // Bereinigen der imageUri
-        imageUri = imageUri ? sanitizeURI(imageUri) : '';
+        imageUri = sanitizeURI(imageUri);
 
         // Log the processed imageUri
         console.log(`Processed imageUri for tokenId ${tokenId}:`, imageUri);
@@ -463,6 +441,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
     return [];
   }
 };
+
 
 
 
