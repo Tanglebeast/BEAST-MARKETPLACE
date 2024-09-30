@@ -339,7 +339,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
       return [];
     }
 
-    const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
+    const contract = new web3.eth.Contract(selectedCollection.abi, selectedCollection.address);
     const totalSupply = await contract.methods.MAX_SUPPLY().call();
 
     // Funktion zum Abrufen der NFT-Daten
