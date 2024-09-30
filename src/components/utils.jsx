@@ -380,7 +380,8 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
         newURI = sanitizeURI(newURI);
 
         // Abrufen der JSON-Daten
-        const response = await axios.get(newURI);
+        const absoluteURI = newURI.startsWith('http') ? newURI : `https://ipfs.io/ipfs/${newURI}`;
+const response = await axios.get(absoluteURI);
         const metadata = response.data;
 
         console.log(`Metadata for tokenId ${tokenId}:`, metadata);
@@ -510,7 +511,8 @@ export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) =>
     newURI = sanitizeURI(newURI);
 
     // Abrufen der JSON-Daten
-    const response = await axios.get(newURI);
+    const absoluteURI = newURI.startsWith('http') ? newURI : `https://ipfs.io/ipfs/${newURI}`;
+const response = await axios.get(absoluteURI);
     const metadata = response.data;
 
     const owner = await contract.methods.ownerOf(tokenId).call();
