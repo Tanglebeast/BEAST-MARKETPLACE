@@ -595,47 +595,39 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
     let tokenURI = await contract.methods.tokenURI(tokenId).call();
 
     // Bereinigen der tokenURI
-    if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
-      tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
-    }
+    const splitURI = tokenURI.split('/');
+    let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
 
     // Spezielle Behandlung für bestimmte Contract-Adressen
     if (isSpecialContract(contractAddress)) {
       // Entferne das .json Suffix, falls vorhanden
-      if (tokenURI.endsWith('.json')) {
-        tokenURI = tokenURI.slice(0, -5); // Entfernt die letzten 5 Zeichen ('.json')
+      if (newURI.endsWith('.json')) {
+        newURI = newURI.slice(0, -5);
       }
-    }
-
-    // Entferne den ersten Abschnitt der URI bis zum "/"
-    const splitURI = tokenURI.split('/');
-    let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
-
-    // Für nicht-spezielle Contracts, füge .json hinzu
-    if (!isSpecialContract(contractAddress)) {
+    } else {
+      // Füge .json hinzu, falls es nicht ein spezieller Contract ist
       newURI += '.json';
     }
 
-    // Bereinigen der newURI
-    newURI = sanitizeURI(newURI);
+    // Entferne doppelte Schrägstriche aus der URI
+    newURI = newURI.replace(/([^:]\/)\/+/g, "$1");
 
-    // console.log(`Formatted IPFS URI: ${newURI} (Contract: ${contractAddress})`);
-
+    // Abrufen der Metadaten
     const metadataResponse = await axios.get(newURI);
     const metadata = metadataResponse.data;
 
-    // console.log(`Original image URI: ${metadata.image} (Contract: ${contractAddress})`);
-
     // Überprüfen und Formatierung der image URI anpassen
     let imageURI = metadata.image;
-    if (!imageURI.startsWith('ipfs://') && !imageURI.startsWith('https://ipfs.io/ipfs/')) {
+    if (imageURI.startsWith('ipfs://')) {
+      imageURI = imageURI.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    } else if (!imageURI.startsWith('https://ipfs.io/ipfs/')) {
       imageURI = `https://ipfs.io/ipfs/${imageURI}`;
     }
-    imageURI = imageURI.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
-    // Bereinigen der imageURI
-    imageURI = sanitizeURI(imageURI);
+    // Entferne doppelte Schrägstriche aus der imageURI
+    imageURI = imageURI.replace(/([^:]\/)\/+/g, "$1");
 
+    // Abrufen der NFT-Details vom Marktplatz
     const nftDetails = await marketplace.methods.getNFTDetails(contractAddress, tokenId).call();
     const priceInEther = web3OnlyRead.utils.fromWei(nftDetails.price, 'ether');
 
@@ -656,10 +648,11 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
       paymentToken: nftDetails.paymentToken, // Füge paymentToken hier hinzu
     };
   } catch (error) {
-    // console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
+    console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
     return null;
   }
 };
+
 
 
 
