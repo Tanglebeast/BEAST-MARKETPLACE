@@ -331,7 +331,7 @@ const isSpecialContract = (address) => {
 
 
 
-export const fetchAllNFTs = async (collectionAddress, marketplace) => {
+export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 0, limit = Infinity) => {
   try {
     const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
     if (!selectedCollection) {
@@ -342,69 +342,130 @@ export const fetchAllNFTs = async (collectionAddress, marketplace) => {
     const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
     const totalSupply = await contract.methods.MAX_SUPPLY().call();
 
-    // console.log('Total supply of NFTs in collection:', totalSupply);
-
     // Funktion zum Abrufen der NFT-Daten
     const fetchNFTData = async (index) => {
       try {
         const tokenId = await contract.methods.tokenByIndex(index).call();
-        const tokenURI = await contract.methods.tokenURI(tokenId).call();
+        let tokenURI = await contract.methods.tokenURI(tokenId).call();
+
+        // Log the original tokenURI
+        console.log(`Original tokenURI for tokenId ${tokenId}:`, tokenURI);
+
+        // Bereinigen der tokenURI
+        if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
+          tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
+        }
+
+        // Spezielle Behandlung für bestimmte Contract-Adressen
+        if (isSpecialContract(collectionAddress)) {
+          // Entferne das .json Suffix, falls vorhanden
+          if (tokenURI.endsWith('.json')) {
+            tokenURI = tokenURI.slice(0, -5);
+          }
+        }
 
         // Entferne den ersten Abschnitt der URI bis zum "/"
         const splitURI = tokenURI.split('/');
-        const newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}.json`;
+        let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
+
+        // Für nicht-spezielle Contracts, füge .json hinzu
+        if (!isSpecialContract(collectionAddress)) {
+          newURI += '.json';
+        }
+
+        // Log the processed tokenURI
+        console.log(`Processed tokenURI for tokenId ${tokenId}:`, newURI);
+
+        // Bereinigen der newURI
+        newURI = sanitizeURI(newURI);
 
         // Abrufen der JSON-Daten
         const response = await axios.get(newURI);
         const metadata = response.data;
 
+        console.log(`Metadata for tokenId ${tokenId}:`, metadata);
 
         const owner = await contract.methods.ownerOf(tokenId).call();
         const uid = `${selectedCollection.address}-${tokenId}`;
 
         // Extract position from attributes
-        const positionAttr = metadata.attributes.find(attr => attr.trait_type === 'position');
+        const positionAttr = metadata.attributes?.find(attr => attr.trait_type === 'position');
         const position = positionAttr ? positionAttr.value : '0-0'; // Default position if not found
 
         // Fetch price from marketplace
         const nftDetails = await getNFTDetails(selectedCollection.address, tokenId, marketplace);
         const priceInEther = nftDetails ? nftDetails.price : '0';
 
+        // Logik für die Bilddarstellung
+        let imageUri = metadata.image;
+
+        // Zusätzliche Überprüfung und Loggen der imageUri
+        if (!imageUri) {
+          console.error(`No imageUri found in metadata for tokenId ${tokenId}`);
+        }
+
+        // Log the original imageUri
+        console.log(`Original imageUri for tokenId ${tokenId}:`, imageUri);
+
+        if (imageUri && !imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
+          imageUri = `https://ipfs.io/ipfs/${imageUri}`;
+        } else if (imageUri && imageUri.startsWith('ipfs://')) {
+          imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+        }
+
+        // Bereinigen der imageUri
+        imageUri = imageUri ? sanitizeURI(imageUri) : '';
+
+        // Log the processed imageUri
+        console.log(`Processed imageUri for tokenId ${tokenId}:`, imageUri);
+
+        // Sicherstellen, dass paymentToken vorhanden ist
+        const paymentToken = nftDetails?.paymentToken || 'N/A'; // Standardwert, falls paymentToken fehlt
+
         return {
           uid: uid,
-          contractAddress: selectedCollection.address,
-          tokenId: tokenId,
-          owner: owner,
+          contractAddress: selectedCollection.address.toLowerCase(),
+          tokenId: tokenId.toString(), // Sicherstellen, dass tokenId als String behandelt wird
+          owner: owner.toLowerCase(),
           name: metadata.name,
-          image: metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/'),
+          description: metadata.description || 'No description available',
+          image: imageUri || 'https://via.placeholder.com/150', // Fallback-Bild, falls kein Bild verfügbar ist
           price: priceInEther,
           position: position,
+          attributes: metadata.attributes,
+          stats: metadata.stats,
+          paymentToken: paymentToken, // Füge paymentToken hier hinzu
         };
       } catch (error) {
-        // console.error(`Error fetching NFT data for index ${index}:`, error);
+        console.error(`Error fetching NFT data for index ${index}:`, error);
         return null;
       }
     };
 
-    // Paralleles Abrufen aller NFTs
-    const allNFTsPromises = [];
-    for (let i = 0; i < totalSupply; i++) {
-      allNFTsPromises.push(fetchNFTData(i));
+    const endIndex = Math.min(parseInt(totalSupply), startIndex + limit);
+
+    // Anzahl der gleichzeitigen Anfragen begrenzen
+    const concurrencyLimit = 10; // Sie können diesen Wert anpassen
+    let allNFTs = [];
+
+    for (let i = startIndex; i < endIndex; i += concurrencyLimit) {
+      const batchPromises = [];
+      for (let j = i; j < i + concurrencyLimit && j < endIndex; j++) {
+        batchPromises.push(fetchNFTData(j));
+      }
+      const batchResults = await Promise.all(batchPromises);
+      allNFTs = allNFTs.concat(batchResults.filter(nft => nft !== null)); // Entfernt null-Einträge
     }
 
-    // Warten auf alle Promises
-    let allNFTs = await Promise.all(allNFTsPromises);
-    // Filtern Sie alle NFTs heraus, die null sind (aufgrund von Fehlern)
-    allNFTs = allNFTs.filter(nft => nft !== null);
-
-    // console.log('All NFTs fetched:', allNFTs);
+    console.log(`Fetched ${allNFTs.length} NFTs from collection ${collectionAddress}`);
 
     return allNFTs;
   } catch (error) {
-    // console.error("Error fetching NFTs:", error);
+    console.error("Error fetching NFTs:", error);
     return [];
   }
 };
+
 
 
 
