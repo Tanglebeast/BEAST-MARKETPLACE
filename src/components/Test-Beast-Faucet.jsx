@@ -85,16 +85,16 @@ const BEASTFaucet = () => {
         const tx = await method.send({ from: currentAccount, gas: gasEstimate, gasPrice });
 
         console.log('Transaction:', tx);
-        const message = "5000 Token erfolgreich gemintet!";
+        const message = "5000 Tokens minted successfully!";
         setPopupMessage(message);
         setPopupVisible(true);
       } else {
-        throw new Error("Keine Wallet erkannt");
+        throw new Error("No wallet found");
       }
     } catch (err) {
       console.error(err);
       setError(err.message);
-      setPopupMessage(`Fehler: ${err.message}`);
+      setPopupMessage(`Error: ${err.message}`);
       setPopupVisible(true);
     } finally {
       setIsMinting(false);
@@ -110,7 +110,7 @@ const BEASTFaucet = () => {
     <div className="beast-faucet-container">
       <h1>BEAST FAUCET</h1>
       <div className="info-section">
-        <p className='grey'>Hole dir jetzt deinen Test-Beast und zahle nie wieder Gebühren!</p>
+        <p className='grey'>Grab your test BEAST Tokens now and pay 0 fees!</p>
         <img className='wh100px mt10' src='/currency-beast.webp' alt="Beast Token" />
       </div>
       <button 
