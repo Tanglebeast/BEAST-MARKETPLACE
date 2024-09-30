@@ -351,33 +351,23 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
         // Log the original tokenURI
         console.log(`Original tokenURI for tokenId ${tokenId}:`, tokenURI);
 
-        // Bereinigen der tokenURI
-        if (!tokenURI.startsWith('ipfs://') && !tokenURI.startsWith('https://ipfs.io/ipfs/')) {
-          tokenURI = `https://ipfs.io/ipfs/${tokenURI}`;
-        }
+        // Split the tokenURI to create a new URI
+        const splitURI = tokenURI.split('/');
+        let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
 
         // Spezielle Behandlung für bestimmte Contract-Adressen
         if (isSpecialContract(collectionAddress)) {
           // Entferne das .json Suffix, falls vorhanden
-          if (tokenURI.endsWith('.json')) {
-            tokenURI = tokenURI.slice(0, -5);
+          if (newURI.endsWith('.json')) {
+            newURI = newURI.slice(0, -5);
           }
-        }
-
-        // Entferne den ersten Abschnitt der URI bis zum "/"
-        const splitURI = tokenURI.split('/');
-        let newURI = `https://ipfs.io/ipfs/${splitURI[splitURI.length - 2]}/${splitURI[splitURI.length - 1]}`;
-
-        // Für nicht-spezielle Contracts, füge .json hinzu
-        if (!isSpecialContract(collectionAddress)) {
+        } else {
+          // Füge .json hinzu, falls es nicht ein spezieller Contract ist
           newURI += '.json';
         }
 
-        // Log the processed tokenURI
+        // Log the processed newURI
         console.log(`Processed tokenURI for tokenId ${tokenId}:`, newURI);
-
-        // Bereinigen der newURI
-        newURI = sanitizeURI(newURI);
 
         // Abrufen der JSON-Daten
         const response = await axios.get(newURI);
@@ -413,9 +403,6 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
           imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
         }
 
-        // Bereinigen der imageUri
-        imageUri = imageUri ? sanitizeURI(imageUri) : '';
-
         // Log the processed imageUri
         console.log(`Processed imageUri for tokenId ${tokenId}:`, imageUri);
 
@@ -444,13 +431,17 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
 
     const endIndex = Math.min(parseInt(totalSupply), startIndex + limit);
 
-    // NFTs nacheinander abrufen (keine gleichzeitigen Anfragen)
+    // Anzahl der gleichzeitigen Anfragen begrenzen
+    const concurrencyLimit = 10; // Sie können diesen Wert anpassen
     let allNFTs = [];
-    for (let i = startIndex; i < endIndex; i++) {
-      const nftData = await fetchNFTData(i);
-      if (nftData !== null) {
-        allNFTs.push(nftData);
+
+    for (let i = startIndex; i < endIndex; i += concurrencyLimit) {
+      const batchPromises = [];
+      for (let j = i; j < i + concurrencyLimit && j < endIndex; j++) {
+        batchPromises.push(fetchNFTData(j));
       }
+      const batchResults = await Promise.all(batchPromises);
+      allNFTs = allNFTs.concat(batchResults.filter(nft => nft !== null)); // Entfernt null-Einträge
     }
 
     console.log(`Fetched ${allNFTs.length} NFTs from collection ${collectionAddress}`);
