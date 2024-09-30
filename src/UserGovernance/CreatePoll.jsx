@@ -160,7 +160,8 @@ const CreatePoll = ({ onClose }) => {
         const method = contract.methods.addPollCreator(newCreatorAddress);
         const params = {};
   
-        const { gasEstimate, gasPrice } = await getGasEstimate(web3, method, params, accounts[0]);
+        const { gasEstimate, gasPrice } = await getGasEstimate(method, {}, accounts[0]);
+
   
         await method.send({
           from: accounts[0],
