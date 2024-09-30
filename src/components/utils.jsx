@@ -397,17 +397,22 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
         // Logik für die Bilddarstellung
         let imageUri = metadata.image;
 
+        // Zusätzliche Überprüfung und Loggen der imageUri
+        if (!imageUri) {
+          console.error(`No imageUri found in metadata for tokenId ${tokenId}`);
+        }
+
         // Log the original imageUri
         console.log(`Original imageUri for tokenId ${tokenId}:`, imageUri);
 
-        if (!imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
+        if (imageUri && !imageUri.startsWith('ipfs://') && !imageUri.startsWith('https://ipfs.io/ipfs/')) {
           imageUri = `https://ipfs.io/ipfs/${imageUri}`;
-        } else if (imageUri.startsWith('ipfs://')) {
+        } else if (imageUri && imageUri.startsWith('ipfs://')) {
           imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
         }
 
         // Bereinigen der imageUri
-        imageUri = sanitizeURI(imageUri);
+        imageUri = imageUri ? sanitizeURI(imageUri) : '';
 
         // Log the processed imageUri
         console.log(`Processed imageUri for tokenId ${tokenId}:`, imageUri);
@@ -422,7 +427,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
           owner: owner.toLowerCase(),
           name: metadata.name,
           description: metadata.description || 'No description available',
-          image: imageUri,
+          image: imageUri || 'https://via.placeholder.com/150', // Fallback-Bild, falls kein Bild verfügbar ist
           price: priceInEther,
           position: position,
           attributes: metadata.attributes,
@@ -458,6 +463,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
     return [];
   }
 };
+
 
 
 
