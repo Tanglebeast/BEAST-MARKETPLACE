@@ -381,8 +381,11 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
         const owner = await contract.methods.ownerOf(tokenId).call();
         const uid = `${selectedCollection.address}-${tokenId}`;
 
+        // Sicherstellen, dass attributes ein Array ist
+        const attributes = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+
         // Extract position from attributes
-        const positionAttr = metadata.attributes?.find(attr => attr.trait_type === 'position');
+        const positionAttr = attributes.find(attr => attr.trait_type === 'position');
         const position = positionAttr ? positionAttr.value : '0-0'; // Default position if not found
 
         // Fetch price from marketplace
@@ -425,7 +428,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
           image: imageUri || 'https://via.placeholder.com/150', // Fallback-Bild, falls kein Bild verfügbar ist
           price: priceInEther,
           position: position,
-          attributes: metadata.attributes,
+          attributes: attributes, // Verwende das gesicherte attributes Array
           stats: metadata.stats,
           paymentToken: paymentToken, // Füge paymentToken hier hinzu
         };
@@ -464,12 +467,15 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
 
 
 
+
 // Neue Funktion zum Abrufen eines einzelnen NFT basierend auf tokenId
 export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) => {
   try {
     console.log(`Fetching single NFT for Collection: ${collectionAddress}, Token ID: ${tokenId}`);
 
-    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
+    const selectedCollection = nftCollections.find(
+      collection => collection.address.toLowerCase() === collectionAddress.toLowerCase()
+    );
     if (!selectedCollection) {
       console.log('Collection not found for address:', collectionAddress);
       return null;
@@ -504,8 +510,11 @@ export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) =>
     const owner = await contract.methods.ownerOf(tokenId).call();
     const uid = `${selectedCollection.address}-${tokenId}`;
 
-    // Extract position from attributes
-    const positionAttr = metadata.attributes.find(attr => attr.trait_type === 'position');
+    // Sicherstellen, dass attributes ein Array ist
+    const attributes = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+
+    // Extraktion der Position aus dem gesicherten attributes Array
+    const positionAttr = attributes.find(attr => attr.trait_type === 'position');
     const position = positionAttr ? positionAttr.value : '0-0'; // Default position if not found
 
     // Fetch price from marketplace
@@ -514,14 +523,18 @@ export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) =>
 
     // Überprüfen und Formatierung der image URI anpassen
     let imageUri = metadata.image;
-    if (imageUri.startsWith('ipfs://')) {
-      imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
-    } else if (!imageUri.startsWith('https://ipfs.io/ipfs/')) {
-      imageUri = `https://ipfs.io/ipfs/${imageUri}`;
+    if (imageUri) {
+      if (imageUri.startsWith('ipfs://')) {
+        imageUri = imageUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+      } else if (!imageUri.startsWith('https://ipfs.io/ipfs/')) {
+        imageUri = `https://ipfs.io/ipfs/${imageUri}`;
+      }
+      // Entferne doppelte Schrägstriche aus der imageUri
+      imageUri = imageUri.replace(/([^:]\/)\/+/g, "$1");
+    } else {
+      console.error(`No imageUri found in metadata for tokenId ${tokenId}`);
+      imageUri = 'https://via.placeholder.com/150'; // Fallback-Bild, falls kein Bild verfügbar ist
     }
-
-    // Entferne doppelte Schrägstriche aus der imageUri
-    imageUri = imageUri.replace(/([^:]\/)\/+/g, "$1");
 
     const structuredNFT = {
       uid: uid,
@@ -533,9 +546,9 @@ export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) =>
       image: imageUri,
       price: priceInEther,
       position: position,
-      attributes: metadata.attributes,
-      stats: metadata.stats,
-      paymentToken: nftDetails.paymentToken, // Füge paymentToken hier hinzu
+      attributes: attributes, // Verwende das gesicherte attributes Array
+      stats: metadata.stats || {}, // Sicherstellen, dass stats vorhanden ist, sonst leeres Objekt
+      paymentToken: nftDetails?.paymentToken || 'N/A', // Füge paymentToken hier hinzu mit Fallback
     };
 
     console.log('Fetched Single NFT Data:', structuredNFT);
@@ -546,6 +559,7 @@ export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) =>
     return null;
   }
 };
+
 
 
 
@@ -610,6 +624,9 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
     const metadataResponse = await axios.get(newURI);
     const metadata = metadataResponse.data;
 
+    // Sicherstellen, dass attributes ein Array ist
+    const attributes = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+
     // Überprüfen und Formatierung der image URI anpassen
     let imageURI = metadata.image;
     if (imageURI.startsWith('ipfs://')) {
@@ -625,27 +642,29 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
     const nftDetails = await marketplace.methods.getNFTDetails(contractAddress, tokenId).call();
     const priceInEther = web3OnlyRead.utils.fromWei(nftDetails.price, 'ether');
 
-    const positionAttr = metadata.attributes.find(attr => attr.trait_type === 'position');
+    // Extraktion der Position aus dem gesicherten attributes Array
+    const positionAttr = attributes.find(attr => attr.trait_type === 'position');
     const position = positionAttr ? positionAttr.value : '0-0';
 
     return {
       contractAddress: contractAddress,
       tokenId: tokenId,
-      owner: owner,
+      owner: owner.toLowerCase(),
       name: metadata.name,
       description: metadata.description || 'No description available',
-      image: imageURI,
+      image: imageURI || 'https://via.placeholder.com/150', // Fallback-Bild, falls kein Bild verfügbar ist
       price: priceInEther,
       position: position,
-      attributes: metadata.attributes,
-      stats: metadata.stats,
-      paymentToken: nftDetails.paymentToken, // Füge paymentToken hier hinzu
+      attributes: attributes, // Verwende das gesicherte attributes Array
+      stats: metadata.stats || {}, // Sicherstellen, dass stats vorhanden ist, sonst leeres Objekt
+      paymentToken: nftDetails.paymentToken || 'N/A', // Füge paymentToken hier hinzu mit Fallback
     };
   } catch (error) {
     console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
     return null;
   }
 };
+
 
 
 

@@ -17,7 +17,7 @@ const NFTAttributesStats = ({ attributes, stats }) => {
             </div>
           ))
         ) : (
-          <p>Keine Attributes verfügbar.</p>
+          <p>No Attributes available.</p>
         )}
       </div>
 
