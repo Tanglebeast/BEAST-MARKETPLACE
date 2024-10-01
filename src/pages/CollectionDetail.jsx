@@ -6,7 +6,11 @@ import {
     getNFTDetails, 
     getUserName, 
     getMaxSupply, 
-    fetchCollectionStats // Importieren Sie die neue Funktion
+    fetchCollectionStats,
+    likeCollection,
+    unlikeCollection,
+    getCollectionLikes,
+    hasUserLikedCollection
 } from '../components/utils';
 import SearchBar from '../components/SearchBar';
 import { nftCollections } from '../NFTCollections';
@@ -29,12 +33,17 @@ const CollectionNFTs = () => {
     const [userNames, setUserNames] = useState({});
     const [maxSupply, setMaxSupply] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [loadedBatches, setLoadedBatches] = useState(1); // Neuer Zustand für geladene Chargen
-    const [totalBatches, setTotalBatches] = useState(1); // Neuer Zustand für Gesamtchargen
+    const [loadedBatches, setLoadedBatches] = useState(1);
+    const [totalBatches, setTotalBatches] = useState(1);
     const [backgroundLoading, setBackgroundLoading] = useState(false);
     const [allAttributes, setAllAttributes] = useState({});
-    const [nativeVolume, setNativeVolume] = useState('0'); // Initialisieren mit '0'
-    const [specialTokenVolume, setSpecialTokenVolume] = useState('0'); // Initialisieren mit '0'
+    const [nativeVolume, setNativeVolume] = useState('0');
+    const [specialTokenVolume, setSpecialTokenVolume] = useState('0');
+
+    // Neue Zustände für Likes
+    const [likes, setLikes] = useState(0);
+    const [hasLiked, setHasLiked] = useState(false);
+    const [likeLoading, setLikeLoading] = useState(false);
 
     const resultsPerPage = 30;
 
@@ -276,136 +285,215 @@ const CollectionNFTs = () => {
     // Berechnung des Ladefortschritts
     const progressPercentage = totalBatches > 0 ? (loadedBatches / totalBatches) * 100 : 0;
 
+    // Zusätzlicher useEffect zum Abrufen der Likes und des Like-Status
+    useEffect(() => {
+        const fetchLikes = async () => {
+            if (!collectionaddress || !account) return;
+            const likesCount = await getCollectionLikes(collectionaddress);
+            setLikes(likesCount);
+
+            const userHasLiked = await hasUserLikedCollection(account, collectionaddress);
+            setHasLiked(userHasLiked);
+        };
+
+        fetchLikes();
+    }, [collectionaddress, account]);
+
+    const handleLikeToggle = async () => {
+        if (!collectionaddress || !account) {
+            alert("Bitte verbinden Sie Ihr Wallet, um Likes zu verwenden.");
+            return;
+        }
+
+        setLikeLoading(true);
+        let success;
+
+        if (hasLiked) {
+            success = await unlikeCollection(collectionaddress);
+        } else {
+            success = await likeCollection(collectionaddress);
+        }
+
+        if (success) {
+            // Aktualisieren der Likes
+            const updatedLikes = hasLiked ? likes - 1 : likes + 1;
+            setLikes(updatedLikes);
+            setHasLiked(!hasLiked);
+        } else {
+            alert("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.");
+        }
+
+        setLikeLoading(false);
+    };
+
     return (
-    <div className="collection-nfts">
-        <div 
-            className='CollectionBanner'
-            style={{ backgroundImage: `url(${bannerImage})` }}
-        >
-            {/* Banner-Informationen können hier eingefügt werden */}
-        </div>
-
-        <div className="nft-list">
-            <div className='SearchandFilterDiv'>
-                {/* Weitere Komponenten können hier eingefügt werden */}
+        <div className="collection-nfts">
+            <div 
+                className='CollectionBanner'
+                style={{ backgroundImage: `url(${bannerImage})` }}
+            >
+                {/* Banner-Informationen können hier eingefügt werden */}
             </div>
-            <div className='w100 flex space-between CollectionDetail-mediaDiv'>
-                <div className='w20 Coll-FilterDiv ButtonandFilterMedia'>
-                    {/* Übergabe von totalNFTsCount */}
-                    <CollectionDetailFilter onFilterChange={setFilters} allAttributes={allAttributes} totalNFTsCount={allNFTs.length} />
+
+            <div className="nft-list">
+                <div className='SearchandFilterDiv'>
+                    {/* Weitere Komponenten können hier eingefügt werden */}
                 </div>
-                <div className='w100 flex column flex-start ml20 ml0-media'>
-                    
-                    <h2 className='mt15 OnlyDesktop mb15'>{collectionName}</h2>
-                    
-                    <div className='w95 flex center-ho space-between'>
-                        <p className='text-align-left grey mt0 w30'>{collectionDescription}</p>
-
-                        <div className="collection-stats gap15">
-
-                            <div className='collection-stats-div text-align-left center-ho'>
-                                <div className='flex column'>
-                                    <p className='s16 grey'>VOLUME IOTA</p>
-                                    <div className='flex center-ho'>
-                                        <div className='bold ml5'>{nativeVolume !== null ? `${nativeVolume}` : '0'}</div>
-                                        <img className='img22 ml5' src='/currency-iota.png' alt="IOTA Icon"></img>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className='collection-stats-div text-align-left center-ho'>
-                                <div className='flex column'>
-                                    <p className='s16 grey'>VOLUME BEAST</p>
-                                    <div className='flex center-ho'>
-                                        <div className='bold ml5'>{specialTokenVolume !== null ? `${specialTokenVolume}` : '0'}</div>
-                                        <img className='img22 ml5' src='/currency-beast.webp' alt="BEAST Icon"></img>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='collection-stats-div text-align-left'>
-                                <p className='s16 grey'>TOTAL NFTS</p>
-                                <div className='bold ml5'>{maxSupply || '0'}</div>
-                            </div>
-                            <div className='collection-stats-div text-align-left'>
-                                <p className='s16 grey'>OWNERS</p>
-                                <div className='bold ml5'>{getUniqueOwners(allNFTs)}</div>
-                            </div>
-                            {/* Weitere Statistiken können hier hinzugefügt werden */}
-                        </div>
+                <div className='w100 flex space-between CollectionDetail-mediaDiv'>
+                    <div className='w20 Coll-FilterDiv ButtonandFilterMedia'>
+                        {/* Übergabe von totalNFTsCount */}
+                        <CollectionDetailFilter onFilterChange={setFilters} allAttributes={allAttributes} totalNFTsCount={allNFTs.length} />
                     </div>
-
-                    <div className='flex space-between w95'>
-                        <div className='SearchbarDesktop text-align-left w30 w100media'>
-                            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                        </div>
-                        <div className="custom-pagination">
+                    <div className='w100 flex column flex-start ml20 ml0-media'>
+                        
+                        {/* Header mit Collection Name und Like-Button */}
+                        <div className='w95 flex center-ho space-between items-center'>
+                            <h2 className='mt15 OnlyDesktop mb15'>{collectionName}</h2>
+                            <div className='flex center-ho'>
+                            <h3 className='mr5'>Leave a Like</h3>
                             <button 
-                                className="custom-pagination-btn previous-btn"
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-                                disabled={currentPage === 1}
+                                className="like-button centered" 
+                                onClick={handleLikeToggle}
+                                disabled={likeLoading}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    outline: 'none'
+                                }}
+                                aria-label={hasLiked ? "Unlike Collection" : "Like Collection"}
                             >
-                                &lt; 
-                            </button>
-                            <span className="custom-pagination-info">
-                                {currentPage} OF {totalPages}
-                            </span>
-
-                            <button 
-                                className="custom-pagination-btn next-btn custom-pagination-info-2 margin0"
-                                onClick={() => {
-                                    if (currentPage < totalPages && currentPage + 1 > loadedBatches) {
-                                        setLoading(true); // Setze den Ladezustand
-                                    }
-                                    setCurrentPage(prev => Math.min(prev + 1, totalPages));
-                                }} 
-                                disabled={currentPage === totalPages || (currentPage + 1 > loadedBatches)}
-                            >
-                                {currentPage < totalPages && currentPage + 1 > loadedBatches ? (
-                                    <img src="/basic-loading.gif" alt="Loading..." className="loading-gif" />
+                                {likeLoading ? (
+                                    <img src="/basic-loading.gif" alt="Loading..." className="img22" />
                                 ) : (
-                                    '>'
+                                    <img 
+                                        src={hasLiked ? "/heart-filled.png" : "/heart-outline.png"} 
+                                        alt={hasLiked ? "Liked" : "Like"} 
+                                        className="heart-icon"
+                                        style={{ width: '24px', height: '24px' }}
+                                    />
                                 )}
                             </button>
-
-                        </div>
-                    </div>
-
-                    {/* Progress-Bar während des Ladens */}
-                    { (loading || backgroundLoading) && (
-                        <div className="progress-bar-container">
-                            <div 
-                                className="progress-bar" 
-                                style={{ width: `${progressPercentage}%` }}
-                            ></div>
-                        </div>
-                    )}
-
-                    {/* Hauptinhalt der NFT-Collection */}
-                    <div className='NFT-Collection-Div'>
-                        {loading && loadedBatches === 0 ? (
-                            <div className="loading-container flex centered">
-                                <img src="/loading.gif" alt="Loading..." />
                             </div>
-                        ) : (
-                            displayedNFTs.length === 0 ? (
-                                <div className="no-nfts-container flex centered column">
-                                    <h2 className="no-nfts-message">No NFTs found...</h2>
-                                    <img src="/no-nft.png" alt="no nft Icon" className="no-nfts-image" />
+                        </div>
+
+                       
+                        
+                        <div className='w95 flex center-ho space-between'>
+                            <p className='text-align-left grey mt0 w30'>{collectionDescription}</p>
+
+                            <div className="collection-stats gap15">
+                                <div className='collection-stats-div text-align-left center-ho'>
+                                    <div className='flex column'>
+                                        <p className='s16 grey'>VOLUME IOTA</p>
+                                        <div className='flex center-ho'>
+                                            <div className='bold ml5'>{nativeVolume !== null ? `${nativeVolume}` : '0'}</div>
+                                            <img className='img22 ml5' src='/currency-iota.png' alt="IOTA Icon"></img>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className='collection-stats-div text-align-left center-ho'>
+                                    <div className='flex column'>
+                                        <p className='s16 grey'>VOLUME BEAST</p>
+                                        <div className='flex center-ho'>
+                                            <div className='bold ml5'>{specialTokenVolume !== null ? `${specialTokenVolume}` : '0'}</div>
+                                            <img className='img22 ml5' src='/currency-beast.webp' alt="BEAST Icon"></img>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className='collection-stats-div text-align-left'>
+                                    <p className='s16 grey'>TOTAL NFTS</p>
+                                    <div className='bold ml5'>{maxSupply || '0'}</div>
+                                </div>
+                                <div className='collection-stats-div text-align-left'>
+                                    <p className='s16 grey'>OWNERS</p>
+                                    <div className='bold ml5'>{getUniqueOwners(allNFTs)}</div>
+                                </div>
+
+                                {/* Hinzufügen der Likes zur Statistik */}
+                                <div className='collection-stats-div text-align-left'>
+                                    <p className='s16 grey'>LIKES</p>
+                                    <div className='flex center-ho'>
+                                    <div className='bold ml5'>{likes}</div>
+                                    <img src='/heart-outline.png' className='ml5 img18'></img>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='flex space-between w95'>
+                            <div className='SearchbarDesktop text-align-left w30 w100media'>
+                                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                            </div>
+                            <div className="custom-pagination">
+                                <button 
+                                    className="custom-pagination-btn previous-btn"
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                                    disabled={currentPage === 1}
+                                >
+                                    &lt; 
+                                </button>
+                                <span className="custom-pagination-info">
+                                    {currentPage} OF {totalPages}
+                                </span>
+
+                                <button 
+                                    className="custom-pagination-btn next-btn custom-pagination-info-2 margin0"
+                                    onClick={() => {
+                                        if (currentPage < totalPages && currentPage + 1 > loadedBatches) {
+                                            setLoading(true); // Setze den Ladezustand
+                                        }
+                                        setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                                    }} 
+                                    disabled={currentPage === totalPages || (currentPage + 1 > loadedBatches)}
+                                >
+                                    {currentPage < totalPages && currentPage + 1 > loadedBatches ? (
+                                        <img src="/basic-loading.gif" alt="Loading..." className="loading-gif" />
+                                    ) : (
+                                        '>'
+                                    )}
+                                </button>
+
+                            </div>
+                        </div>
+
+                        {/* Progress-Bar während des Ladens */}
+                        { (loading || backgroundLoading) && (
+                            <div className="progress-bar-container">
+                                <div 
+                                    className="progress-bar" 
+                                    style={{ width: `${progressPercentage}%` }}
+                                ></div>
+                            </div>
+                        )}
+
+                        {/* Hauptinhalt der NFT-Collection */}
+                        <div className='NFT-Collection-Div'>
+                            {loading && loadedBatches === 0 ? (
+                                <div className="loading-container flex centered">
+                                    <img src="/loading.gif" alt="Loading..." />
                                 </div>
                             ) : (
-                                getCurrentNFTs().map(nft => (
-                                    <Link key={`${nft.contractAddress}-${nft.tokenId}`} to={`/collections/${collectionaddress}/${nft.tokenId}`} className="nft-card">
-                                        <CollectionDetailCard nft={nft} account={account} currencyIcon={currencyIcon} userNames={userNames} />
-                                    </Link>
-                                ))
-                            )
-                        )}
+                                displayedNFTs.length === 0 ? (
+                                    <div className="no-nfts-container flex centered column">
+                                        <h2 className="no-nfts-message">No NFTs found...</h2>
+                                        <img src="/no-nft.png" alt="no nft Icon" className="no-nfts-image" />
+                                    </div>
+                                ) : (
+                                    getCurrentNFTs().map(nft => (
+                                        <Link key={`${nft.contractAddress}-${nft.tokenId}`} to={`/collections/${collectionaddress}/${nft.tokenId}`} className="nft-card">
+                                            <CollectionDetailCard nft={nft} account={account} currencyIcon={currencyIcon} userNames={userNames} />
+                                        </Link>
+                                    ))
+                                )
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     );
 };
 

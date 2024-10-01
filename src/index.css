@@ -457,6 +457,11 @@ p,span {
   width: auto;
 }
 
+.img18 {
+  height: 18px;
+  width: auto;
+}
+
 .pt12 {
   padding-top: 12px;
 }

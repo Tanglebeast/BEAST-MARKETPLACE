@@ -1372,6 +1372,86 @@ export const fetchCollectionStats = async (marketplace, collectionAddress) => {
 
 
 
+const getMarketplaceInstance = async () => {
+  const networkId = await web3.eth.net.getId();
+  const deployedNetwork = nftMarketplaceAbi.networks[networkId];
+  
+  if (!deployedNetwork) {
+    throw new Error('Marketplace contract not deployed to detected network.');
+  }
+  
+  return new web3.eth.Contract(nftMarketplaceAbi.abi, deployedNetwork.address);
+};
+
+export const likeCollection = async (collectionAddress) => {
+  try {
+    const marketplace = await getMarketplaceInstance();
+    const accounts = await web3.eth.getAccounts();
+    if (accounts.length === 0) throw new Error('No account connected');
+
+    const gasEstimate = await marketplace.methods.likeCollection(collectionAddress).estimateGas({ from: accounts[0] });
+    const gasPrice = await web3.eth.getGasPrice();
+
+    const tx = await marketplace.methods.likeCollection(collectionAddress).send({
+      from: accounts[0],
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    console.log('Collection liked successfully:', tx);
+    return true;
+  } catch (error) {
+    console.error('Error liking collection:', error);
+    return false;
+  }
+};
+
+export const unlikeCollection = async (collectionAddress) => {
+  try {
+    const marketplace = await getMarketplaceInstance();
+    const accounts = await web3.eth.getAccounts();
+    if (accounts.length === 0) throw new Error('No account connected');
+
+    const gasEstimate = await marketplace.methods.unlikeCollection(collectionAddress).estimateGas({ from: accounts[0] });
+    const gasPrice = await web3.eth.getGasPrice();
+
+    const tx = await marketplace.methods.unlikeCollection(collectionAddress).send({
+      from: accounts[0],
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    console.log('Collection unliked successfully:', tx);
+    return true;
+  } catch (error) {
+    console.error('Error unliking collection:', error);
+    return false;
+  }
+};
+
+export const getCollectionLikes = async (collectionAddress) => {
+  try {
+    const marketplace = await getMarketplaceInstance();
+    const likes = await marketplace.methods.getCollectionLikes(collectionAddress).call();
+    return parseInt(likes, 10);
+  } catch (error) {
+    console.error('Error getting collection likes:', error);
+    return 0;
+  }
+};
+
+export const hasUserLikedCollection = async (userAddress, collectionAddress) => {
+  try {
+    const marketplace = await getMarketplaceInstance();
+    const hasLiked = await marketplace.methods.hasUserLikedCollection(userAddress, collectionAddress).call();
+    return hasLiked;
+  } catch (error) {
+    console.error('Error checking if user liked collection:', error);
+    return false;
+  }
+};
+
+
 // export const getNFTHistory = async (contractAddress, tokenId) => {
 //   try {
 //     console.log('Fetching NFT history for contract address:', contractAddress, 'and token ID:', tokenId);

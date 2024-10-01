@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+// CollectionCards.jsx
+import React, { useState, useEffect } from 'react'; 
 import { nftCollections } from '../NFTCollections';
 import '../styles/Collections.css';
 import ShortenAddress from '../components/ShortenAddress';
 import SearchBar from '../components/SearchBar';
-import { getCollectionDetails } from '../components/utils';
+import { getCollectionDetails, getCollectionLikes } from '../components/utils'; // Stelle sicher, dass getCollectionLikes importiert ist
 import CollectionFilter from '../components/CollectionFilter';
 import { getCurrentNetwork } from '../components/networkConfig'; // Stelle sicher, dass der Import korrekt ist
 
 const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionDetails, setCollectionDetails] = useState({});
-  const [filters, setFilters] = useState({ artists: [], networks: [] });
+  const [filters, setFilters] = useState({ artists: [], networks: [], likes: '' }); // Inklusive likes
   const [selectedNetwork, setSelectedNetwork] = useState(getCurrentNetwork()); // Nutze den aktuellen Netzwerkwert
 
   useEffect(() => {
@@ -18,7 +19,8 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
       const details = await Promise.all(
         nftCollections.map(async (collection) => {
           const details = await getCollectionDetails(collection.address);
-          return { address: collection.address, ...details };
+          const likes = await getCollectionLikes(collection.address); // Likes abrufen
+          return { address: collection.address, ...details, likes };
         })
       );
       const detailsMap = details.reduce((acc, detail) => {
@@ -33,19 +35,47 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
 
   useEffect(() => {
     // Wenn selectedNetwork sich ändert, z.B. durch einen Netzwerkwechsel, führe eine Aktualisierung durch
-    setSelectedNetwork(getCurrentNetwork());
-  }, [selectedNetwork]);
+    const updateNetwork = () => {
+      const currentNetwork = getCurrentNetwork();
+      setSelectedNetwork(currentNetwork);
+    };
 
-  const filteredCollections = nftCollections.filter(collection =>
-    (collection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     collection.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     collection.address.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    (filters.artists.length === 0 || filters.artists.includes(collection.artist)) &&
-    (filters.networks.length === 0 || filters.networks.includes(collection.network)) &&
-    collection.network === selectedNetwork // Filter by selected network
-  );
+    updateNetwork();
+    // Optional: Abhängig von deiner Netzwerk-Konfiguration könntest du Event-Listener hinzufügen
 
-  const collectionsToShow = limit ? filteredCollections.slice(0, limit) : filteredCollections;
+  }, []);
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  const filteredCollections = nftCollections
+    .filter(collection => {
+      const matchesSearch = 
+        collection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        collection.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        collection.address.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesArtists = filters.artists.length === 0 || filters.artists.includes(collection.artist);
+      const matchesNetworks = filters.networks.length === 0 || filters.networks.includes(collection.network);
+      const matchesNetworkSelection = collection.network === selectedNetwork;
+
+      return matchesSearch && matchesArtists && matchesNetworks && matchesNetworkSelection;
+    })
+    .map(collection => ({
+      ...collection,
+      likes: collectionDetails[collection.address]?.likes || 0
+    }));
+
+  // Sorting based on likes
+  const sortedCollections = [...filteredCollections];
+  if (filters.likes === 'most_likes') {
+    sortedCollections.sort((a, b) => b.likes - a.likes);
+  } else if (filters.likes === 'low_likes') {
+    sortedCollections.sort((a, b) => a.likes - b.likes);
+  }
+
+  const collectionsToShow = limit ? sortedCollections.slice(0, limit) : sortedCollections;
 
   return (
     <div className='CollectionDiv'>
@@ -53,7 +83,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
       <div className='w95 space-between flex MediaGalleryDiv'>
         {showFilter && (
           <div className='w20 Coll-FilterDiv'>
-            <CollectionFilter onFilterChange={setFilters} />
+            <CollectionFilter onFilterChange={handleFilterChange} />
           </div>
         )}
         <div className='centered w95 column flex flex-start ml20 MediaGalleryUnderDiv'>
@@ -72,9 +102,6 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
                 <a href={`/collections/${collection.address}`} key={index} className="collection-card">
                   <div className='collection-banner'>
                     <img src={collection.banner} alt={collection.name} />
-                    {/* <div className='networklogo'>
-                      <img src={collection.currency} alt="currency logo" className="currency-logo-coll" />
-                    </div> */}
                   </div>
 
                   <div className='text-align-left w90 mb5 collection-infoCardDiv'>
@@ -84,19 +111,11 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
                     </div>
                     {collectionDetails[collection.address] && (
                       <>
-                        {/* <div className='centered space-between w100 border-top'>
-                          <div className='centered column'>
-                            <p className='mb5 mt10px'>FLOOR</p>
-                            <div className='centered s20'>
-                              {collectionDetails[collection.address].floorPrice}
-                              <img src={collection.currency} alt="currency logo" className="currency-logo-coll" />
-                            </div>
-                          </div>
-                          <div className='centered column'>
-                            <p className='mb5 mt10px'>LISTED</p>
-                            <div className='s20'>
-                              {collectionDetails[collection.address].listedCount}
-                            </div>
+                        {/* Zusätzliche Informationen können hier hinzugefügt werden */}
+                        {/* <div className='likes-info'>
+                          <p className='mb5'>Likes</p>
+                          <div className='s20'>
+                            {collectionDetails[collection.address].likes}
                           </div>
                         </div> */}
                       </>
