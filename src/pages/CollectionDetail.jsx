@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';  
 import { useParams, Link } from 'react-router-dom';
-import { fetchAllNFTs, initializeMarketplace, getNFTDetails, getUserName, getMaxSupply } from '../components/utils';
+import { 
+    fetchAllNFTs, 
+    initializeMarketplace, 
+    getNFTDetails, 
+    getUserName, 
+    getMaxSupply, 
+    fetchCollectionStats // Importieren Sie die neue Funktion
+} from '../components/utils';
 import SearchBar from '../components/SearchBar';
 import { nftCollections } from '../NFTCollections';
 import CollectionDetailCard from '../components/CollectionDetailCard';
@@ -26,6 +33,8 @@ const CollectionNFTs = () => {
     const [totalBatches, setTotalBatches] = useState(1); // Neuer Zustand für Gesamtchargen
     const [backgroundLoading, setBackgroundLoading] = useState(false);
     const [allAttributes, setAllAttributes] = useState({});
+    const [nativeVolume, setNativeVolume] = useState('0'); // Initialisieren mit '0'
+    const [specialTokenVolume, setSpecialTokenVolume] = useState('0'); // Initialisieren mit '0'
 
     const resultsPerPage = 30;
 
@@ -99,6 +108,16 @@ const CollectionNFTs = () => {
                 setCurrencyIcon(collection.currency);
                 setBannerImage(collection.Collectionbanner);
             }
+
+            // Abrufen der Volumendaten für die spezifische Kollektion
+            const fetchStats = async () => {
+                const stats = await fetchCollectionStats(marketplace, collectionaddress);
+                if (stats) {
+                    setNativeVolume(stats.nativeVolume);
+                    setSpecialTokenVolume(stats.specialTokenVolume);
+                }
+            };
+            fetchStats();
         }
     }, [collectionaddress, marketplace]);
 
@@ -281,10 +300,32 @@ const CollectionNFTs = () => {
                     
                     <div className='w95 flex center-ho space-between'>
                         <p className='text-align-left grey mt0 w30'>{collectionDescription}</p>
+
                         <div className="collection-stats gap15">
+
+                            <div className='collection-stats-div text-align-left center-ho'>
+                                <div className='flex column'>
+                                    <p className='s16 grey'>VOLUME IOTA</p>
+                                    <div className='flex center-ho'>
+                                        <div className='bold ml5'>{nativeVolume !== null ? `${nativeVolume}` : '0'}</div>
+                                        <img className='img22 ml5' src='/currency-iota.png' alt="IOTA Icon"></img>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className='collection-stats-div text-align-left center-ho'>
+                                <div className='flex column'>
+                                    <p className='s16 grey'>VOLUME BEAST</p>
+                                    <div className='flex center-ho'>
+                                        <div className='bold ml5'>{specialTokenVolume !== null ? `${specialTokenVolume}` : '0'}</div>
+                                        <img className='img22 ml5' src='/currency-beast.webp' alt="BEAST Icon"></img>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className='collection-stats-div text-align-left'>
                                 <p className='s16 grey'>TOTAL NFTS</p>
-                                <div className='bold ml5'>{maxSupply}</div>
+                                <div className='bold ml5'>{maxSupply || '0'}</div>
                             </div>
                             <div className='collection-stats-div text-align-left'>
                                 <p className='s16 grey'>OWNERS</p>
@@ -365,7 +406,7 @@ const CollectionNFTs = () => {
             </div>
         </div>
     </div>
-);
+    );
 };
 
 export default CollectionNFTs;

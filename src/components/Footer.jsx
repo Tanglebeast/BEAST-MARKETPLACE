@@ -48,7 +48,7 @@ const Footer = () => {
                 </div>
             </div>
             <div className="footer-bottom VisibleLink">
-                &copy; 2024 Beast-Art all rights reserved | <a href="/imprint">Imprint</a> | <a href="/terms">Terms of Use</a> | <a href="/privacy">Privacy Policy</a>
+                &copy; 2024 TANGLESPACE all rights reserved | <a href="/imprint">Imprint</a> | <a href="/terms">Terms of Use</a> | <a href="/privacy">Privacy Policy</a>
             </div>
             </div>
         </footer>

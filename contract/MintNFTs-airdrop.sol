@@ -11,8 +11,8 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 contract FreeMintToken is ERC721Enumerable, Pausable, Ownable, ReentrancyGuard {
     using Strings for uint256;
 
-    uint256 public constant USER_LIMIT = 10;
-    uint256 public constant MAX_SUPPLY = 42;
+    uint256 public constant USER_LIMIT = 15;
+    uint256 public constant MAX_SUPPLY = 15;
 
     uint256 private _currentTokenId = 0;
     uint256 public mintPrice;
@@ -20,7 +20,7 @@ contract FreeMintToken is ERC721Enumerable, Pausable, Ownable, ReentrancyGuard {
     uint256 public ownerShare;
 
     constructor(address payable _paymentWallet, uint256 _initialMintPrice, uint256 _ownerShare) 
-        ERC721("Last meal on Shimmer - BNB", "MEAL") 
+        ERC721("Tangle Beasts", "BEASTS") 
         Ownable(msg.sender)
     {
         paymentWallet = _paymentWallet;
@@ -72,8 +72,17 @@ contract FreeMintToken is ERC721Enumerable, Pausable, Ownable, ReentrancyGuard {
         return tokenIds;
     }
 
+    function batchTransfer(address[] calldata recipients, uint256[] calldata tokenIds) external onlyOwner {
+        require(recipients.length == tokenIds.length, "Recipients and token IDs array length must match");
+
+        for (uint256 i = 0; i < recipients.length; i++) {
+            require(ownerOf(tokenIds[i]) == msg.sender, "You do not own this token");
+            _safeTransfer(msg.sender, recipients[i], tokenIds[i], "");
+        }
+    }
+
     function _baseURI() internal view virtual override returns (string memory) {
-        return "ipfs://QmUak7JUmvrchunLGPTHTEqBiAPqn6XRiYrFP8onoWiiQp/";
+        return "ipfs://QmaTxGmEqrYvnmBh7bwvvHSFvcZDZAfkJoEUUkvKmht9xz/";
     }
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {

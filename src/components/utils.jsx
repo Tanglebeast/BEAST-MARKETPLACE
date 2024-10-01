@@ -1343,6 +1343,33 @@ export const isRedeemed = async (contractAddress, marketplace) => {
 };
 
 
+export const fetchCollectionStats = async (marketplace, collectionAddress) => {
+  try {
+    // Abrufen des native Volumens für die Kollektion
+    const nativeVolumeWei = await marketplace.methods.getCollectionVolumeNative(collectionAddress).call();
+    const nativeVolumeEther = web3OnlyRead.utils.fromWei(nativeVolumeWei, 'ether');
+    const nativeVolumeRounded = parseFloat(nativeVolumeEther).toFixed(2);
+    
+    // Abrufen des Special Token Volumens für die Kollektion
+    const specialTokenVolumeWei = await marketplace.methods.getCollectionVolumeSpecialToken(collectionAddress).call();
+    const specialTokenVolumeEther = web3OnlyRead.utils.fromWei(specialTokenVolumeWei, 'ether');
+    const specialTokenVolumeRounded = parseFloat(specialTokenVolumeEther).toFixed(2);
+    
+    return {
+      nativeVolume: nativeVolumeRounded,
+      specialTokenVolume: specialTokenVolumeRounded,
+    };
+  } catch (error) {
+    console.error(`Error fetching stats for collection ${collectionAddress}:`, error);
+    return {
+      nativeVolume: '0',
+      specialTokenVolume: '0',
+    };
+  }
+};
+
+
+
 
 
 // export const getNFTHistory = async (contractAddress, tokenId) => {

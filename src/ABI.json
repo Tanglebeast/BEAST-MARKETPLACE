@@ -404,6 +404,82 @@
 			"inputs": [
 				{
 					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"name": "collectionVolumeNative",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"name": "collectionVolumeSpecialToken",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_collectionAddress",
+					"type": "address"
+				}
+			],
+			"name": "getCollectionVolumeNative",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_collectionAddress",
+					"type": "address"
+				}
+			],
+			"name": "getCollectionVolumeSpecialToken",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
 					"name": "_contractAddress",
 					"type": "address"
 				},
@@ -536,6 +612,30 @@
 			"inputs": [
 				{
 					"internalType": "address",
+					"name": "_contractAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_tokenId",
+					"type": "uint256"
+				}
+			],
+			"name": "getSaleHistory",
+			"outputs": [
+				{
+					"internalType": "uint256[]",
+					"name": "",
+					"type": "uint256[]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
 					"name": "user",
 					"type": "address"
 				}
@@ -654,6 +754,35 @@
 			"type": "function"
 		},
 		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "saleHistory",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
 			"inputs": [],
 			"name": "SPECIAL_TOKEN_ADDRESS",
 			"outputs": [
@@ -720,7 +849,7 @@
 	  },
 	  "//": "IOTA EVM",
 	  "1075": {
-		"address": "0x5B5DCBac5D73126dB9ca6EbCd16DD6a24EB9dD91",
+		"address": "0xbF20b1dDA252182d2D1c98B244ce6874dEdC0616",
 		"testcampaign address": "0xDC446Da886cF98ac5b910392d41D19BF3AAeCEbe"
 	  },
 	  "//": "SHIMMER EVM",

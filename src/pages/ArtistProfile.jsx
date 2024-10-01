@@ -42,12 +42,12 @@ const ArtistProfile = () => {
           </div>
           <div className="social-links">
             <div>
-              <div className='ArtistNetworks'>
+              {/* <div className='ArtistNetworks'>
                 <h4>NETWORKS</h4>
                 {currencyIcons.map((icon, index) => (
                   <img key={index} src={icon} alt="currency icon" className="network-icon mr5" />
                 ))}
-              </div>
+              </div> */}
             </div>
             <div>
               <h4>SOCIALS</h4>
