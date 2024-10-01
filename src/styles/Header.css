@@ -4,8 +4,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   background-color: black;
   color: #fff;
   width: 100%; 
@@ -16,8 +16,8 @@
 .navbar {
   background-color: transparent;
   width: 100%;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   border-radius: 0;
 }
 
@@ -26,7 +26,7 @@
 }
 
 .logo {
-  height: 70px;
+  height: 50px;
 }
 
 .nav-container {

@@ -11,7 +11,7 @@ const Footer = () => {
                 <div className="footer-section about">
                 <a href="/">
               <div className="logo-footer">
-                <img src="/beast-art-neu.svg" alt="Logo" />
+                <img src="/Tanglespace-logo.svg" alt="Logo" />
               </div>
             </a>
             <div className='footerdescription'>
