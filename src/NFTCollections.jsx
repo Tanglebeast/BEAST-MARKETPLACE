@@ -3,7 +3,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 
   export const nftCollections = [
 	{
-		name: 'PP-COLLECTION',
+		name: 'PFP-COLLECTION',
 		description: 'A collection of 115 beautiful OG Tanglebest Tigers, perfect for a new PFP!',
 		banner: '/Artist-2.png',
 		grid: '/soon-grid.png',
@@ -79,10 +79,10 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  },
 	  {
 		name: 'Tangle Apes',
-		description: 'A beautiful collection of 15 unique and super rare Beasts. The first Tanglebeast NFT collection ever created!',
-		banner: '/tangle-beasts-nft.png',
+		description: 'A beautiful collection of 15 unique Apes.',
+		banner: '/tangle-apes.png',
 		grid: '/soon-grid.png',
-		Collectionbanner: '/tanglebeasts-banner.png',
+		Collectionbanner: '/Banner-apes.png',
 		artist: 'Tanglebeasts',
 		artistwallet: '0x2FEA5b277e4a11406664691ac4A5315e6912ddC1',
 		network: 'iotaevm',
@@ -90,6 +90,21 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 		rpcurl: 'https://json-rpc.evm.testnet.iotaledger.net',
 		currency: '/currency-iota.png',
 		address: '0x8716eC249ffFd2d70F84636D7fD147820c7647dF',
+		abi: ABI,
+	  },
+	  {
+		name: 'Tanglebeasts X Katakora',
+		description: 'A hand-drawn collection of 5 unique Beasts, drawn by the artist Katakora in cooperation with Tanglebeasts.',
+		banner: '/katakora-pfp.jpg',
+		grid: '/soon-grid.png',
+		Collectionbanner: '/Banner-katakora.png',
+		artist: 'Tanglebeasts',
+		artistwallet: '0x2FEA5b277e4a11406664691ac4A5315e6912ddC1',
+		network: 'iotaevm',
+		networkid: '0x433',
+		rpcurl: 'https://json-rpc.evm.testnet.iotaledger.net',
+		currency: '/currency-iota.png',
+		address: '0xae41e8211FA5b4DC3c35B75156932A9494Fa13Be',
 		abi: ABI,
 	  },
 	  {
