@@ -188,7 +188,7 @@ const networkConfigs = {
                 if (pollData.isERC20Poll) {
                     artistNameFromPoll = 'BEAST-VOTING';
                 } else if (uniqueArtists.length > 1) {
-                    artistNameFromPoll = 'FRACTALZ';
+                    artistNameFromPoll = 'TANGLESPACE';
                 } else {
                     artistNameFromPoll = uniqueArtists[0] || 'PROJECT-VOTING';
                 }

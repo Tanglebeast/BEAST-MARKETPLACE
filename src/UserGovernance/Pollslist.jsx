@@ -176,7 +176,7 @@ const PollsList = ({ artistName }) => {
               const uniqueArtists = [...new Set(nftData.map((item) => item.artist).filter(Boolean))];
 
               // Bestimmen des artistName basierend auf der Anzahl eindeutiger Künstler
-              let artistNameFromPoll = uniqueArtists.length > 1 ? 'FRACTALZ' : (uniqueArtists[0] || '');
+              let artistNameFromPoll = uniqueArtists.length > 1 ? 'TANGLESPACE' : (uniqueArtists[0] || '');
 
               // Wenn es eine ERC20-Umfrage ist, setze den Künstler auf "Tanglebeasts"
               if (poll.isERC20Poll) {

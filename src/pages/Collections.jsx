@@ -14,28 +14,36 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
   const [filters, setFilters] = useState({ artists: [], networks: [], sortOrder: 'community_rank' }); // Inklusive sortOrder mit Default-Wert
   const [selectedNetwork, setSelectedNetwork] = useState(getCurrentNetwork()); // Nutze den aktuellen Netzwerkwert
   const [collectionSalesCounts, setCollectionSalesCounts] = useState({}); // Neue State für Verkaufszahlen
+  const [isLoading, setIsLoading] = useState(true); // Neuer Ladezustand
 
   useEffect(() => {
     const fetchCollectionData = async () => {
-      const details = await Promise.all(
-        nftCollections.map(async (collection) => {
-          const details = await getCollectionDetails(collection.address);
-          const likes = await getCollectionLikes(collection.address); // Likes abrufen
-          const salesCount = await fetchCollectionSalesCount(collection.address); // Verkaufszahlen abrufen
-          return { address: collection.address, ...details, likes, salesCount };
-        })
-      );
-      const detailsMap = details.reduce((acc, detail) => {
-        acc[detail.address] = { ...detail };
-        return acc;
-      }, {});
-      setCollectionDetails(detailsMap);
+      setIsLoading(true); // Ladezustand auf true setzen
+      try {
+        const details = await Promise.all(
+          nftCollections.map(async (collection) => {
+            const details = await getCollectionDetails(collection.address);
+            const likes = await getCollectionLikes(collection.address); // Likes abrufen
+            const salesCount = await fetchCollectionSalesCount(collection.address); // Verkaufszahlen abrufen
+            return { address: collection.address, ...details, likes, salesCount };
+          })
+        );
+        const detailsMap = details.reduce((acc, detail) => {
+          acc[detail.address] = { ...detail };
+          return acc;
+        }, {});
+        setCollectionDetails(detailsMap);
 
-      const salesCountsMap = details.reduce((acc, detail) => {
-        acc[detail.address] = detail.salesCount;
-        return acc;
-      }, {});
-      setCollectionSalesCounts(salesCountsMap);
+        const salesCountsMap = details.reduce((acc, detail) => {
+          acc[detail.address] = detail.salesCount;
+          return acc;
+        }, {});
+        setCollectionSalesCounts(salesCountsMap);
+      } catch (error) {
+        console.error("Fehler beim Laden der Kollektionen:", error);
+      } finally {
+        setIsLoading(false); // Ladezustand auf false setzen, egal ob Erfolg oder Fehler
+      }
     };
 
     fetchCollectionData();
@@ -105,7 +113,11 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
           <div className='SearchbarDesktop text-align-left w30 w100media'>
             {showSearchBar && <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
           </div>
-          {collectionsToShow.length === 0 ? (
+          {isLoading ? ( // Überprüfe den Ladezustand
+            <div className="loading-container flex centered">
+              <img src="/loading.gif" alt="Loading..." className="loading-image" />
+            </div>
+          ) : collectionsToShow.length === 0 ? (
             <div className="no-nfts-container flex centered column">
               <h2 className="no-nfts-message">No collections found...</h2>
               <img src="/no-nft.png" alt="No collections" className="no-nft-image" />
