@@ -25,7 +25,7 @@
   .brandingColorDiv {
     position: absolute;
     top: 50px;
-    left: -210px; /* Startposition des Div außerhalb des Bildschirms */
+    left: -245px; /* Startposition des Div außerhalb des Bildschirms */
     transform: translateX(10%);
     transition: left 0.3s ease; /* Smooth Transition */
     display: flex;

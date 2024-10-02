@@ -48,6 +48,11 @@ const ChangeTheme = () => {
               onClick={() => handleColorChange('#535bf2', '#535bf2bf', '#0C1215')}
             />
             <div
+              className={`colorOption ${color === '#404375' ? 'selected' : ''}`}
+              style={{ backgroundColor: '#404375' }}
+              onClick={() => handleColorChange('#404375', '#404375bf', '#151e22')}
+            />
+            <div
               className={`colorOption ${color === '#f39c12' ? 'selected' : ''}`}
               style={{ backgroundColor: '#f39c12' }}
               onClick={() => handleColorChange('#f39c12', '#f39c12bf', '#1C2022')}

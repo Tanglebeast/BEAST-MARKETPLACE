@@ -1,0 +1,118 @@
+ 
+ #contactForm {
+    background-color: black;
+    padding: 20px;
+    border-radius: 8px;
+    width: 50%;
+    height: 90%;
+    overflow: scroll;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    margin-top: 15px;
+  }
+
+ #contactForm input,
+  .DescriptionInput,
+  .AdditionalInfoInput,
+  .CountryInput {
+    padding: 7px;
+    margin-bottom: 15px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    background-color: #121212;
+    color: white;
+  }
+
+  #contactForm input:hover,
+  .DescriptionInput:hover,
+  .AdditionalInfoInput:hover,
+  .CountryInput:hover {
+    border: 2px solid var(--branding-color);
+  }
+
+  .DescriptionInput,
+  .AdditionalInfoInput {
+    height: 100px;
+  }
+
+  #contactForm input[type="checkbox"] {
+    accent-color: var(--branding-color); /* Für moderne Browser */
+    height: 15px;
+    width: 15px;
+  }
+  
+  #contactForm input[type="radio"] {
+    accent-color: var(--branding-color);
+    height: 15px;
+    width: 15px; /* Für moderne Browser */
+  }
+
+  .star-icon {
+    color: var(--branding-color); /* Setzt die Farbe des Sterns auf Rot */
+    font-size: 22px; /* Setzt die Größe des Sterns */
+    margin-left: 3px
+  }
+  
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .sendformbtn {
+    background-color: var(--branding-color);
+    font-family: Josefin Sans, sans-serif !important;
+    border: none;
+    color: #fff;
+    padding: 10px 22px;
+    font: inherit;
+    border-radius: 30px;
+    transition: background-color .2s ease;
+  }
+
+  .sendformbtn:hover,
+  .add-coll-btn:hover {
+    background-color: var(--branding-color-hover);
+  }
+
+  .add-coll-btn {
+    background-color: var(--branding-color);
+    font-family: Josefin Sans, sans-serif !important;
+    border: none;
+    color: #fff;
+    padding: 4px 0px;
+    font: inherit;
+    border-radius: 30px;
+    width: 87%;
+    transition: background-color .2s ease;
+  }
+
+  .textfield-add-removeable {
+    width: 85%;
+  }
+
+  .remove-coll-btn {
+    background-color: red;
+    font-family: Josefin Sans, sans-serif !important;
+    border: none;
+    color: #fff;
+    padding: 7px;
+    font: inherit;
+    border-radius: 30px;
+    width: 10%;
+    transition: background-color .2s ease;
+    margin-left: 5px;
+  }
+
+  @media (max-width: 1100px) {
+    #contactForm {
+        width: 90%;
+      }
+  }
+
+
+  

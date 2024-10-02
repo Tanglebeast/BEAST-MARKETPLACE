@@ -44,6 +44,7 @@ import PublicBlogPage from './Blog/Publicblogpage';
 import NFTCollectionForm from './components/UploadNFTCollectionForm';
 import BeastToIotaPrice from './components/BeastToIotaPrice';
 import BEASTFaucet from './components/Test-Beast-Faucet';
+import KontaktFormular from './components/ArtistContactFormula';
 
 
 const App = () => {
@@ -122,6 +123,7 @@ const App = () => {
         <Route path="/collections/:collectionaddress/:tokenid" element={<NFTDetail />} />
 
         <Route path="/upload" element={<NFTCollectionForm />} />
+        <Route path="/register" element={<KontaktFormular />} />
         {/* <Route path="/price" element={<BeastToIotaPrice />} /> */}
 
         <Route path="/articles" element={<PublicBlogPage blogPosts={blogPosts} />} /> {/* Öffentliche Blog-Seite */}
