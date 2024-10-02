@@ -53,6 +53,34 @@
 			"type": "function"
 		},
 		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_contractAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_tokenId",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_price",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "_paymentToken",
+					"type": "address"
+				}
+			],
+			"name": "listNFT",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
 			"inputs": [],
 			"stateMutability": "nonpayable",
 			"type": "constructor"
@@ -116,34 +144,6 @@
 			],
 			"name": "CollectionUnliked",
 			"type": "event"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "_contractAddress",
-					"type": "address"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_tokenId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_price",
-					"type": "uint256"
-				},
-				{
-					"internalType": "address",
-					"name": "_paymentToken",
-					"type": "address"
-				}
-			],
-			"name": "listNFT",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
 		},
 		{
 			"anonymous": false,
@@ -316,6 +316,31 @@
 			"type": "function"
 		},
 		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "collection",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "price",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "paymentToken",
+					"type": "address"
+				}
+			],
+			"name": "SaleRecorded",
+			"type": "event"
+		},
+		{
 			"inputs": [
 				{
 					"internalType": "address",
@@ -451,6 +476,40 @@
 					"internalType": "address",
 					"name": "",
 					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"name": "collectionSales",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "price",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "paymentToken",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
 				}
 			],
 			"name": "collectionToArtistFee",
@@ -535,6 +594,42 @@
 					"internalType": "uint256",
 					"name": "",
 					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_collectionAddress",
+					"type": "address"
+				}
+			],
+			"name": "getCollectionSales",
+			"outputs": [
+				{
+					"components": [
+						{
+							"internalType": "uint256",
+							"name": "timestamp",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "price",
+							"type": "uint256"
+						},
+						{
+							"internalType": "address",
+							"name": "paymentToken",
+							"type": "address"
+						}
+					],
+					"internalType": "struct NFTMarketplace.Sale[]",
+					"name": "",
+					"type": "tuple[]"
 				}
 			],
 			"stateMutability": "view",
@@ -999,7 +1094,7 @@
 	  },
 	  "//": "IOTA EVM",
 	  "1075": {
-		"address": "0xc373a6eED34d9FDDE0DEd51CEE2224bECe3184DB"
+		"address": "0x96F918048AF54B65E50691678369B4bDe49f3223"
 	  },
 	  "//": "SHIMMER EVM",
 	  "1073": {

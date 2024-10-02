@@ -64,12 +64,14 @@
 
 
 /* Verstecke das Standard-Checkbox-Design */
-.checkbox-label input[type="checkbox"] {
-    display: none; /* Versteckt die Standard-Checkbox */
+.checkbox-label input[type="checkbox"],
+.radio-label input[type="radio"] {
+    display: none; /* Versteckt die Standard-Checkbox/Radio */
 }
 
-/* Style für die benutzerdefinierte Checkbox */
-.checkbox-label {
+/* Style für die benutzerdefinierte Checkbox und Radio */
+.checkbox-label,
+.radio-label {
     position: relative;
     padding-left: 30px; /* Platz für das benutzerdefinierte Häkchen */
     cursor: pointer;
@@ -78,7 +80,8 @@
     line-height: 20px; /* Zeilenhöhe anpassen, um das Häkchen vertikal zu zentrieren */
 }
 
-.custom-checkbox {
+.custom-checkbox,
+.custom-radio {
     position: absolute;
     left: 0;
     top: 50%;
@@ -86,25 +89,45 @@
     width: 15px;
     height: 15px;
     border: 2px solid #FFFFFF; /* Rahmenfarbe */
-    background-color: #000000; /* Hintergrundfarbe der Checkbox */
-    border-radius: 4px; /* Ecken abrunden */
+    background-color: #000000; /* Hintergrundfarbe der Checkbox/Radio */
+    border-radius: 4px; /* Ecken abrunden für Checkbox */
 }
 
-/* Häkchen (Checkmark) sichtbar, wenn Checkbox aktiviert ist */
-.checkbox-label input[type="checkbox"]:checked + .custom-checkbox {
+/* Spezifische Styles für Radio-Buttons */
+.custom-radio {
+    border-radius: 50%; /* Runde Form für Radio-Buttons */
+}
+
+/* Häkchen (Checkmark) sichtbar, wenn Checkbox/Radio aktiviert ist */
+.checkbox-label input[type="checkbox"]:checked + .custom-checkbox,
+.radio-label input[type="radio"]:checked + .custom-radio {
     background-color: var(--branding-color); /* Hintergrundfarbe des aktivierten Häkchens */
     border-color: var(--branding-color); /* Rahmenfarbe des aktivierten Häkchens */
 }
 
-.custom-checkbox::after {
+/* Häkchen für Checkbox und Radio */
+.custom-checkbox::after,
+.custom-radio::after {
     content: '✔'; /* Das Häkchen-Symbol */
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     color: #000000; /* Häkchenfarbe */
-    font-size: 16px; /* Größe des Häkchens */
+    font-size: 12px; /* Größe des Häkchens */
     line-height: 0; /* Zeilenhöhe auf 0 setzen, um es präzise zu positionieren */
+    opacity: 0; /* Standardmäßig versteckt */
+    transition: opacity 0.2s ease;
+}
+
+/* Sichtbares Häkchen, wenn aktiviert */
+.checkbox-label input[type="checkbox"]:checked + .custom-checkbox::after,
+.radio-label input[type="radio"]:checked + .custom-radio::after {
+    opacity: 1;
+}
+
+.radio-label {
+    margin: 15px 0;
 }
 
 

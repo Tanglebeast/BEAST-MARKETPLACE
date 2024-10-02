@@ -4,33 +4,41 @@ import { nftCollections } from '../NFTCollections';
 import '../styles/Collections.css';
 import ShortenAddress from '../components/ShortenAddress';
 import SearchBar from '../components/SearchBar';
-import { getCollectionDetails, getCollectionLikes } from '../components/utils'; // Stelle sicher, dass getCollectionLikes importiert ist
+import { getCollectionDetails, getCollectionLikes, fetchCollectionSalesCount } from '../components/utils'; // Stelle sicher, dass fetchCollectionSalesCount importiert ist
 import CollectionFilter from '../components/CollectionFilter';
 import { getCurrentNetwork } from '../components/networkConfig'; // Stelle sicher, dass der Import korrekt ist
 
 const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionDetails, setCollectionDetails] = useState({});
-  const [filters, setFilters] = useState({ artists: [], networks: [], likes: '' }); // Inklusive likes
+  const [filters, setFilters] = useState({ artists: [], networks: [], sortOrder: 'community_rank' }); // Inklusive sortOrder mit Default-Wert
   const [selectedNetwork, setSelectedNetwork] = useState(getCurrentNetwork()); // Nutze den aktuellen Netzwerkwert
+  const [collectionSalesCounts, setCollectionSalesCounts] = useState({}); // Neue State für Verkaufszahlen
 
   useEffect(() => {
-    const fetchCollectionDetails = async () => {
+    const fetchCollectionData = async () => {
       const details = await Promise.all(
         nftCollections.map(async (collection) => {
           const details = await getCollectionDetails(collection.address);
           const likes = await getCollectionLikes(collection.address); // Likes abrufen
-          return { address: collection.address, ...details, likes };
+          const salesCount = await fetchCollectionSalesCount(collection.address); // Verkaufszahlen abrufen
+          return { address: collection.address, ...details, likes, salesCount };
         })
       );
       const detailsMap = details.reduce((acc, detail) => {
-        acc[detail.address] = detail;
+        acc[detail.address] = { ...detail };
         return acc;
       }, {});
       setCollectionDetails(detailsMap);
+
+      const salesCountsMap = details.reduce((acc, detail) => {
+        acc[detail.address] = detail.salesCount;
+        return acc;
+      }, {});
+      setCollectionSalesCounts(salesCountsMap);
     };
 
-    fetchCollectionDetails();
+    fetchCollectionData();
   }, []);
 
   useEffect(() => {
@@ -64,15 +72,21 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
     })
     .map(collection => ({
       ...collection,
-      likes: collectionDetails[collection.address]?.likes || 0
+      timestamp: parseInt(collection.timestamp, 10), // Konvertiere timestamp zu Zahl für Sortierung
+      likes: collectionDetails[collection.address]?.likes || 0, // Behalte likes bei
+      salesCount: collectionSalesCounts[collection.address] || 0 // Behalte salesCount bei
     }));
 
-  // Sorting based on likes
+  // Sorting based on sortOrder
   const sortedCollections = [...filteredCollections];
-  if (filters.likes === 'most_likes') {
-    sortedCollections.sort((a, b) => b.likes - a.likes);
-  } else if (filters.likes === 'low_likes') {
-    sortedCollections.sort((a, b) => a.likes - b.likes);
+  if (filters.sortOrder === 'community_rank') {
+    sortedCollections.sort((a, b) => b.likes - a.likes); // Sortiere nach den meisten Likes
+  } else if (filters.sortOrder === 'newest') {
+    sortedCollections.sort((a, b) => b.timestamp - a.timestamp); // Sortiere nach neuesten
+  } else if (filters.sortOrder === 'oldest') {
+    sortedCollections.sort((a, b) => a.timestamp - b.timestamp); // Sortiere nach ältesten
+  } else if (filters.sortOrder === 'top_traded') {
+    sortedCollections.sort((a, b) => b.salesCount - a.salesCount); // Sortiere nach den meisten Verkäufen
   }
 
   const collectionsToShow = limit ? sortedCollections.slice(0, limit) : sortedCollections;
@@ -116,6 +130,18 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
                           <p className='mb5'>Likes</p>
                           <div className='s20'>
                             {collectionDetails[collection.address].likes}
+                          </div>
+                        </div>
+                        <div className='sales-info'>
+                          <p className='mb5'>Sales</p>
+                          <div className='s20'>
+                            {collectionDetails[collection.address].salesCount}
+                          </div>
+                        </div>
+                        <div className='timestamp-info'>
+                          <p className='mb5'>Created:</p>
+                          <div className='s20'>
+                            {new Date(collection.timestamp * 1000).toLocaleDateString()}
                           </div>
                         </div> */}
                       </>

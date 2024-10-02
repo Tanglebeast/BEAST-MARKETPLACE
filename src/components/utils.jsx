@@ -1372,6 +1372,43 @@ export const fetchCollectionStats = async (marketplace, collectionAddress) => {
 
 
 
+// Neue Funktion zum Abrufen der Gesamtverkäufe einer Kollektion
+export const fetchCollectionSalesCount = async (collectionAddress) => {
+  try {
+    // Überprüfen, ob die Kollektion in nftCollections vorhanden ist
+    const selectedCollection = nftCollections.find(
+      collection => collection.address.toLowerCase() === collectionAddress.toLowerCase()
+    );
+
+    if (!selectedCollection) {
+      console.log('Collection not found for address:', collectionAddress);
+      return 0;
+    }
+
+    // Instanziieren des Marketplace-Vertrags
+    const marketplaceContract = new web3OnlyRead.eth.Contract(
+      nftMarketplaceAbi.abi,
+      nftMarketplaceAbi.networks[await web3OnlyRead.eth.net.getId()].address
+    );
+
+    // Abrufen der Verkaufsdaten der Kollektion
+    const sales = await marketplaceContract.methods.getCollectionSales(selectedCollection.address).call();
+
+    // Rückgabe der Anzahl der Verkäufe
+    const salesCount = sales.length;
+    console.log(`Fetched ${salesCount} sales for collection ${collectionAddress}`);
+    return parseInt(salesCount, 10);
+  } catch (error) {
+    console.error("Error fetching collection sales count:", error);
+    return 0;
+  }
+};
+
+
+
+
+
+
 const getMarketplaceInstance = async () => {
   const networkId = await web3.eth.net.getId();
   const deployedNetwork = nftMarketplaceAbi.networks[networkId];

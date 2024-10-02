@@ -9,7 +9,7 @@ const CollectionFilter = ({ onFilterChange }) => {
         artists: [], 
         networks: [] // Behalte networks als leeres Array bei
     });
-    const [likesSort, setLikesSort] = useState(''); // Zustand für Likes-Sortierung
+    const [sortOrder, setSortOrder] = useState('community_rank'); // Standardmäßig "Community rank" auswählen
 
     const toggleAccordion = (index) => {
         setActiveIndices(prevState =>
@@ -26,20 +26,20 @@ const CollectionFilter = ({ onFilterChange }) => {
             const updatedWords = prevState[type].includes(word)
                 ? prevState[type].filter(w => w !== word)
                 : [...prevState[type], word];
-    
+        
             const newSelectedWords = { ...prevState, [type]: updatedWords };
-            onFilterChange({ ...newSelectedWords, likes: likesSort, networks: prevState.networks });
+            onFilterChange({ ...newSelectedWords, sortOrder, networks: prevState.networks });
             return newSelectedWords;
         });
     };
 
-    const handleLikesToggle = (value) => {
-        if (likesSort === value) {
-            setLikesSort('');
-            onFilterChange({ ...selectedWords, likes: '', networks: selectedWords.networks });
+    const handleSortToggle = (value) => {
+        if (sortOrder === value) {
+            setSortOrder(''); // Optional: Keine Sortierung auswählen
+            onFilterChange({ ...selectedWords, sortOrder: '', networks: selectedWords.networks });
         } else {
-            setLikesSort(value);
-            onFilterChange({ ...selectedWords, likes: value, networks: selectedWords.networks });
+            setSortOrder(value);
+            onFilterChange({ ...selectedWords, sortOrder: value, networks: selectedWords.networks });
         }
     };
 
@@ -59,9 +59,9 @@ const CollectionFilter = ({ onFilterChange }) => {
         //     type: 'networks'
         // }, // Netzwerkfilter-Item auskommentiert
         {
-            question: 'LIKES', // Neue Filterbox für Likes
-            words: ['Most Likes', 'Low Likes'],
-            type: 'likesSort'
+            question: 'SORT', // Neue Filterbox für Sortierung
+            words: ['Community rank', 'Top Traded', 'Newest', 'Oldest'], // "Top Traded" hinzugefügt
+            type: 'sortOrder'
         }
     ];
     
@@ -107,7 +107,7 @@ const CollectionFilter = ({ onFilterChange }) => {
                             ref={el => contentRef.current[index] = el}
                             className="accordion-filterContent"
                         >
-                            {item.type !== 'likesSort' ? (
+                            {item.type !== 'sortOrder' ? (
                                 item.words.map((word, i) => (
                                     <label key={i} className="checkbox-label">
                                         <input
@@ -121,15 +121,21 @@ const CollectionFilter = ({ onFilterChange }) => {
                                 ))
                             ) : (
                                 item.words.map((word, i) => {
-                                    const value = word === 'Most Likes' ? 'most_likes' : 'low_likes';
+                                    let value;
+                                    if (word === 'Community rank') value = 'community_rank';
+                                    else if (word === 'Newest') value = 'newest';
+                                    else if (word === 'Oldest') value = 'oldest';
+                                    else if (word === 'Top Traded') value = 'top_traded'; // "Top Traded" Wert zuweisen
+
                                     return (
-                                        <label key={i} className="checkbox-label">
+                                        <label key={i} className="radio-label">
                                             <input
-                                                type="checkbox"
-                                                checked={likesSort === value}
-                                                onChange={() => handleLikesToggle(value)}
+                                                type="radio"
+                                                name="sortOrder"
+                                                checked={sortOrder === value}
+                                                onChange={() => handleSortToggle(value)}
                                             />
-                                            <span className={`custom-checkbox ${likesSort === value ? 'checked' : ''}`}></span>
+                                            <span className={`custom-radio ${sortOrder === value ? 'checked' : ''}`}></span>
                                             {word}
                                         </label>
                                     );
