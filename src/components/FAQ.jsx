@@ -9,26 +9,38 @@ const Accordion = () => {
     };
 
     const faqItems = [
-        {
-            question: 'What is a Fractal?',
-            answer: 'A Fractal is a NFT, or Non-Fungible Token. It is a type of digital asset that represents ownership or proof of authenticity of a unique item or piece of content, stored on a blockchain. Unlike cryptocurrencies like Bitcoin, which are fungible and can be exchanged on a one-to-one basis, NFTs are unique and cannot be exchanged on a like-for-like basis.'
-        },
-        {
-            question: 'What does it mean to own a Fractal?',
-            answer: 'A Fractal is an NFT that serves as a digital, tamper-proof certificate of ownership for an artwork. Each artwork is divided into a fixed number of smaller pieces. Each piece represents a percentage of the artwork, meaning you can officially own a fraction of it.'
-        },
-        {
-            question: 'Where is the Artwork stored?',
-            answer: 'Each artwork is safely stored in a UV-protected, dark room, securely packed, and kept safe from high temperatures to guarantee its longevity.'
-        },
-        {
-            question: 'Why Fees and how much?',
-            answer: 'Currently, for every sale on the platform, the seller has to pay a 6% fee. Of this fee, 3% goes into the Fractals Treasury to fund the project and exhibitions, and 3% goes to the artist.'
-        },
-        {
-            question: 'Can I see my Artwork?',
-            answer: 'Yes, there will be regular exhibition events. All artworks will be exhibited for investors to see in real life. Your Fractal NFT also serves as a digital ticket to access these events.'
-        }
+            {
+                question: 'Can I list my Soonaverse collection?',
+                answer: 'Yes, we can list Soonaverse collections. However, it is important to understand that this marketplace operates on the EVM. This means you cannot list the original Soonaverse collection. A new collection with the same NFTs needs to be created on the IOTA EVM, which removes the value of the original collection.'
+            },
+            {
+                question: 'What is needed in order to submit a Soonaverse collection?',
+                answer: 'To list your Soonaverse collection, we require the NFT images that have the same name or number as the NFT name, description, or metadata. We need a connection between each image and its corresponding NFT. Unfortunately, this is the only way since Soonaverse does not provide image data.'
+            },
+            {
+                question: 'Where can I submit my collection?',
+                answer: 'You can find the project registration form in the footer of our website. After reviewing your submission, we will contact you.'
+            },
+            {
+                question: 'Can I submit an EVM collection?',
+                answer: 'Yes, you can easily submit your EVM collection. Simply fill out the project registration form in the footer, and we will contact you.'
+            },
+            {
+                question: 'Which currency is used to purchase NFTs?',
+                answer: 'You can pay with IOTA and BEAST Token.'
+            },
+            {
+                question: 'Why are there fees, and how much are they?',
+                answer: 'Currently, for every sale on the platform, the seller must pay a 6% fee. Of this fee, 3% goes to the TANGLESPACE Treasury to fund the project, and 3% goes to the owner of the NFT collection. NFT sales paid with BEAST Token are feeless.'
+            },
+            {
+                question: 'How can I avoid the artist and service fees?',
+                answer: 'NFT transfers paid with BEAST Token are 100% feeless.'
+            },
+            {
+                question: 'Is there a central storage of user data?',
+                answer: 'No, all user data such as profile images, usernames, etc., are stored in the smart contract.'
+            }    
     ];
 
     return (

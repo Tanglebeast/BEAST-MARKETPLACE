@@ -36,8 +36,8 @@ const Footer = () => {
                         {/* <li><a href="https://fractalz.xyz">Homepage</a></li> */}
                         <li><a href="/register">REGISTER YOUR NFT PROJECT</a></li>
                         {/* <li><a href="/faucet">Faucets</a></li>
-                        <li><a href="https://fractalz.xyz/?artistmodalopen=true">Become Artist</a></li>
-                        <li><a href="/faq">FAQ</a></li> */}
+                        <li><a href="https://fractalz.xyz/?artistmodalopen=true">Become Artist</a></li> */}
+                        <li><a href="/faq">FAQ</a></li>
                     </ul>
                 </div>
                 <div className="footer-section contact VisibleLink">
