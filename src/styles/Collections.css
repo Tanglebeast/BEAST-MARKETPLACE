@@ -150,7 +150,37 @@
     font-size: 1rem;
     color: #555;
   }
-  
+
+  .collectionCategoryDiv h3{
+    margin: 0px;
+  }
+
+  .collectionCategoryDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 7px;
+  }
+
+  .collectionCategoryDiv:hover {
+    background-color: rgb(57, 57, 57);
+  }
+
+  .collectionCategoryDiv.active {
+    background-color: var(--branding-color);
+  }
+
+  .collection-progress-bar-container {
+    position: relative;
+    width: 95%;
+    height: 5px;
+    background-color: #5d5d5d79;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 5px;
+}
 
   @media (max-width: 768px) {
     .MediaGalleryDiv {

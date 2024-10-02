@@ -282,6 +282,10 @@ p,span {
   opacity: 50%;
 }
 
+.flex-end {
+  justify-content: end;
+}
+
 .alert-color {
   background-color: rgb(167, 0, 0) !important;
 }
