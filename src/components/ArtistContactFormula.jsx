@@ -362,7 +362,7 @@ function KontaktFormular() {
             <span className="star-icon">*</span>
           </label>
         </div>
-        <button className='sendformbtn w50 loading-gif-img' type="submit">
+        <button className='sendformbtn w50 img25' type="submit">
           {loading ? <img src="/basic-loading.gif" alt="Loading..." /> : 'SUBMIT FORM'}
         </button>
       </form>
