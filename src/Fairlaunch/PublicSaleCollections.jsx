@@ -4,6 +4,7 @@ import { nftCollections } from '../NFTCollections';
 import '../styles/Collections.css';
 import SearchBar from '../components/SearchBar';
 import CollectionFilter from '../components/CollectionFilter';
+import MintFilter from './MintFilter';
 import { web3OnlyRead } from '../components/utils';
 import { getRpcUrl, getCurrentNetwork } from '../components/networkConfig';
 
@@ -106,7 +107,7 @@ const FairMintCollections = () => {
       <h2 className='text-align-left mt15 onlymedia'>FAIRMINT</h2>
       <div className='w95 space-between flex MediaGalleryDiv'>
         <div className='w20 ButtonandFilterMedia'>
-          <CollectionFilter onFilterChange={setFilters} />
+          <MintFilter onFilterChange={setFilters} />
         </div>
         <div className='w95 column flex flex-start ml20 mlnull centered-media'>
           <h2 className='text-align-left mt15 OnlyDesktop'>FAIRMINT</h2>

@@ -8,10 +8,10 @@ const PrivacyPolicy = () => {
       
       <h2 className='mt50'>1. Introduction</h2>
       <p>
-        1.1 This Privacy Policy describes how FRACTALZ (hereinafter referred to as "Marketplace") collects, processes, and uses personal data of users (hereinafter referred to as "Users"). By using the Marketplace, Users agree to this Privacy Policy.
+        1.1 This Privacy Policy describes how TANGLESPACE (hereinafter referred to as "Marketplace") collects, processes, and uses personal data of users (hereinafter referred to as "Users"). By using the Marketplace, Users agree to this Privacy Policy.
       </p>
       <p>
-        1.2 FRACTALZ is a decentralized platform that facilitates the trading of Non-Fungible Tokens (NFTs). The platform operates without central control and all actions and transactions take place on the blockchain.
+        1.2 TANGLESPACE is a decentralized platform that facilitates the trading of Non-Fungible Tokens (NFTs). The platform operates without central control and all actions and transactions take place on the blockchain.
       </p>
 
       <h2 className='mt50'>2. Collection and Processing of Personal Data</h2>

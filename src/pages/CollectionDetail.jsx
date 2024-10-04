@@ -461,7 +461,7 @@ const CollectionNFTs = () => {
 
                         {/* Progress-Bar während des Ladens */}
                         { (loading || backgroundLoading) && (
-                            <div className="progress-bar-container">
+                            <div className="progress-bar-container mb5">
                                 <div 
                                     className="progress-bar" 
                                     style={{ width: `${progressPercentage}%` }}
@@ -470,7 +470,7 @@ const CollectionNFTs = () => {
                         )}
 
                         {/* Hauptinhalt der NFT-Collection */}
-                        <div className='NFT-Collection-Div'>
+                        <div className='NFT-Collection-Div gap10'>
                             {loading && loadedBatches === 0 ? (
                                 <div className="loading-container flex centered">
                                     <img src="/loading.gif" alt="Loading..." />

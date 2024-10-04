@@ -11,6 +11,7 @@ export const artistList = [
       discord: 'https://discord.com/invite/6ERDG7NGvJ',
       instagram: '/',
       website: '/',
+      timestamp: '1727332899',
     },
     {
         name: 'Crypto-Gin',
@@ -23,6 +24,7 @@ export const artistList = [
         discord: 'https://discord.com/invite/6ERDG7NGvJ',
         instagram: '/',
         website: '/',
+        timestamp: '1727505699',
       },
       {
         name: 'Little Cookies',
@@ -35,7 +37,9 @@ export const artistList = [
         discord: 'https://discord.com/invite/6ERDG7NGvJ',
         instagram: '/',
         website: '/',
+        timestamp: '1727764899',
       },
+
     // Add more collections as needed
   ];
   

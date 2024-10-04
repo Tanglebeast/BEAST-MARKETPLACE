@@ -31,6 +31,7 @@ import BlogFormPopup from '../Blog/BlogFormPupup';
 import BlogListPage from '../Blog/Bloglistpage';
 import PopupContainer from '../Blog/BlogFormPupup';
 import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
+import ImageWithLoading from '../components/ImageWithLoading';
 // import RedeemPopup from '../components/RedeemPopup';
 
 // Funktion zum Abrufen des Kollektion-Namens
@@ -572,7 +573,7 @@ const MyNFTs = () => {
                       <div key={`${nft.contractAddress}-${nft.tokenId}`} className="my-nft-card">
                         <Link to={`/collections/${nft.contractAddress}/${nft.tokenId}`}>
                           <div className='my-nft-image'>
-                            <img src={nft.image || '/default-nft.png'} alt={nft.name || 'Unnamed NFT'} />
+                          <ImageWithLoading src={nft.image || '/default-nft.png'} alt={nft.name || 'Unnamed NFT'} />
                           </div>
                           <div className='text-align-left w95 pt12 My-nft-details-Div'>
                             <div>

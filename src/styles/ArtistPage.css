@@ -1,58 +1,273 @@
+/* src/styles/ArtistPage.css */
 
-.Artist-Maindiv {
-    text-align: center;
-    margin-top: 35px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
+/* Gemeinsame Klassen aus CollectionDetail.css nutzen */
+.collection-nfts {
+  text-align: center;
+  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-.artist-page {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding: 20px;
-    justify-content: center;
-  }
-  
-  .artist-card {
-    background-color: black;
-    border-radius: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    text-align: center;
-    width: 250px;
-    color: white;
-    text-decoration: none;
-    transition: all 0.25s;
+.CollectionBanner {
+  width: 95%;
+  border-radius: 15px;
+  height: 500px; /* Passe die Höhe nach Bedarf an */
+  background-size: cover;
+  background-position: center;
+}
+
+.bannerInfo {
+  width: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 18%;
+  background-color: rgba(0, 0, 0, 0.714);
+  padding: 20px;
+  border-radius: 15px;
+  position: absolute; /* Stelle sicher, dass es über dem Banner positioniert ist */
+}
+
+.nft-list {
+  width: 100%;
+}
+
+.NFT-Collection-Div {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  max-width: 100%;
+  justify-content: center;
+}
+
+.nft-card {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 250px;
+  background-color: black; /* Hintergrundfarbe hinzufügen, wenn gewünscht */
+  color: white; /* Textfarbe anpassen */
+  transition: transform 0.25s;
+}
+
+.nft-card:hover {
+  transform: scale(1.01);
+}
+
+.nft-card:active {
+  transform: scale(0.95) rotateZ(1.1deg);
+}
+
+.artistCard-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 250px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.artist-profile-picture {
+  height: auto;
+  width: 100%;
+  border-radius: 15px;
+}
+
+.artist-name {
+  margin-top: 17px;
+  margin-bottom: 8px;
+}
+
+.collection-stats {
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: auto;
+}
+
+.collection-stats-div p {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.collection-stats-div {
+  padding: 10px 20px;
+  background-color: black;
+  border-radius: 10px;
+}
+
+.SearchandFilterDiv {
+  display: flex;
+  align-items: flex-start;
+  width: 20%;
+  margin-bottom: 10px;
+  margin-top: 75px;
+  margin-left: 1%;
+}
+
+.loading-container {
+  width: 100%;
+}
+
+.no-nfts-container img{
+  width: 250px;
+  height: auto;
+}
+
+.custom-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0px;
+  padding: 10px;
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: 'Arial', sans-serif;
+  color: white;
+}
+
+.custom-pagination-btn {
+  padding: 6px 14px;
+  border: none;
+  background-color: var(--branding-color);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.custom-pagination-btn:disabled {
+  opacity: 30%;
+  cursor: not-allowed;
+}
+
+.custom-pagination-btn:hover:not(:disabled) {
+  background-color: var(--branding-color-hover);
+}
+
+.previous-btn {
+  margin-right: 20px;
+}
+
+.next-btn {
+  margin-left: 20px;
+}
+
+.custom-pagination-info {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.575);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-pagination-info img {
+  height: 20px !important;
+  width: 20px !important;
+  margin-left: 10px;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  padding: 0px !important;
+}
+
+.custom-pagination-info-2 img {
+  height: 15px !important;
+  width: 15px !important;
+  margin-left: 0px;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  padding: 0px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-bar-container {
+  position: relative;
+  width: 95%;
+  height: 5px;
+  background-color: #5d5d5d79;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--branding-color);
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 0;
+  left: 0;
+  line-height: 20px;
+  font-size: 12px;
+  color: #000;
+}
+
+@media (max-width: 768px) {
+
+  .CollectionDetail-mediaDiv {
+      flex-direction: column;
   }
 
-  .artist-card:hover {
-    transform: scale(1.01);
-  }
-  
-  .artist-card:active {
-    transform: scale(0.95) rotateZ(1.1deg);
+  .collection-nfts {
+      display: flex;
+      justify-content: center;
+      margin-top: 0px;
+      width: 100%;
   }
 
-  .artistCard-image {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 250px;
-    overflow: hidden;
-    border-radius: 10px;
+  .CollectionBanner{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
   }
-  
-  .artist-profile-picture {
-    height: auto;
-    width: 100%;
-    border-radius: 15px;
+
+  .bannerInfo {
+      top: auto;
+      width: 100%;
+      display: flex;
+      padding: 8px 0px;
+      height: auto;
   }
-  
-  .artist-name {
-    margin-top: 17px;
-    margin-bottom: 8px;
+
+  .collection-stats {
+      width: 80%;
   }
-  
+
+  .NFT-Collection-Div {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+  }
+
+  .ml0-media {
+      margin-left: 0px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .SearchandFilterDiv {
+      width: 0px;
+      margin-top: 20px;
+  }
+}

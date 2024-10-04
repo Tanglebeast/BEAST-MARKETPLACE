@@ -233,6 +233,10 @@ p,span {
   margin-bottom: 50px;
 }
 
+.hidden {
+  overflow: hidden;
+}
+
 .w30 {
   width: 30%;
 }
@@ -294,6 +298,10 @@ p,span {
   margin-bottom: 15px;
 }
 
+.padding0 {
+  padding: 0px !important;
+}
+
 .align-items-end {
   align-items: end;
 }
@@ -340,6 +348,10 @@ p,span {
 
 .w100 {
   width: 100%;
+}
+
+.w15 {
+  width: 15%;
 }
 
 .w98 {
@@ -405,6 +417,10 @@ p,span {
 
 .gap10 {
   gap: 10px;
+}
+
+.gap5 {
+  gap: 5px;
 }
 
 .w90 {

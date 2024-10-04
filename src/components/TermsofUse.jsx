@@ -8,10 +8,10 @@ const Terms = () => {
       
       <h2 className='mt50'>1. General Provisions</h2>
       <p>
-        1.1 These Terms of Use (hereinafter referred to as "Terms") govern the use of the decentralized NFT marketplace FRACTALZ (hereinafter referred to as "Marketplace"). By using the Marketplace, the user (hereinafter referred to as "User") agrees to these Terms.
+        1.1 These Terms of Use (hereinafter referred to as "Terms") govern the use of the decentralized NFT marketplace TANGLESPACE (hereinafter referred to as "Marketplace"). By using the Marketplace, the user (hereinafter referred to as "User") agrees to these Terms.
       </p>
       <p>
-        1.2 FRACTALZ is a decentralized platform that enables Users to trade Non-Fungible Tokens (NFTs). The Marketplace operates without central control or management by the provider. All actions and transactions take place on the blockchain and are subject to its rules.
+        1.2 TANGLESPACE is a decentralized platform that enables Users to trade Non-Fungible Tokens (NFTs). The Marketplace operates without central control or management by the provider. All actions and transactions take place on the blockchain and are subject to its rules.
       </p>
 
       <h2 className='mt50'>2. Definitions</h2>
@@ -19,12 +19,12 @@ const Terms = () => {
         2.1 "NFT" stands for Non-Fungible Token, a unique digital asset based on blockchain technology.
       </p>
       <p>
-        2.2 "Marketplace" refers to the FRACTALZ platform, where Users can buy, sell, and trade NFTs without centralized intervention by the operator.
+        2.2 "Marketplace" refers to the TANGLESPACE platform, where Users can buy, sell, and trade NFTs without centralized intervention by the operator.
       </p>
 
       <h2 className='mt50'>3. Use of the Marketplace</h2>
       <p>
-        3.1 To use the Marketplace, the User must create an account. This account is stored and managed in a Smart Contract on the blockchain.
+        3.1 To use the Marketplace, the User must connect a wallet. This wallet is stored and managed in a Smart Contract on the blockchain.
       </p>
       <p>
         3.2 Due to the decentralized nature of the Marketplace, the provider cannot delete, suspend, or modify User accounts. The User is responsible for their actions on the Marketplace.

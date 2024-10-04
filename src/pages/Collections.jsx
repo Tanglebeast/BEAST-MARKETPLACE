@@ -6,6 +6,7 @@ import SearchBar from '../components/SearchBar';
 import { getCollectionDetails, getCollectionLikes, fetchCollectionSalesCount } from '../components/utils';
 import CollectionFilter from '../components/CollectionFilter';
 import { getCurrentNetwork } from '../components/networkConfig';
+import ImageWithLoading from '../components/ImageWithLoading';
 
 const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
   // State für Suche und Filter
@@ -173,8 +174,8 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
           </div>
           
           {/* Kategorie- und Pagination-Buttons */}
-          <div className='flex center-ho gap10 mt15 mb5 space-between w95'>
-            <div className='flex center-ho'>
+          <div className='flex center-ho mt15 mb5 space-between w95'>
+            <div className='flex center-ho gap5'>
               {/* Kategorie Buttons */}
               {['ALL', 'ART', 'PFP', 'PHOTOGRAPHY', 'METAVERSE', 'GAMING', 'MUSIC'].map((category) => (
                 <div
@@ -234,7 +235,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
               {currentCollections.map((collection, index) => (
                 <a href={`/collections/${collection.address}`} key={index} className="collection-card">
                   <div className='collection-banner'>
-                    <img src={collection.banner} alt={collection.name} />
+                  <ImageWithLoading src={collection.banner} alt={collection.name} />
                   </div>
 
                   <div className='text-align-left w90 mb5 collection-infoCardDiv'>

@@ -243,12 +243,21 @@ const NFTDetail = () => {
         link: `/collections/${address}`,
         artist: collection.artist,
         currency: collection.currency,
-        artistpfp: artist ? artist.profilepicture : '/default-artist.png'
+        artistpfp: artist ? artist.profilepicture : '/default-artist.png',
+        category: collection.category // Kategorie hinzugefügt
       };
     } else {
-      return { name: 'Unknown Collection', link: '#', artist: 'Unknown Artist', currency: '', artistpfp: '/default-artist.png' };
+      return { 
+        name: 'Unknown Collection', 
+        link: '#', 
+        artist: 'Unknown Artist', 
+        currency: '', 
+        artistpfp: '/default-artist.png',
+        category: 'Unbekannt' // Standardkategorie
+      };
     }
   };
+  
   
 
   const handleConnectWallet = async () => {
@@ -300,9 +309,25 @@ const NFTDetail = () => {
               </div>
 
               <div className='flex column'>
-                <span className='s16 grey'>TOTAL SUPPLY</span>
-                <span className='s18 blue bold mb10'>{maxSupply} NFTs</span>
-              </div>
+                  <span className='s16 grey'>TOTAL SUPPLY</span>
+                  <span className='s18 blue bold mb10'>{maxSupply} NFTs</span>
+                </div>
+
+                {/* Neuer Abschnitt für Kategorien */}
+                <div className='flex column'>
+                  <span className='s16 grey'>CATEGORIES</span>
+                  <span className='s18 blue bold mb10'>
+                    {collectionDetails.category.split(',').map((cat, index) => (
+                      <span
+                      className='bold' 
+                      key={index}>
+                        {cat.trim()}
+                        {index < collectionDetails.category.split(',').length - 1 && ', '}
+                      </span>
+                    ))}
+                  </span>
+                </div>
+
 
               {/* <div className='flex column'>
                 <span className='s16 grey'>YOUR SUPPLY</span>

@@ -24,6 +24,7 @@ import CreatePoll from '../UserGovernance/CreatePoll';
 import BlogListPage from '../Blog/Bloglistpage';
 import PopupContainer from '../Blog/BlogFormPupup';
 import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
+import ImageWithLoading from '../components/ImageWithLoading';
 // import RedeemPopup from '../components/RedeemPopup';
 
 // **Definiere getCollectionName vor ihrer ersten Verwendung**
@@ -518,7 +519,7 @@ const UserNFTs = () => {
                       <Link to={`/collections/${nft.contractAddress.toLowerCase()}/${nft.tokenId}`}>
 
                         <div className='my-nft-image'>
-                          <img src={nft.image || '/default-nft.png'} alt={nft.name || 'Unnamed NFT'} />
+                        <ImageWithLoading src={nft.image || '/default-nft.png'} alt={nft.name || 'Unnamed NFT'} />
                         </div>
                         <div className='text-align-left w95 pt12 My-nft-details-Div'>
                           <div>
