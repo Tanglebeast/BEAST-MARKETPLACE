@@ -1,6 +1,7 @@
+// src/pages/ArtistPage.js
+
 import React, { useState, useEffect } from 'react';
 import { artistList } from '../ArtistList';
-import { nftCollections } from '../NFTCollections';
 import { Link } from 'react-router-dom';
 import '../styles/ArtistPage.css';
 import SearchBar from '../components/SearchBar';
@@ -13,17 +14,26 @@ const contractAddress = '0x01d7D562A905A53f5855C0FEa2a1C00aAF0Fc4dC';
 const ArtistPage = () => {
   // Suchzustand
   const [searchQuery, setSearchQuery] = useState('');
+  
   // Sortierzustand
   const [sortOrder, setSortOrder] = useState('communityRank');
+  
   // Pagination-Zustände
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 30;
+  
+  // Ladezustände
   const [loading, setLoading] = useState(false);
   const [progressPercentage, setProgressPercentage] = useState(0);
+  const [skipLoading, setSkipLoading] = useState(false);
+  
   // Zustand für Follower-Anzahlen
   const [followerCounts, setFollowerCounts] = useState({});
-  // Zustand, um das Laden beim Sortieren zu überspringen
-  const [skipLoading, setSkipLoading] = useState(false);
+  
+  // Neuer Zustand für den Following-Filter
+  const [showFollowing, setShowFollowing] = useState(false);
+  const [followedProjects, setFollowedProjects] = useState([]);
+  const [userAddress, setUserAddress] = useState(null);
 
   // Funktion zur Initialisierung von web3
   const initWeb3 = async () => {
@@ -36,6 +46,17 @@ const ArtistPage = () => {
     } else {
       alert('Bitte installieren Sie MetaMask!');
       return null;
+    }
+  };
+
+  // Funktion zum Abrufen der Benutzeradresse
+  const getUserAddress = async () => {
+    const web3 = await initWeb3();
+    if (web3) {
+      const accounts = await web3.eth.getAccounts();
+      if (accounts.length > 0) {
+        setUserAddress(accounts[0].toLowerCase());
+      }
     }
   };
 
@@ -64,17 +85,55 @@ const ArtistPage = () => {
     }
   };
 
-  // Handler für Sortieränderungen
-  const handleSortChange = (order) => {
-    setSortOrder(order);
-    setCurrentPage(1); // Reset auf erste Seite bei Sortieränderung
-    setSkipLoading(true); // Verhindert das Laden beim Sortieren
+  // Funktion zum Abrufen der gefolgten Projekte
+  const fetchFollowedProjects = async () => {
+    if (!userAddress) return;
+
+    const web3 = await initWeb3();
+    if (!web3) return;
+
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
+    const followed = [];
+
+    try {
+      for (let artist of artistList) {
+        const followers = await contract.methods
+          .getFollowers(artist.name.toLowerCase())
+          .call();
+        if (followers.map(addr => addr.toLowerCase()).includes(userAddress)) {
+          followed.push(artist.name.toLowerCase());
+        }
+      }
+      setFollowedProjects(followed);
+    } catch (error) {
+      console.error('Fehler beim Abrufen der gefolgten Projekte:', error);
+    }
   };
 
-  // Filtern der Künstler basierend auf dem Suchbegriff
+ // Handler für Sortieränderungen
+const handleSortChange = (order) => {
+  setSortOrder(order);
+  setCurrentPage(1); // Reset auf erste Seite bei Sortieränderung
+  setSkipLoading(true); // Verhindert das Laden beim Sortieren
+};
+
+// Handler für Following-Filteränderungen
+const handleFollowingChange = (value) => {
+  setShowFollowing(value);
+  setCurrentPage(1); // Reset auf erste Seite bei Filteränderung
+  setSkipLoading(true); // Verhindert das Laden beim Filter
+};
+
+
+  // Filtern der Künstler basierend auf dem Suchbegriff und dem "Following"-Filter
   const filteredArtists = artistList.filter(artist =>
     artist.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ).filter(artist => {
+    if (showFollowing) {
+      return followedProjects.includes(artist.name.toLowerCase());
+    }
+    return true;
+  });
 
   // Sortieren der gefilterten Künstler basierend auf sortOrder
   const sortedArtists = [...filteredArtists].sort((a, b) => {
@@ -107,12 +166,27 @@ const ArtistPage = () => {
     } else {
       setSkipLoading(false);
     }
-  }, [currentPage, searchQuery]); // Entfernen von sortOrder aus den Abhängigkeiten
+  }, [currentPage]);
+  
 
   // Abrufen der Follower-Anzahlen beim Laden der Komponente
   useEffect(() => {
     fetchAllFollowerCounts();
   }, []);
+
+  // Abrufen der Benutzeradresse beim Laden der Komponente
+  useEffect(() => {
+    getUserAddress();
+  }, []);
+
+  // Abrufen der gefolgten Projekte, wenn showFollowing aktiviert ist
+  useEffect(() => {
+    if (showFollowing && userAddress) {
+      fetchFollowedProjects();
+    } else {
+      setFollowedProjects([]);
+    }
+  }, [showFollowing, userAddress]);
 
   // Funktion zum Simulieren des Ladevorgangs und Aktualisieren der Progressbar
   const loadPage = (page) => {
@@ -133,18 +207,24 @@ const ArtistPage = () => {
   return (
     <div className="collection-nfts">
       {/* Banner hinzufügen, falls gewünscht */}
-  
+
       <div className="nft-list centered hidden">
         <div className='w95 flex space-between CollectionDetail-mediaDiv'>
           <div className='w20 Coll-FilterDiv ButtonandFilterMedia'>
-            <ArtistFilter onSortChange={handleSortChange} />
+            {/* Angepasste Filterkomponente mit "Following" */}
+            <ArtistFilter 
+              sortOrder={sortOrder} 
+              onSortChange={handleSortChange} 
+              showFollowing={showFollowing}
+              onFollowingChange={handleFollowingChange}
+            />
             {/* Falls du zusätzliche Filter hast */}
           </div>
           <div className='w100 flex column flex-start ml20 ml0-media'>
-  
+
             <div className='w95 flex center-ho space-between'>
               <h2 className='mt15 OnlyDesktop mb15'>PROJECTS</h2>
-  
+
               <div className="project-stats gap15">
                 {/* Optional: Statistiken anzeigen */}
                 <div className='collection-stats-div text-align-left'>
@@ -154,7 +234,7 @@ const ArtistPage = () => {
                 {/* Weitere Statistiken können hier hinzugefügt werden */}
               </div>
             </div>
-  
+
             <div className='flex space-between w95'>
               <div className='SearchbarDesktop text-align-left w30 w100media'>
                 <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -170,7 +250,7 @@ const ArtistPage = () => {
                 <span className="custom-pagination-info">
                   {currentPage} OF {totalPages}
                 </span>
-  
+
                 <button 
                   className="custom-pagination-btn next-btn custom-pagination-info-2 margin0"
                   onClick={() => {
@@ -188,7 +268,7 @@ const ArtistPage = () => {
                 </button>
               </div>
             </div>
-  
+
             {/* Progress-Bar während des Ladens */}
             {loading && (
               <div className="progress-bar-container">
@@ -198,7 +278,7 @@ const ArtistPage = () => {
                 ></div>
               </div>
             )}
-  
+
             {/* Hauptinhalt der Artist-Collection */}
             {!loading && (
               <div className='NFT-Collection-Div gap10'>
@@ -223,7 +303,7 @@ const ArtistPage = () => {
                 )}
               </div>
             )}
-  
+
             {/* Lade-Overlay */}
             {loading && (
               <div className="loading-overlay">
@@ -234,33 +314,7 @@ const ArtistPage = () => {
         </div>
       </div>
       
-      {/* Pagination Controls am unteren Ende
-      {!loading && (
-        <div className="custom-pagination">
-          <button 
-            className="custom-pagination-btn previous-btn"
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-            disabled={currentPage === 1 || loading}
-          >
-            &lt; 
-          </button>
-          <span className="custom-pagination-info">
-            {currentPage} OF {totalPages}
-          </span>
-  
-          <button 
-            className="custom-pagination-btn next-btn"
-            onClick={() => {
-              if (currentPage < totalPages) {
-                setCurrentPage(prev => prev + 1);
-              }
-            }} 
-            disabled={currentPage === totalPages || loading}
-          >
-            &gt;
-          </button>
-        </div>
-      )} */}
+      {/* Pagination Controls am unteren Ende (optional) */}
     </div>
   );
 };

@@ -38,6 +38,7 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 0fr)); /* Flexible grid */
     max-width: 100%; /* Limit its maximum width */
     justify-content: center;
+    padding: 10px;
 }
 
 .nft-card {
