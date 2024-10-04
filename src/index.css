@@ -266,6 +266,10 @@ p,span {
   margin-bottom: 0px !important;
 }
 
+.margin0 {
+  margin: 0px;
+}
+
 .mt5 {
   margin-top: 5px;
 }

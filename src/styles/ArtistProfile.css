@@ -54,8 +54,11 @@
   
   
   .social-links {
-    margin-top: 150px;
     text-align: right;
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    height: 250px;
   }
   
   .social-links a {

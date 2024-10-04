@@ -291,9 +291,9 @@ const PollsList = ({ artistName }) => {
                   </div>
                   <div className='w100 flex column flex-start ml20 ml0-media'>
                       
+                      <div className='w95 flex space-between center-ho'>
                       <h2 className='mt15 OnlyDesktop mb0'>{headingText}</h2>
-                      
-                      <div className='w95 flex align-items-end justify-content-end'>
+                      <div>
                           <div className="collection-stats gap15 p0imp">
                               <div className='collection-stats-div text-align-left'>
                                   <p className='s16 grey'>TOTAL POLLS</p>
@@ -308,6 +308,7 @@ const PollsList = ({ artistName }) => {
                                   <div className='bold ml5'>{filteredPolls.filter(poll => poll.status === 'Expired').length}</div>
                               </div>
                               {/* Weitere Statistiken können hier hinzugefügt werden */}
+                          </div>
                           </div>
                       </div>
 

@@ -1,10 +1,9 @@
-// src/components/ArtistFilter.js
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/CollectionFilter.css'; // Verwende dieselbe CSS-Datei für das Styling
 
-const ArtistFilter = ({ onSortChange }) => { // onSortChange als Prop hinzufügen
+const ArtistFilter = ({ onSortChange }) => {
     const [isOpen, setIsOpen] = useState(true); // Standardmäßig geöffnet
-    const [sortOrder, setSortOrder] = useState(''); // Sortierzustand
+    const [sortOrder, setSortOrder] = useState('communityRank'); // Standardwert auf 'communityRank' gesetzt
     const contentRef = useRef(null);
 
     const toggleAccordion = () => {
@@ -40,6 +39,18 @@ const ArtistFilter = ({ onSortChange }) => { // onSortChange als Prop hinzufüge
                         ref={contentRef}
                         className="accordion-filterContent"
                     >
+                        {/* Community Rank an erster Stelle */}
+                        <label className="radio-label">
+                            <input
+                                type="radio"
+                                name="sortOrder"
+                                value="communityRank"
+                                checked={sortOrder === 'communityRank'}
+                                onChange={handleSortChange}
+                            />
+                            <span className="custom-radio"></span>
+                            Community Rank
+                        </label>
                         <label className="radio-label">
                             <input
                                 type="radio"

@@ -41,6 +41,16 @@
   justify-content: center;
 }
 
+.project-stats {
+  border: none;
+  border-radius: 10px;
+  padding: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: auto;
+}
+
 .nft-card {
   text-decoration: none;
   display: flex;
