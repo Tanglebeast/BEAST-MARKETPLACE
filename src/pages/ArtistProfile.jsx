@@ -163,13 +163,13 @@ const ArtistProfile = () => {
             {/* Follow/Unfollow Button und Follower-Anzahl */}
             {currentAccount ? (
               <div>
-                <p className='mb15'>{followerCount} Follower</p>
+                <h3 className='mb15'>{followerCount} FOLLOWER</h3>
                 <button onClick={toggleFollow} className="button mb15 w90">
                   <h3 className='margin0'>{isFollowing ? 'UNFOLLOW' : 'FOLLOW'}</h3>
                 </button>
               </div>
             ) : (
-              <p className='mb5'>{followerCount} Follower</p>
+              <h3 className='mb5'>{followerCount} FOLLOWER</h3>
             )}
 
             {/* Ihre bestehenden Social Links */}
