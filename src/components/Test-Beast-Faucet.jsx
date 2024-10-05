@@ -135,7 +135,7 @@ const BEASTFaucet = () => {
       )}
 
 
-        <div className='mt50 centered column VisibleLink'>
+        <div className='mt50 centered column VisibleLinkiota'>
             <h2>IOTA FAUCET</h2>
             <p className='grey'>Click on the link below to grab some Test IOTAs.</p>
           <h3 className='mb5'>

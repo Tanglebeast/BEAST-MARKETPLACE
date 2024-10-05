@@ -1,38 +1,118 @@
-/* src/styles/BEASTFaucet.css */
+/* BEASTFaucet.css */
+
 .beast-faucet-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px;
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background: rgb(0, 0, 0);
+  border-radius: 15px;
+  color: #f0f0f0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+}
+
+.beast-faucet-container h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: var(--branding-color); /* Akzentfarbe */
+}
+
+.info-section {
+  margin-bottom: 30px;
+}
+
+.info-section p {
+  font-size: 1.1em;
+  color: #ffffff;
+}
+
+.wh100px {
+  width: 100px;
+  height: 100px;
+}
+
+.mt10 {
+  margin-top: 10px;
+}
+
+.mint-button {
+  padding: 15px 30px;
+  font-size: 1.2em;
+  color: #ffffff;
+  background-color: var(--branding-color);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.mint-button:hover {
+  background-color: var(--branding-color-hover);
+  transform: translateY(-2px);
+}
+
+.mint-button:active {
+  transform: translateY(0);
+}
+
+.mint-button.disabled,
+.mint-button:disabled {
+  opacity: 0,5;
+  cursor: not-allowed;
+}
+
+.error-message {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #ff4d4d;
+  color: #ffffff;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.success-message {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: #ffffff;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+
+.VisibleLinkiota a {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: var(--branding-color);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.VisibleLinkiota a:hover {
+  background-color: var(--branding-color-hover);
+}
+
+.icon {
+  vertical-align: middle;
+}
+
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .beast-faucet-container {
+    padding: 20px;
+    margin: 20px;
   }
-  
+
+  .beast-faucet-container h1 {
+    font-size: 2em;
+  }
+
   .mint-button {
-    padding: 15px 30px;
-    font-size: 16px;
-    background-color: var(--branding-color);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    width: 100%;
+    font-size: 1em;
   }
-  
-  .mint-button:disabled {
-    background-color: #535bf244;
-    cursor: not-allowed;
-  }
-  
-  .mint-button:hover:not(:disabled) {
-    background-color: var(--branding-color-hover);
-  }
-  
-  .error-message {
-    color: #f44336;
-    margin-top: 20px;
-  }
-  
-  .info-section {
-    margin-top: 20px;
-    text-align: center;
-  }
-  
+}
