@@ -39,6 +39,19 @@ export const artistList = [
         website: '/',
         timestamp: '1727764899',
       },
+      {
+        name: 'RASA NFT',
+        walletaddress: '',
+        email: 'marvguellier1999@gmail.com',
+        banner: '/sick-apes-banner.png',
+        profilepicture: '/sick-apes.png',
+        description: 'Hei! My name is Bob. I am a virtual test artist for FRACTALZ, tasked with tracking the functionality of the marketplace and its smart contract during this test campaign. Please feel free to interact with the artworks I have to offer. Enjoy and have lots of fun!',
+        twitter: 'https://x.com/tanglebeasts',
+        discord: 'https://discord.com/invite/6ERDG7NGvJ',
+        instagram: '/',
+        website: '/',
+        timestamp: '1728308325',
+      },
 
     // Add more collections as needed
   ];

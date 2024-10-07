@@ -16,7 +16,8 @@ import {
   unpauseContract,
   isContractPaused,
   getTokenIdsOfOwner,
-  artistwalletAddresses
+  artistwalletAddresses,
+  addProject
 } from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import '../styles/MyNFTs.css';
@@ -32,6 +33,8 @@ import BlogListPage from '../Blog/Bloglistpage';
 import PopupContainer from '../Blog/BlogFormPupup';
 import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
 import ImageWithLoading from '../components/ImageWithLoading';
+import AddProjectPopup from '../components/AddProjectPopup';
+
 // import RedeemPopup from '../components/RedeemPopup';
 
 // Funktion zum Abrufen des Kollektion-Namens
@@ -75,6 +78,8 @@ const MyNFTs = () => {
   const [allPagesData, setAllPagesData] = useState({});
   const [isPreloading, setIsPreloading] = useState(false);
   const [loadedPages, setLoadedPages] = useState(0);
+  const [isAddProjectPopupOpen, setIsAddProjectPopupOpen] = useState(false); // Neuer State für das AddProjectPopup
+
 
   const resultsPerPage = 30;
   const userCache = useRef({});
@@ -109,6 +114,22 @@ const MyNFTs = () => {
       setError("Fehler beim Umschalten des Vertragsstatus.");
     }
   };
+
+  const handleAddProject = async (projectName) => {
+    try {
+      const success = await addProject(projectName.trim()); // Verwende die addProject-Funktion aus utils
+      if (success) {
+        alert('Projekt erfolgreich hinzugefügt!');
+        setIsAddProjectPopupOpen(false);
+      } else {
+        alert('Fehler beim Hinzufügen des Projekts.');
+      }
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen des Projekts:', error);
+      alert('Fehler beim Hinzufügen des Projekts.');
+    }
+  };
+  
 
   // Initiales Laden der Benutzerdaten und NFTs
   useEffect(() => {
@@ -468,6 +489,7 @@ const MyNFTs = () => {
 
                   {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
                     <>
+                    <button className='SetArtistWalletButton yellow' onClick={() => setIsAddProjectPopupOpen(true)}>ADD PROJECT NAME</button>
                       <button className='SetArtistWalletButton yellow' onClick={() => setIsArtistWalletPopupOpen(true)}>SET ARTIST WALLET</button>
                       <button className='PauseToggleButton alert-color' onClick={handlePauseToggle}>
                         {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
@@ -647,6 +669,15 @@ const MyNFTs = () => {
           onClose={() => setIsSubmitCollectionPopupOpen(false)} 
         />
       )}
+
+      {isAddProjectPopupOpen && (
+          <AddProjectPopup
+            isOpen={isAddProjectPopupOpen}
+            onClose={() => setIsAddProjectPopupOpen(false)}
+            handleSave={handleAddProject}
+          />
+        )}
+
       {isArtistWalletPopupOpen && (
         <SetArtistWalletPopup
           handleSave={async (contractAddress, artistWallet, artistFeePercent) => {

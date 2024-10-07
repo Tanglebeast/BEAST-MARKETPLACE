@@ -3,6 +3,19 @@
 		{
 			"inputs": [
 				{
+					"internalType": "string",
+					"name": "_name",
+					"type": "string"
+				}
+			],
+			"name": "addProject",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
 					"internalType": "uint256",
 					"name": "_index",
 					"type": "uint256"
@@ -42,12 +55,12 @@
 		{
 			"inputs": [
 				{
-					"internalType": "address",
-					"name": "_collectionAddress",
-					"type": "address"
+					"internalType": "string",
+					"name": "_name",
+					"type": "string"
 				}
 			],
-			"name": "likeCollection",
+			"name": "followProject",
 			"outputs": [],
 			"stateMutability": "nonpayable",
 			"type": "function"
@@ -56,26 +69,11 @@
 			"inputs": [
 				{
 					"internalType": "address",
-					"name": "_contractAddress",
-					"type": "address"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_tokenId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "uint256",
-					"name": "_price",
-					"type": "uint256"
-				},
-				{
-					"internalType": "address",
-					"name": "_paymentToken",
+					"name": "_collectionAddress",
 					"type": "address"
 				}
 			],
-			"name": "listNFT",
+			"name": "likeCollection",
 			"outputs": [],
 			"stateMutability": "nonpayable",
 			"type": "function"
@@ -144,6 +142,34 @@
 			],
 			"name": "CollectionUnliked",
 			"type": "event"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_contractAddress",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_tokenId",
+					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_price",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "_paymentToken",
+					"type": "address"
+				}
+			],
+			"name": "listNFT",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
 		},
 		{
 			"anonymous": false,
@@ -395,6 +421,19 @@
 				}
 			],
 			"name": "transferOwnership",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_name",
+					"type": "string"
+				}
+			],
+			"name": "unfollowProject",
 			"outputs": [],
 			"stateMutability": "nonpayable",
 			"type": "function"
@@ -676,6 +715,25 @@
 		{
 			"inputs": [
 				{
+					"internalType": "string",
+					"name": "_name",
+					"type": "string"
+				}
+			],
+			"name": "getFollowers",
+			"outputs": [
+				{
+					"internalType": "address[]",
+					"name": "",
+					"type": "address[]"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
 					"internalType": "address",
 					"name": "_contractAddress",
 					"type": "address"
@@ -862,6 +920,30 @@
 				}
 			],
 			"name": "hasUserLikedCollection",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_name",
+					"type": "string"
+				},
+				{
+					"internalType": "address",
+					"name": "_user",
+					"type": "address"
+				}
+			],
+			"name": "isFollowing",
 			"outputs": [
 				{
 					"internalType": "bool",
@@ -1094,7 +1176,7 @@
 	  },
 	  "//": "IOTA EVM",
 	  "1075": {
-		"address": "0x96F918048AF54B65E50691678369B4bDe49f3223"
+		"address": "0x5F9AFb428210e06957F70b84783386aB06FD0A82"
 	  },
 	  "//": "SHIMMER EVM",
 	  "1073": {

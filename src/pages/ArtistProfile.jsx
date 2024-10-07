@@ -1,3 +1,5 @@
+// ArtistProfile.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import '../styles/ArtistProfile.css';
@@ -6,13 +8,14 @@ import ArtistCollectionCards from '../components/ArtistCollections';
 import PollsList from '../UserGovernance/Pollslist';
 import { nftCollections } from '../NFTCollections';
 import PublicBlogPage from '../Blog/Publicblogpage';
-import Web3 from 'web3'; // Import von web3.js
-
-// Definieren der ABI direkt im Code
-const contractABI = [ { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" } ], "name": "addProject", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" } ], "name": "followProject", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" } ], "name": "unfollowProject", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" } ], "name": "getFollowers", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" } ];
-
-// Importieren der getGasEstimate Funktion
-import { getGasEstimate } from '../components/utils'; // Passen Sie den Pfad entsprechend an
+import {
+  followProject,
+  unfollowProject,
+  getFollowers,
+  isFollowingProject,
+  addProject,
+  getMarketplaceInstance
+} from '../components/utils'; // Import der Utils-Funktionen
 
 const ArtistProfile = () => {
   const { artistname } = useParams();
@@ -20,8 +23,10 @@ const ArtistProfile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
   const [currentAccount, setCurrentAccount] = useState(null);
-
-  const contractAddress = '0x01d7D562A905A53f5855C0FEa2a1C00aAF0Fc4dC'; // Ihre Contract-Adresse
+  const [projectName, setProjectName] = useState('');
+  const [isOwner, setIsOwner] = useState(false);
+  const [addProjectLoading, setAddProjectLoading] = useState(false);
+  const [addProjectError, setAddProjectError] = useState('');
 
   const artist = artistList.find(
     artist => artist.name.toLowerCase() === artistname.toLowerCase()
@@ -39,107 +44,101 @@ const ArtistProfile = () => {
     new Set(artistCollections.map(collection => collection.currency))
   );
 
-  // Funktion zur Initialisierung von web3
-  const initWeb3 = async () => {
-    if (window.ethereum) {
-      const web3 = new Web3(window.ethereum);
-      return web3;
-    } else if (window.web3) {
-      const web3 = new Web3(window.web3.currentProvider);
-      return web3;
-    } else {
-      alert('Bitte installieren Sie MetaMask!');
-      return null;
-    }
-  };
-
-  // Funktion zum Abrufen des aktuellen Accounts aus dem lokalen Speicher
-  const getCurrentAccount = () => {
-    const account = localStorage.getItem('account');
+  // Funktion zum Abrufen des aktuellen Accounts aus localStorage und Setzen des Zustands
+  const fetchAccount = () => {
+    const account = localStorage.getItem('account'); // Annahme: Der Account wird unter 'account' gespeichert
     if (account) {
       setCurrentAccount(account);
     } else {
-      // Setze currentAccount auf null, wenn kein Account im lokalen Speicher gefunden wird
       setCurrentAccount(null);
     }
   };
 
   // Funktion zum Abrufen der Follower-Daten
   const fetchFollowerData = async () => {
-    const web3 = await initWeb3();
-    if (!web3) return;
-
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-
     try {
-      // Abrufen der Follower-Adressen
-      const followers = await contract.methods
-        .getFollowers(artistname.toLowerCase())
-        .call();
-
+      const followers = await getFollowers(artistname.toLowerCase());
       setFollowerCount(followers.length);
 
-      // Prüfen, ob der aktuelle Benutzer folgt
       if (currentAccount) {
-        const isUserFollowing = followers.some(
-          address => address.toLowerCase() === currentAccount.toLowerCase()
-        );
-        setIsFollowing(isUserFollowing);
+        const following = await isFollowingProject(artistname.toLowerCase(), currentAccount);
+        setIsFollowing(following);
       }
     } catch (error) {
       console.error('Fehler beim Abrufen der Follower-Daten:', error);
     }
   };
 
-  // Funktion zum Folgen/Entfolgen des Projekts mit getGasEstimate
+  // Funktion zum Folgen/Entfolgen des Projekts
   const toggleFollow = async () => {
-    const web3 = await initWeb3();
-    if (!web3 || !currentAccount) {
-      // Wenn kein Account vorhanden ist, sollte der Button nicht sichtbar sein
-      return;
-    }
-
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-
     try {
-      let method;
+      let success;
       if (isFollowing) {
         // Entfolgen
-        method = contract.methods.unfollowProject(artistname.toLowerCase());
+        success = await unfollowProject(artistname.toLowerCase());
       } else {
         // Folgen
-        method = contract.methods.followProject(artistname.toLowerCase());
+        success = await followProject(artistname.toLowerCase());
       }
 
-      // Schätzen des Gasverbrauchs mit getGasEstimate
-      const { gasEstimate, gasPrice } = await getGasEstimate(
-        method,
-        {},
-        currentAccount,
-        web3 // Übergabe von web3 an die Funktion
-      );
-
-      // Senden der Transaktion mit den geschätzten Gaswerten
-      await method.send({
-        from: currentAccount,
-        gas: gasEstimate,
-        gasPrice: gasPrice,
-      });
-
-      // Aktualisieren des Zustands
-      setIsFollowing(!isFollowing);
-      setFollowerCount(prevCount => (isFollowing ? prevCount - 1 : prevCount + 1));
+      if (success) {
+        setIsFollowing(!isFollowing);
+        setFollowerCount(prevCount => (isFollowing ? prevCount - 1 : prevCount + 1));
+      }
     } catch (error) {
       console.error('Fehler beim Ändern des Follower-Status:', error);
     }
   };
 
+  // Funktion zum Hinzufügen eines Projekts
+  const handleAddProject = async (e) => {
+    e.preventDefault();
+    setAddProjectLoading(true);
+    setAddProjectError('');
+
+    try {
+      const success = await addProject(projectName.trim());
+      if (success) {
+        alert('Projekt erfolgreich hinzugefügt!');
+        setProjectName('');
+      }
+    } catch (error) {
+      setAddProjectError('Fehler beim Hinzufügen des Projekts.');
+    }
+
+    setAddProjectLoading(false);
+  };
+
+  // Funktion zum Überprüfen, ob der aktuelle Benutzer der Owner ist
+  const checkIfOwner = async () => {
+    try {
+      const marketplace = await getMarketplaceInstance();
+      const owner = await marketplace.methods.owner().call();
+      if (currentAccount && owner.toLowerCase() === currentAccount.toLowerCase()) {
+        setIsOwner(true);
+      } else {
+        setIsOwner(false);
+      }
+    } catch (error) {
+      console.error('Fehler beim Überprüfen des Besitzers:', error);
+    }
+  };
+
   useEffect(() => {
-    getCurrentAccount();
+    fetchAccount();
   }, []);
 
   useEffect(() => {
-    fetchFollowerData();
+    if (currentAccount) {
+      fetchFollowerData();
+      checkIfOwner();
+    } else {
+      // Wenn kein Account vorhanden ist, können wir trotzdem die Follower-Zahl anzeigen
+      // Je nach Implementierung der getFollowers-Funktion könnten Sie die Follower-Zahl auch ohne Account abrufen
+      fetchFollowerData();
+      setIsFollowing(false);
+      setIsOwner(false);
+    }
   }, [currentAccount]);
 
   return (
@@ -160,48 +159,69 @@ const ArtistProfile = () => {
             <p>{artist.description}</p>
           </div>
           <div className="social-links">
-            {/* Follow/Unfollow Button und Follower-Anzahl */}
-            {currentAccount ? (
-              <div>
-                <h3 className='mb15'>{followerCount} FOLLOWER</h3>
-                <button onClick={toggleFollow} className="button mb15 w90">
-                  <h3 className='margin0'>{isFollowing ? 'UNFOLLOW' : 'FOLLOW'}</h3>
-                </button>
-              </div>
-            ) : (
-              <h3 className='mb5'>{followerCount} FOLLOWER</h3>
+            {/* Follower-Anzahl immer anzeigen */}
+            <div>
+            <h3 className='mb15'>{followerCount} FOLLOWER{followerCount !== 1 ? 'S' : ''}</h3>
+
+            {/* Follow/Unfollow Button nur anzeigen, wenn ein Account vorhanden ist */}
+            {currentAccount && (
+              <button onClick={toggleFollow} className="button mb15 w90">
+                <h3 className='margin0'>{isFollowing ? 'UNFOLLOW' : 'FOLLOW'}</h3>
+              </button>
             )}
+            </div>
 
             {/* Ihre bestehenden Social Links */}
             <div>
-            {artist.twitter && (
-              <a href={artist.twitter} target="_blank" rel="noopener noreferrer">
-                <img src="/x.png" alt="Twitter Icon" />
-              </a>
-            )}
-            {artist.discord && (
-              <a href={artist.discord} target="_blank" rel="noopener noreferrer">
-                <img src="/discord.png" alt="Discord Icon" />
-              </a>
-            )}
-            {artist.instagram && (
-              <a
-                href={artist.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src="/instagram.png" alt="Instagram Icon" />
-              </a>
-            )}
-            {artist.website && (
-              <a href={artist.website} target="_blank" rel="noopener noreferrer">
-                <img src="/website.png" alt="Website Icon" />
-              </a>
-            )}
+              {artist.twitter && (
+                <a href={artist.twitter} target="_blank" rel="noopener noreferrer">
+                  <img src="/x.png" alt="Twitter Icon" />
+                </a>
+              )}
+              {artist.discord && (
+                <a href={artist.discord} target="_blank" rel="noopener noreferrer">
+                  <img src="/discord.png" alt="Discord Icon" />
+                </a>
+              )}
+              {artist.instagram && (
+                <a
+                  href={artist.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img src="/instagram.png" alt="Instagram Icon" />
+                </a>
+              )}
+              {artist.website && (
+                <a href={artist.website} target="_blank" rel="noopener noreferrer">
+                  <img src="/website.png" alt="Website Icon" />
+                </a>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Anzeige der Add Project Sektion nur für den Owner */}
+      {/* {isOwner && (
+        <div className="add-project-section">
+          <h3>Neues Projekt hinzufügen</h3>
+          <form onSubmit={handleAddProject}>
+            <input
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              placeholder="Projektname"
+              required
+            />
+            <button type="submit" className="button" disabled={addProjectLoading}>
+              {addProjectLoading ? 'Hinzufügen...' : 'Projekt Hinzufügen'}
+            </button>
+          </form>
+          {addProjectError && <p className="error">{addProjectError}</p>}
+        </div>
+      )} */}
+
       <div className="toggle-buttons flex centered mt15 VisibleLink gap15">
         <button
           onClick={() => setSelectedComponent('gallery')}

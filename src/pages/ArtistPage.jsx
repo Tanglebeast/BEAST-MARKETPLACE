@@ -6,10 +6,7 @@ import { Link } from 'react-router-dom';
 import '../styles/ArtistPage.css';
 import SearchBar from '../components/SearchBar';
 import ArtistFilter from '../components/ArtistFilter';
-import Web3 from 'web3';
-
-const contractABI = [ { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" } ], "name": "addProject", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" } ], "name": "followProject", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" } ], "name": "unfollowProject", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "_name", "type": "string" } ], "name": "getFollowers", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" } ];
-const contractAddress = '0x01d7D562A905A53f5855C0FEa2a1C00aAF0Fc4dC';
+import { getFollowers, isFollowingProject, getCurrentAccount } from '../components/utils'; // Import der Utility-Funktionen
 
 const ArtistPage = () => {
   // Suchzustand
@@ -35,47 +32,33 @@ const ArtistPage = () => {
   const [followedProjects, setFollowedProjects] = useState([]);
   const [userAddress, setUserAddress] = useState(null);
 
-  // Funktion zur Initialisierung von web3
-  const initWeb3 = async () => {
-    if (window.ethereum) {
-      const web3 = new Web3(window.ethereum);
-      return web3;
-    } else if (window.web3) {
-      const web3 = new Web3(window.web3.currentProvider);
-      return web3;
-    } else {
-      alert('Bitte installieren Sie MetaMask!');
-      return null;
-    }
-  };
+  useEffect(() => {
+    console.log('showFollowing:', showFollowing);
+    console.log('followedProjects:', followedProjects);
+  }, [showFollowing, followedProjects]);
 
   // Funktion zum Abrufen der Benutzeradresse
-  const getUserAddress = async () => {
-    const web3 = await initWeb3();
-    if (web3) {
-      const accounts = await web3.eth.getAccounts();
-      if (accounts.length > 0) {
-        setUserAddress(accounts[0].toLowerCase());
-      }
-    }
-  };
+// Funktion zum Abrufen der Benutzeradresse
+const fetchUserAddress = async () => {
+  const account = await getCurrentAccount();
+  if (account) {
+    const lowerCaseAccount = account.toLowerCase();
+    setUserAddress(lowerCaseAccount);
+    console.log('User Address:', lowerCaseAccount); // Debugging-Log
+  } else {
+    console.log('Keine Benutzeradresse gefunden'); // Debugging-Log
+  }
+};
+
 
   // Funktion zum Abrufen der Follower-Anzahlen für alle Künstler
   const fetchAllFollowerCounts = async () => {
-    const web3 = await initWeb3();
-    if (!web3) return;
-
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-
     const counts = {};
 
     try {
       // Für jeden Künstler die Follower-Anzahl abrufen
       for (let artist of artistList) {
-        const followers = await contract.methods
-          .getFollowers(artist.name.toLowerCase())
-          .call();
-
+        const followers = await getFollowers(artist.name.toLowerCase());
         counts[artist.name.toLowerCase()] = followers.length;
       }
 
@@ -86,44 +69,44 @@ const ArtistPage = () => {
   };
 
   // Funktion zum Abrufen der gefolgten Projekte
-  const fetchFollowedProjects = async () => {
-    if (!userAddress) return;
+// Funktion zum Abrufen der gefolgten Projekte
+const fetchFollowedProjects = async () => {
+  if (!userAddress) {
+    console.log('Keine Benutzeradresse vorhanden');
+    return;
+  }
 
-    const web3 = await initWeb3();
-    if (!web3) return;
+  const followed = [];
 
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-    const followed = [];
-
-    try {
-      for (let artist of artistList) {
-        const followers = await contract.methods
-          .getFollowers(artist.name.toLowerCase())
-          .call();
-        if (followers.map(addr => addr.toLowerCase()).includes(userAddress)) {
-          followed.push(artist.name.toLowerCase());
-        }
+  try {
+    for (let artist of artistList) {
+      const isFollowing = await isFollowingProject(artist.name.toLowerCase(), userAddress);
+      console.log(`Is following ${artist.name}:`, isFollowing); // Debugging-Log
+      if (isFollowing) {
+        followed.push(artist.name.toLowerCase());
       }
-      setFollowedProjects(followed);
-    } catch (error) {
-      console.error('Fehler beim Abrufen der gefolgten Projekte:', error);
     }
+    setFollowedProjects(followed);
+    console.log('Gefolgte Projekte:', followed); // Debugging-Log
+  } catch (error) {
+    console.error('Fehler beim Abrufen der gefolgten Projekte:', error);
+  }
+};
+
+
+  // Handler für Sortieränderungen
+  const handleSortChange = (order) => {
+    setSortOrder(order);
+    setCurrentPage(1); // Reset auf erste Seite bei Sortieränderung
+    setSkipLoading(true); // Verhindert das Laden beim Sortieren
   };
 
- // Handler für Sortieränderungen
-const handleSortChange = (order) => {
-  setSortOrder(order);
-  setCurrentPage(1); // Reset auf erste Seite bei Sortieränderung
-  setSkipLoading(true); // Verhindert das Laden beim Sortieren
-};
-
-// Handler für Following-Filteränderungen
-const handleFollowingChange = (value) => {
-  setShowFollowing(value);
-  setCurrentPage(1); // Reset auf erste Seite bei Filteränderung
-  setSkipLoading(true); // Verhindert das Laden beim Filter
-};
-
+  // Handler für Following-Filteränderungen
+  const handleFollowingChange = (value) => {
+    setShowFollowing(value);
+    setCurrentPage(1); // Reset auf erste Seite bei Filteränderung
+    setSkipLoading(true); // Verhindert das Laden beim Filter
+  };
 
   // Filtern der Künstler basierend auf dem Suchbegriff und dem "Following"-Filter
   const filteredArtists = artistList.filter(artist =>
@@ -167,7 +150,6 @@ const handleFollowingChange = (value) => {
       setSkipLoading(false);
     }
   }, [currentPage]);
-  
 
   // Abrufen der Follower-Anzahlen beim Laden der Komponente
   useEffect(() => {
@@ -176,7 +158,7 @@ const handleFollowingChange = (value) => {
 
   // Abrufen der Benutzeradresse beim Laden der Komponente
   useEffect(() => {
-    getUserAddress();
+    fetchUserAddress();
   }, []);
 
   // Abrufen der gefolgten Projekte, wenn showFollowing aktiviert ist
@@ -285,7 +267,7 @@ const handleFollowingChange = (value) => {
                 {artistsToShow.length === 0 ? (
                   <div className="no-nfts-container flex centered column">
                     <h2 className="no-nfts-message">No projects found...</h2>
-                    <img src="/no-artist.png" alt="no artist Icon" className="no-nfts-image" />
+                    <img src="/no-nft.png" alt="no artist Icon" className="no-nfts-image" />
                   </div>
                 ) : (
                   artistsToShow.map((artist, index) => (

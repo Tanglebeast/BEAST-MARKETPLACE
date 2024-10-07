@@ -1409,14 +1409,37 @@ export const fetchCollectionSalesCount = async (collectionAddress) => {
 
 
 
-const getMarketplaceInstance = async () => {
+export const initWeb3 = async () => {
+  if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    try {
+      // Anfrage zur Kontoerlaubnis
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+    } catch (error) {
+      console.error('Benutzer hat den Kontozugriff abgelehnt:', error);
+      throw new Error('Benutzer hat den Kontozugriff abgelehnt');
+    }
+  } else if (window.web3) {
+    web3 = new Web3(window.web3.currentProvider);
+  } else {
+    alert('Bitte installieren Sie MetaMask!');
+    throw new Error('MetaMask nicht gefunden');
+  }
+};
+
+// Initialisierung der Contract-Instanz
+export const getMarketplaceInstance = async () => {
+  if (!web3) {
+    await initWeb3();
+  }
+
   const networkId = await web3.eth.net.getId();
   const deployedNetwork = nftMarketplaceAbi.networks[networkId];
-  
+
   if (!deployedNetwork) {
-    throw new Error('Marketplace contract not deployed to detected network.');
+    throw new Error('Marketplace Contract ist im erkannten Netzwerk nicht bereitgestellt.');
   }
-  
+
   return new web3.eth.Contract(nftMarketplaceAbi.abi, deployedNetwork.address);
 };
 
@@ -1484,6 +1507,120 @@ export const hasUserLikedCollection = async (userAddress, collectionAddress) => 
     return hasLiked;
   } catch (error) {
     console.error('Error checking if user liked collection:', error);
+    return false;
+  }
+};
+
+
+
+
+
+
+// Funktion zum Abrufen des aktuellen Accounts
+export const getCurrentAccount = async () => {
+  if (!web3) {
+    await initWeb3();
+  }
+  const accounts = await web3.eth.getAccounts();
+  if (accounts.length === 0) {
+    throw new Error('Keine Accounts verbunden');
+  }
+  return accounts[0];
+};
+
+// Follow Project
+export const followProject = async (projectName) => {
+  try {
+    const marketplace = await getMarketplaceInstance();
+    const account = await getCurrentAccount();
+
+    const gasEstimate = await marketplace.methods.followProject(projectName).estimateGas({ from: account });
+    const gasPrice = await web3.eth.getGasPrice();
+
+    const tx = await marketplace.methods.followProject(projectName).send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    console.log('Project followed successfully:', tx);
+    return true;
+  } catch (error) {
+    console.error('Error following project:', error);
+    return false;
+  }
+};
+
+// Unfollow Project
+export const unfollowProject = async (projectName) => {
+  try {
+    const marketplace = await getMarketplaceInstance();
+    const account = await getCurrentAccount();
+
+    const gasEstimate = await marketplace.methods.unfollowProject(projectName).estimateGas({ from: account });
+    const gasPrice = await web3.eth.getGasPrice();
+
+    const tx = await marketplace.methods.unfollowProject(projectName).send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    console.log('Project unfollowed successfully:', tx);
+    return true;
+  } catch (error) {
+    console.error('Error unfollowing project:', error);
+    return false;
+  }
+};
+
+// Get Followers
+export const getFollowers = async (projectName) => {
+  try {
+    const marketplace = await getMarketplaceInstance();
+    const followers = await marketplace.methods.getFollowers(projectName).call();
+    return followers; // Array von Adressen
+  } catch (error) {
+    console.error('Error getting followers:', error);
+    return [];
+  }
+};
+
+export const isFollowingProject = async (projectName, userAddress) => {
+  try {
+      const marketplace = await getMarketplaceInstance();
+      if (!marketplace) {
+          console.error('Marketplace-Instanz konnte nicht abgerufen werden');
+          return false;
+      }
+      const following = await marketplace.methods.isFollowing(projectName, userAddress).call(); // Geändert von isFollower zu isFollowing
+      console.log(`Is ${userAddress} following ${projectName}:`, following); // Debugging-Log
+      return following;
+  } catch (error) {
+      console.error('Error checking if user is following project:', error);
+      return false;
+  }
+};
+
+// Add Project (nur für den Owner)
+export const addProject = async (projectName) => {
+  try {
+    const marketplace = await getMarketplaceInstance();
+    const account = await getCurrentAccount();
+
+    const gasEstimate = await marketplace.methods.addProject(projectName).estimateGas({ from: account });
+    const gasPrice = await web3.eth.getGasPrice();
+
+    const tx = await marketplace.methods.addProject(projectName).send({
+      from: account,
+      gas: gasEstimate,
+      gasPrice: gasPrice
+    });
+
+    console.log('Project added successfully:', tx);
+    return true;
+  } catch (error) {
+    console.error('Error adding project:', error);
     return false;
   }
 };
