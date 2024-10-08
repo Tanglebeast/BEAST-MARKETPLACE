@@ -1,61 +1,120 @@
+/* Header.css */
+
+/* Positionierung für die ChangeTheme Komponente */
 .brandingColorContainer {
-    position: relative;
-  }
-  
-  .toggleButton {
-    transition: left 0.3s ease; /* Smooth Transition */
-    background-color: var(--branding-color); /* Button-Farbe anpassen */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 1001;
+  position: relative;
+
+}
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  background-color: var(--branding-color);
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+  border: none;
+}
+
+.toggleButton:hover {
+  background-color: var(--branding-color-hover);
+}
+
+.toggleButton img {
+  width: 24px;
+  height: 24px;
+}
+
+.brandingColorDiv {
+  position: absolute;
+  top: 40px; /* Anpassen je nach Header Höhe */
+  right: 0;
+  left: auto;
+  transform: translateX(0);
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: var(--branding-color);
+  border-radius: 8px;
+  padding: 15px;
+  z-index: 1000;
+  min-width: 200px;
+}
+
+.brandingColorDiv.open {
+  display: flex;
+}
+
+/* Option Container Styling */
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.colorOptions {
+  display: flex;
+  gap: 10px;
+}
+
+.colorOption {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.colorOption.selected {
+  border-color: white;
+}
+
+.modeOptions {
+  display: flex;
+  gap: 10px;
+}
+
+
+.modeOption {
+  width: 33px;
+  height: 33px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.modeOption.selected {
+  background-color: var(--branding-color-hover);
+  border-color: var(--text-color);
+}
+
+.modeOption:hover {
+  background-color: var(--branding-color-hover);
+  transform: scale(1.05);
+}
+
+.mode-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 768px) {
+  .brandingColorContainer {
+    margin-left: 10px;
   }
 
-  .toggleButton:hover {
-    background-color: var(--branding-color-hover);
-  }
-
-  .toggleButton img {
-    width: 24px; /* Anpassung der Größe nach Bedarf */
-    height: 24px; /* Anpassung der Größe nach Bedarf */
-  }
-  
-  
   .brandingColorDiv {
-    position: absolute;
     top: 50px;
-    left: -250px; /* Startposition des Div außerhalb des Bildschirms */
-    transform: translateX(10%);
-    transition: left 0.3s ease; /* Smooth Transition */
-    display: flex;
-    align-items: center;
-    background-color: var(--branding-color);
-    border: none;
-    border-radius: 5px;
-    z-index: 1000;
-    height: 45px;
+    right: 10px;
   }
-  
-  .brandingColorDiv.open {
-    left: -25px; /* Position des Div, wenn es geöffnet ist */
-  }
-  
-  .colorOptions {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-  }
-  
-  .colorOption {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent; /* Standard-Rand */
-  }
-  
-  .colorOption.selected {
-    border-color: white; /* Randfarbe für ausgewählte Farbe */
-  }
-  
+}

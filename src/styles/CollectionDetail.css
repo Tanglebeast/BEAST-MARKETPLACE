@@ -14,6 +14,7 @@
     height: 500px; /* oder wie groß du es haben möchtest */
     background-size: cover;
     background-position: center;
+    box-shadow: var(--card-box-shadow);
     }
 
   .bannerInfo {
@@ -82,13 +83,16 @@
 
 .collection-stats-div p {
     margin-top: 0px;
-    margin-bottom: 0px;
+  margin-bottom: 0px;
+  color: var(--text-color);
+  opacity: 70%;
 }
 
 .collection-stats-div {
     padding: 10px 20px;
-    background-color: black;
-    border-radius: 10px;
+  background-color: var(--card-background-color);
+  border-radius: 10px;
+  box-shadow: var(--card-box-shadow);
 }
 
 
@@ -128,7 +132,7 @@
 }
 
 .loading-container {
-    width: 100%;
+    width: 300px;
 }
 
 

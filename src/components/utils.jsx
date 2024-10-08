@@ -11,6 +11,7 @@ import NetworkSelectionPopup from '../components/NetworkSelectionPopup';
 import { getRpcUrl, setNetwork } from './networkConfig';
 
 
+
 const web3 = new Web3(window.ethereum);
 export let web3OnlyRead = new Web3(getRpcUrl()); // Initialisieren mit der Standard-RPC-URL
 
@@ -1409,23 +1410,23 @@ export const fetchCollectionSalesCount = async (collectionAddress) => {
 
 
 
-export const initWeb3 = async () => {
-  if (window.ethereum) {
-    web3 = new Web3(window.ethereum);
-    try {
-      // Anfrage zur Kontoerlaubnis
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-    } catch (error) {
-      console.error('Benutzer hat den Kontozugriff abgelehnt:', error);
-      throw new Error('Benutzer hat den Kontozugriff abgelehnt');
-    }
-  } else if (window.web3) {
-    web3 = new Web3(window.web3.currentProvider);
-  } else {
-    alert('Bitte installieren Sie MetaMask!');
-    throw new Error('MetaMask nicht gefunden');
-  }
-};
+// export const initWeb3 = async () => {
+//   if (window.ethereum) {
+//     web3 = new Web3(window.ethereum);
+//     try {
+//       // Anfrage zur Kontoerlaubnis
+//       await window.ethereum.request({ method: 'eth_requestAccounts' });
+//     } catch (error) {
+//       console.error('Benutzer hat den Kontozugriff abgelehnt:', error);
+//       throw new Error('Benutzer hat den Kontozugriff abgelehnt');
+//     }
+//   } else if (window.web3) {
+//     web3 = new Web3(window.web3.currentProvider);
+//   } else {
+//     alert('Bitte installieren Sie MetaMask!');
+//     throw new Error('MetaMask nicht gefunden');
+//   }
+// };
 
 // Initialisierung der Contract-Instanz
 export const getMarketplaceInstance = async () => {

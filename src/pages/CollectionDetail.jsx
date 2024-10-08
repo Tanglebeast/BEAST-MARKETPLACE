@@ -17,6 +17,10 @@ import { nftCollections } from '../NFTCollections';
 import CollectionDetailCard from '../components/CollectionDetailCard';
 import '../styles/CollectionDetail.css';
 import CollectionDetailFilter from '../components/CollectionDetailFilter';
+import HeartIcon from '../Assets/HeartIcon';
+import CurrencyBeastIcon from '../Assets/currency-beast';
+import CurrencyIotaIcon from '../Assets/currency-iota';
+import LoadingSpinner from '../Assets/loading-spinner';
 
 const CollectionNFTs = () => {
     const { collectionaddress } = useParams();
@@ -363,15 +367,28 @@ const CollectionNFTs = () => {
                                 }}
                                 aria-label={hasLiked ? "Unlike Collection" : "Like Collection"}
                             >
-                                {likeLoading ? (
-                                    <img src="/basic-loading.gif" alt="Loading..." className="img22" />
-                                ) : (
-                                    <img 
-                                        src={hasLiked ? "/heart-filled.png" : "/heart-outline.png"} 
-                                        alt={hasLiked ? "Liked" : "Like"} 
-                                        className="heart-icon"
-                                        style={{ width: '24px', height: '24px' }}
+                                  {likeLoading ? (
+                                    <LoadingSpinner
+                                    filled={false} 
+                                                    textColor="currentColor" 
+                                                    size={24} 
+                                                    className="img22"
                                     />
+                                ) : (
+                                    hasLiked ? (
+                                        <img 
+                                            src="/heart-filled.png" 
+                                            alt="Liked" 
+                                            className="heart-icon"
+                                            style={{ width: '24px', height: '24px' }}
+                                        />
+                                    ) : (
+                                        <HeartIcon 
+                                            filled={false} 
+                                            textColor="currentColor" 
+                                            size={22} 
+                                        />
+                                    )
                                 )}
                             </button>
                             </div>
@@ -380,15 +397,18 @@ const CollectionNFTs = () => {
                        
                         
                         <div className='w95 flex center-ho space-between'>
-                            <p className='text-align-left grey mt0 w30'>{collectionDescription}</p>
+                            <p className='text-align-left opacity-70 mt0 w30'>{collectionDescription}</p>
 
                             <div className="collection-stats gap15">
                                 <div className='collection-stats-div text-align-left center-ho'>
                                     <div className='flex column'>
                                         <p className='s16 grey'>VOLUME IOTA</p>
                                         <div className='flex center-ho'>
-                                            <div className='bold ml5'>{nativeVolume !== null ? `${nativeVolume}` : '0'}</div>
-                                            <img className='img22 ml5' src='/currency-iota.png' alt="IOTA Icon"></img>
+                                            <div className='bold ml5 mr5'>{nativeVolume !== null ? `${nativeVolume}` : '0'}</div>
+                                            <CurrencyIotaIcon
+                                            filled={false} 
+                                            textColor="currentColor" 
+                                            size={24} />
                                         </div>
                                     </div>
                                 </div>
@@ -397,8 +417,11 @@ const CollectionNFTs = () => {
                                     <div className='flex column'>
                                         <p className='s16 grey'>VOLUME BEAST</p>
                                         <div className='flex center-ho'>
-                                            <div className='bold ml5'>{specialTokenVolume !== null ? `${specialTokenVolume}` : '0'}</div>
-                                            <img className='img22 ml5' src='/currency-beast.webp' alt="BEAST Icon"></img>
+                                            <div className='bold ml5 mr5'>{specialTokenVolume !== null ? `${specialTokenVolume}` : '0'}</div>
+                                            <CurrencyBeastIcon
+                                             filled={false} 
+                                             textColor="currentColor" 
+                                             size={24} />
                                         </div>
                                     </div>
                                 </div>
@@ -416,8 +439,12 @@ const CollectionNFTs = () => {
                                 <div className='collection-stats-div text-align-left'>
                                     <p className='s16 grey'>LIKES</p>
                                     <div className='flex center-ho'>
-                                    <div className='bold ml5'>{likes}</div>
-                                    <img src='/heart-outline.png' className='ml5 img18'></img>
+                                    <div className='bold ml5 mr5'>{likes}</div>
+                                    <HeartIcon 
+                                            filled={false} 
+                                            textColor="currentColor" 
+                                            size={18} 
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -450,7 +477,12 @@ const CollectionNFTs = () => {
                                     disabled={currentPage === totalPages || (currentPage + 1 > loadedBatches)}
                                 >
                                     {currentPage < totalPages && currentPage + 1 > loadedBatches ? (
-                                        <img src="/basic-loading.gif" alt="Loading..." className="loading-gif" />
+                                        <LoadingSpinner
+                                        filled={false} 
+                                                        textColor="currentColor" 
+                                                        size={16} 
+                                                        className="loading-gif"
+                                        />
                                     ) : (
                                         '>'
                                     )}
@@ -472,8 +504,13 @@ const CollectionNFTs = () => {
                         {/* Hauptinhalt der NFT-Collection */}
                         <div className='NFT-Collection-Div gap10'>
                             {loading && loadedBatches === 0 ? (
-                                <div className="loading-container flex centered">
-                                    <img src="/loading.gif" alt="Loading..." />
+                                <div className="loading-container flex centered mt150 mb150">
+                                    <LoadingSpinner
+                                        filled={false} 
+                                                        textColor="currentColor" 
+                                                        size={100} 
+                                                        className="loading-gif"
+                                        />
                                 </div>
                             ) : (
                                 displayedNFTs.length === 0 ? (

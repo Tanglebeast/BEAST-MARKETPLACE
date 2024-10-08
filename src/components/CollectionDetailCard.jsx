@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 import ShortenAddress from './ShortenAddress';
 import BeastToIotaPrice from './BeastToIotaPrice';
 import '../styles/CollectionDetailCard.css';
+import CurrencyBeastIcon from '../Assets/currency-beast';
+import CurrencyIotaIcon from '../Assets/currency-iota';
+import LoadingSpinner from '../Assets/loading-spinner';
 
 const CollectionDetailCard = ({ nft, account, currencyIcon, userNames }) => {
     const ownerAddress = nft.owner.toLowerCase();
@@ -58,14 +61,25 @@ const CollectionDetailCard = ({ nft, account, currencyIcon, userNames }) => {
                 <div className="price-container center-ho mt15 space-between">
                     {parseFloat(nft.price) !== 0 ? (
                         <>
-                            <div className='center-ho'>
-                                <img 
-                                    src={isNativeCurrencyListed ? currencyIcon : '/currency-beast.webp'} 
-                                    alt="Currency Icon" 
-                                    className="currency-icon" 
-                                />
-                                <span className='bold'>{nft.price}</span>
-                            </div>
+                            <div className='center-ho' style={{ color: 'var(--text-color)' }}>
+                                {isNativeCurrencyListed ? (
+                                    <CurrencyIotaIcon
+                                    filled={false} 
+                                    textColor="currentColor" 
+                                    size={24} 
+                                    className="currency-icon"
+                                    />
+                                ) : (
+                                    <CurrencyBeastIcon 
+                                    filled={false} 
+                                    textColor="currentColor" 
+                                    size={24} 
+                                    className="currency-icon"
+                                    />
+                                )}
+                                <span className='bold ml5'>{nft.price}</span>
+                                </div>
+
                             
                             {/* Konvertierten Preis nur anzeigen, wenn die native Währung NICHT verwendet wird */}
                             {!isNativeCurrencyListed && (

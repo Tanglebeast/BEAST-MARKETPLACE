@@ -5,15 +5,16 @@
 }
 
 .accordion-item {
-    background-color: #000000; /* Black background for items */
+    background-color: var(--card-background-color);
     border-radius: 8px;
     margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Softer shadow */
+    box-shadow: var(--card-box-shadow);
+    color: var(--text-color);
 }
 
 .accordion-header {
-    background-color: black; /* Black */
-    color: #FFFFFF; /* White text */
+    background-color: var(--card-background-color);
+    color: var(--text-color);
     padding: 15px;
     font-size: 18px;
     font-family: 'Josefin Sans', sans-serif;

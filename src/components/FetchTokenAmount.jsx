@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import PropTypes from 'prop-types';
 import BN from 'bn.js'; // Importieren von BN aus bn.js
+import LoadingSpinner from '../Assets/loading-spinner';
+import CurrencyBeastIcon from '../Assets/currency-beast';
+import CurrencyIotaIcon from '../Assets/currency-iota';
 
 const FetchTokenAmount = ({ account }) => {
   const [nativeBalance, setNativeBalance] = useState(null);
@@ -96,7 +99,12 @@ const FetchTokenAmount = ({ account }) => {
   if (loading) {
     return (
       <div className="token-amount-loading">
-        <img src="/basic-loading.gif" alt="Lädt..." />
+        <LoadingSpinner
+                                        filled={false} 
+                                                        textColor="currentColor" 
+                                                        size={22} 
+                                                        className="loading-gif"
+                                        />
       </div>
     );
   }
@@ -109,14 +117,24 @@ const FetchTokenAmount = ({ account }) => {
     <div className="token-amount">
       {nativeBalance !== null && (
         <div className="native-balance flex center-ho">
-          <img className='' src='/currency-iota.png' alt="Native Token" />
-          {nativeBalance}
+          <CurrencyIotaIcon
+                                    filled={false} 
+                                    textColor="currentColor" 
+                                    size={24} 
+                                    className="currency-icon"
+                                    />
+          <span className="ml5 s16">{nativeBalance}</span>
         </div>
       )}
       {tokenBalance !== null && (
         <div className="erc20-balance flex center-ho">
-          <img className='' src='/currency-beast.webp' alt="ERC-20 Token" />
-          {tokenBalance}
+          <CurrencyBeastIcon
+                filled={false} 
+                textColor="currentColor" 
+                size={24} 
+                className="currency-icon"
+                />
+          <span className="ml5 s16">{tokenBalance}</span>
         </div>
       )}
     </div>

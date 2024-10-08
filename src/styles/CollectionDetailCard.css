@@ -4,7 +4,7 @@
   justify-content: center;
   flex-direction: column;
   border-radius: 10px;
-  background-color: black;
+  background-color: var(--card-background-color);
   width: 270px;
   color: white;
   transition: all 0.25s;

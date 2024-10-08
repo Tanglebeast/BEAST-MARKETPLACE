@@ -15,7 +15,8 @@
 }
 
 .nft-detail {
-    background-color: black;
+    background-color: var(--card-background-color);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
     padding: 15px;
     border-radius: 15px;
     display: flex;

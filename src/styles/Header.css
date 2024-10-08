@@ -6,8 +6,9 @@
   align-items: center;
   padding-top: 15px;
   padding-bottom: 15px;
-  background-color: black;
-  color: #fff;
+  background-color: var(--card-background-color);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+    color: var(--text-color);
   width: 100%; 
   border-radius: 0;
   position: relative; /* Für mobile Menü Positionierung */
@@ -21,12 +22,10 @@
   border-radius: 0;
 }
 
-.title {
-  margin: 0;
-}
-
-.logo {
-  height: 50px;
+.logo-svg {
+  height: 50px; /* Ändern Sie dies nach Bedarf */
+  width: auto; /* Proportionale Höhe */
+  transition: width 0.3s ease;
 }
 
 .nav-container {
@@ -115,7 +114,9 @@
   position: absolute;
   top: 100%;
   right: 10%;
-  background-color: black;
+  background-color: var(--card-background-color);
+    color: var(--text-color) !important;
+    box-shadow: var(--card-box-shadow);
   border-radius: 5px;
   z-index: 10;
   width: 200px;
@@ -123,7 +124,7 @@
 
 .dropdown-link {
   display: block;
-  color: white;
+  color: var(--text-color) !important;
   text-decoration: none;
   padding: 21px 10px;
 }
@@ -198,15 +199,15 @@
 /* Styling für die Token-Anzeige */
 .token-amount {
   padding: 10px;
-  background-color: black;
-  border-bottom: 1px solid #eaeaea74;
+  background-color: var(--card-background-color);
+  border-bottom: 1px solid var(--text-color);
 }
 
 .native-balance,
 .erc20-balance {
   margin: 10px 0;
   font-size: 16px;
-  color: white;
+  color: var(--text-color);
 }
 
 .token-amount-error {

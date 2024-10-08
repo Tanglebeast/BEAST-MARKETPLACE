@@ -36,7 +36,8 @@
 
 .my-nft-card,
 .user-nft-card {
-    background-color: Black;
+    background-color: var(--card-background-color);
+  box-shadow: var(--card-box-shadow);
     margin: 0px;
     padding: 10px;
     width: 250px;
@@ -170,6 +171,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: var(--card-box-shadow);
 }
 
 .ProfileBannerDiv img {

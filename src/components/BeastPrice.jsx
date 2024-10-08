@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import CurrencyBeastIcon from '../Assets/currency-beast';
 
 const BeastPrice = () => {
   const [price, setPrice] = useState(null);
@@ -61,15 +62,15 @@ const BeastPrice = () => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={addTokenToMetaMask}>
-      <img
-        id="tokenimage"
-        style={{ width: '25px', height: '25px', marginRight: '6px' }}
-        src="/currency-beast.webp"
-        alt="Token"
-      />
+      <CurrencyBeastIcon
+                filled={false} 
+                textColor="currentColor" 
+                size={24} 
+                className="currency-icon"
+                />
       <span
         id="price"
-        style={{ fontSize: '17px', marginRight: '-8px' }}
+        style={{ fontSize: '17px', marginRight: '0px' }}
       >
         {/* {error || (price ? `$${price}` : 'Loading...')} */}
         {error || (price ? `$0.002` : 'Loading...')}

@@ -1,6 +1,10 @@
 :root {
   --branding-color: #535bf2;
   --branding-color-hover: #535bf2bf;
+  --background-color: #0C1215;
+  --text-color: #FFFFFF;
+  --card-background-color: #000000;
+  --card-box-shadow: none;
 }
 
 
@@ -11,8 +15,23 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-    background-color: #12150c;
-  color: white;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+body.dark-mode {
+  --background-color: #0C1215;
+  --text-color: #FFFFFF;
+  --card-background-color: #000000;
+  --card-box-shadow: none;
+}
+
+
+body.light-mode {
+  --background-color: #FFFFFF;
+  --text-color: #000000;
+  --card-background-color: #F7F7F7;
+  --card-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
 }
 
 header {
@@ -63,6 +82,7 @@ code {
 
 h1, h2, h3 {
   font-family: 'Josefin Sans', sans-serif;
+  color: var(--text-color) !important;
 }
 
 p,span {
@@ -70,6 +90,12 @@ p,span {
   font-weight: 400;
   font-style: normal;
   font-size: 18px;
+  color: var(--text-color) !important;
+}
+
+a,
+button {
+  color: var(--text-color) !important;
 }
 
 
@@ -290,6 +316,10 @@ p,span {
   opacity: 50%;
 }
 
+.opacity-70 {
+  opacity: 70%;
+}
+
 .flex-end {
   justify-content: end;
 }
@@ -340,6 +370,19 @@ p,span {
 
 .blue {
   color: var(--branding-color);
+}
+
+.mt150 {
+  margin-top: 150px;
+}
+
+.mb150 {
+  margin-bottom: 150px;
+}
+
+.modetext {
+  color: var(--text-color) !important;
+  fill: var(--text-color);
 }
 
 .deco-none {

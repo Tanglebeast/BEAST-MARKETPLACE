@@ -57,7 +57,7 @@
   }
 
   .poll-card {
-    background-color: black;
+    background-color: var(--card-background-color);
     border-radius: 8px;
     padding: 20px;
     box-sizing: border-box;
@@ -67,6 +67,7 @@
     justify-content: space-between;
     display: flex;
     flex-direction: column;
+    box-shadow: var(--card-box-shadow);
   }
 
   .poll-Collection-Div{

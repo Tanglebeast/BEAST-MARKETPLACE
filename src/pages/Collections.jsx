@@ -7,6 +7,7 @@ import { getCollectionDetails, getCollectionLikes, fetchCollectionSalesCount } f
 import CollectionFilter from '../components/CollectionFilter';
 import { getCurrentNetwork } from '../components/networkConfig';
 import ImageWithLoading from '../components/ImageWithLoading';
+import LoadingSpinner from '../Assets/loading-spinner';
 
 const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
   // State für Suche und Filter
@@ -222,8 +223,13 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
 
           {/* Hauptinhalt der Kollektionen */}
           {isInitialLoad ? (
-            <div className="loading-container flex centered">
-              <img src="/loading.gif" alt="Loading..." className="loading-image" />
+            <div className="loading-container flex centered mt150 mb150">
+              <LoadingSpinner
+                                        filled={false} 
+                                                        textColor="currentColor" 
+                                                        size={100} 
+                                                        className="loading-gif"
+                                        />
             </div>
           ) : sortedCollections.length === 0 ? (
             <div className="no-nfts-container flex centered column">
@@ -241,7 +247,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
                   <div className='text-align-left w90 mb5 collection-infoCardDiv'>
                     <div className='mb5 card-footer-infoDiv'>
                       <h3 className='mb10'>{collection.name}</h3>
-                      <span className='s18 grey'>{collection.artist}</span>
+                      <span className='s18 grey modetext opacity-70 bold'>{collection.artist}</span>
                     </div>
                     {collectionDetails[collection.address] && (
                       <>

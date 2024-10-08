@@ -17,6 +17,7 @@
   height: 500px; /* Passe die Höhe nach Bedarf an */
   background-size: cover;
   background-position: center;
+  box-shadow: var(--card-box-shadow);
 }
 
 .bannerInfo {
@@ -61,8 +62,8 @@
   border-radius: 10px;
   overflow: hidden;
   width: 250px;
-  background-color: black; /* Hintergrundfarbe hinzufügen, wenn gewünscht */
-  color: white; /* Textfarbe anpassen */
+  background-color: var(--card-background-color);
+  box-shadow: var(--card-box-shadow);
   transition: transform 0.25s;
 }
 
@@ -107,12 +108,15 @@
 .collection-stats-div p {
   margin-top: 0px;
   margin-bottom: 0px;
+  color: var(--text-color);
+  opacity: 70%;
 }
 
 .collection-stats-div {
   padding: 10px 20px;
-  background-color: black;
+  background-color: var(--card-background-color);
   border-radius: 10px;
+  box-shadow: var(--card-box-shadow);
 }
 
 .SearchandFilterDiv {
@@ -125,7 +129,7 @@
 }
 
 .loading-container {
-  width: 100%;
+  width: 300px;
 }
 
 .no-nfts-container img{

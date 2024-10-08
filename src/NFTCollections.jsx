@@ -167,7 +167,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 		networkid: '0x433',
 		rpcurl: 'https://json-rpc.evm.testnet.iotaledger.net',
 		currency: '/currency-iota.png',
-		category: 'ART',
+		category: 'PFP',
 		timestamp: '1728308325',
 		address: '0x511046D465AD172FbFA8a62FF586Cb814284367e',
 		abi: ABI,

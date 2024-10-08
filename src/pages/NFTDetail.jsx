@@ -28,6 +28,8 @@ import ShortenAddress from '../components/ShortenAddress';
 import PriceHistory from '../components/PriceHistory';
 import BeastToIotaPrice from '../components/BeastToIotaPrice';
 import NFTAttributesStats from '../components/NFTAttributesStats';
+import CurrencyBeastIcon from '../Assets/currency-beast';
+import CurrencyIotaIcon from '../Assets/currency-iota';
 
 // import NFTHistory from '../components/NFTHistory';
 
@@ -377,8 +379,15 @@ const NFTDetail = () => {
                         
                       {nftDetails.paymentToken !== '0x0000000000000000000000000000000000000000' ? (
               <>
-                <img src="/currency-beast.webp" alt="ERC20 Currency Icon" className="currency-icon" />
-                <p className='mt5 mb5'>{nftDetails.price} BEAST</p>
+                <CurrencyBeastIcon
+                filled={false} 
+                textColor="currentColor" 
+                size={24} 
+                className="currency-icon"
+                />
+
+                
+                <p className='mt5 mb5 ml5'>{nftDetails.price} BEAST</p>
                 <BeastToIotaPrice
                   listingPrice={parseFloat(nftDetails.price)}
                   onConversion={(convertedPrice) => {
@@ -394,8 +403,13 @@ const NFTDetail = () => {
               </>
             ) : (
               <>
-                <img src={collectionDetails.currency} alt="Currency Icon" className="currency-icon" />
-                <p className='mt5 mb5'>{nftDetails.price} IOTA</p>
+                <CurrencyIotaIcon
+                                    filled={false} 
+                                    textColor="currentColor" 
+                                    size={24} 
+                                    className="currency-icon"
+                                    />
+                <p className='mt5 mb5 ml5'>{nftDetails.price} IOTA</p>
                 {/* Zeige den IOTA-Preis nicht an */}
               </>
             )}

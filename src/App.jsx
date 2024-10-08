@@ -88,7 +88,6 @@ const App = () => {
         disconnectWallet(setAccount, setIsConnected);
       }}
     />
-    <ChangeTheme />
     <div className="MainDiv">
       <Routes>
         <Route path="/" element={<Navigate to="/collections" replace />} />

@@ -5,15 +5,16 @@
 }
 
 .accordion-item {
-    background-color: #000000; /* White background for items */
+    background-color: var(--card-background-color);
     border-radius: 8px;
     margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Softer shadow */
+    box-shadow: var(--card-box-shadow);
+    color: var(--text-color);
 }
 
 .accordion-header {
-    background-color: black; /* Soft purple */
-    color: #FFFFFF; /* White text */
+    background-color: var(--card-background-color);
+    color: var(--text-color);
     padding: 15px;
     font-size: 18px;
     border: none;
@@ -29,12 +30,12 @@
 }
 
 .accordion-header:hover {
-    background-color: black; /* Soft purple */
+    background-color: var(--branding-color-hover); /* Soft purple */
 }
 
 
 .accordion-content {
-    background-color: #050505; /* Very light grey for content */
+    background-color: var(--card-background-color);
     overflow: hidden;
     padding: 0 15px;
     max-height: 0;

@@ -1,6 +1,7 @@
 .footerDiv {
-    background-color: black;
-    color: white;
+    background-color: var(--card-background-color);
+    box-shadow: 0 -3px 5px rgba(0, 0, 0, 0.3);
+  color: var(--text-color);
     padding: 2rem 1rem;
     position: relative;
     bottom: 0;
@@ -75,6 +76,10 @@
     margin-left: 0px;
     margin-right: 25px;
     transition: transform 0.25s ease;
+}
+
+.social-icons img {
+    box-shadow: var(--card-box-shadow) !important;
 }
 
 .social-icons:hover{

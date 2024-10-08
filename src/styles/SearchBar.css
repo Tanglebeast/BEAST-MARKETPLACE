@@ -3,9 +3,10 @@
     width: 100%;
     padding: 10px;
     border-radius: 25px;
-    background-color: black;
+    background-color: var(--card-background-color);
+    box-shadow: var(--card-box-shadow);
     border: none;
-    color: white;
+    color: var(--text-color);
   }
 
   @media (max-width: 768px) {
