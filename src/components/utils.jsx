@@ -221,7 +221,7 @@ const getNetworkConfig = (network) => {
 // };
 
 export const connectWallet = async (setAccount) => {
-  if (typeof window.ethereum !== 'undefined') {
+  if (typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask) { // Nur MetaMask zulassen
     try {
       // Überprüfen, ob ein Netzwerk im lokalen Speicher vorhanden ist
       let selectedNetwork = localStorage.getItem('selectedNetwork');
@@ -259,6 +259,7 @@ export const connectWallet = async (setAccount) => {
 
 
 
+
 export const disconnectWallet = (setAccount, setIsConnected) => {
   localStorage.removeItem('account');
   setAccount('');
@@ -271,23 +272,25 @@ export const initializeMarketplace = async (setMarketplace, refreshData) => {
     const account = localStorage.getItem('account');
     const web3Instance = account ? web3 : web3OnlyRead;
 
-    // Logge, welche Web3-Instanz verwendet wird
-    // console.log(`Using Web3 instance: ${account ? 'web3' : 'web3OnlyRead'}`);
-
-    const networkId = await web3Instance.eth.net.getId();
-    const marketplaceData = nftMarketplaceAbi.networks[networkId];
-    if (marketplaceData) {
-      const marketplace = new web3Instance.eth.Contract(nftMarketplaceAbi.abi, marketplaceData.address);
-      setMarketplace(marketplace);
-      await refreshData(marketplace);
+    if (window.ethereum && window.ethereum.isMetaMask) { // Nur MetaMask zulassen
+      const networkId = await web3Instance.eth.net.getId();
+      const marketplaceData = nftMarketplaceAbi.networks[networkId];
+      if (marketplaceData) {
+        const marketplace = new web3Instance.eth.Contract(nftMarketplaceAbi.abi, marketplaceData.address);
+        setMarketplace(marketplace);
+        await refreshData(marketplace);
+      } else {
+        showAlert('Marketplace contract not deployed to detected network.');
+      }
     } else {
-      showAlert('Marketplace contract not deployed to detected network.');
+      showAlert('MetaMask is required to interact with the marketplace.');
     }
   } catch (error) {
     console.error("Error initializing marketplace:", error);
     showAlert('Failed to initialize marketplace.');
   }
 };
+
 
 
 

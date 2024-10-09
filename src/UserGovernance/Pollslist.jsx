@@ -63,53 +63,53 @@ const PollsList = ({ artistName }) => {
   const [progressPercentage, setProgressPercentage] = useState(0);
 
   useEffect(() => {
-      const init = async () => {
-          const storedAccount = localStorage.getItem('account');
+    const init = async () => {
+        const storedAccount = localStorage.getItem('account');
 
-          if (storedAccount) {
-              if (window.ethereum) {
-                  try {
-                      const web3Instance = new Web3(window.ethereum);
-                      setWeb3(web3Instance);
+        if (storedAccount) {
+            if (window.ethereum && window.ethereum.isMetaMask) {  // Nur MetaMask zulassen
+                try {
+                    const web3Instance = new Web3(window.ethereum);
+                    setWeb3(web3Instance);
 
-                      const accounts = await web3Instance.eth.requestAccounts();
-                      const currentAccount = accounts[0];
+                    const accounts = await web3Instance.eth.requestAccounts();
+                    const currentAccount = accounts[0];
 
-                      if (storedAccount.toLowerCase() !== currentAccount.toLowerCase()) {
-                          setErrorMessage(
-                              'Das verbundene Konto stimmt nicht mit dem gespeicherten Konto überein. Bitte verbinden Sie die richtige Wallet.'
-                          );
-                      } else {
-                          setConnectedAccount(currentAccount);
-                          const nftVotingContract = new web3Instance.eth.Contract(NFT_VOTING_ABI, NFT_VOTING_ADDRESS);
-                          setContract(nftVotingContract);
-                          await fetchPolls(nftVotingContract);
-                      }
-                  } catch (error) {
-                      console.error('Fehler beim Initialisieren von Web3 oder Vertrag:', error);
-                      setErrorMessage('Fehler beim Initialisieren von Web3 oder Vertrag.');
-                  }
-              } else {
-                  alert('Bitte installieren Sie MetaMask!');
-              }
-          } else {
-              try {
-                  const readOnlyWeb3 = new Web3(getRpcUrl());
-                  setWeb3(readOnlyWeb3);
-                  const readOnlyContract = new readOnlyWeb3.eth.Contract(NFT_VOTING_ABI, NFT_VOTING_ADDRESS);
-                  setContract(readOnlyContract);
-                  await fetchPolls(readOnlyContract);
-              } catch (error) {
-                  console.error('Fehler beim Einrichten von Read-Only Web3:', error);
-                  setErrorMessage('Fehler beim Einrichten von Read-Only Web3.');
-              }
-          }
+                    if (storedAccount.toLowerCase() !== currentAccount.toLowerCase()) {
+                        setErrorMessage(
+                            'Das verbundene Konto stimmt nicht mit dem gespeicherten Konto überein. Bitte verbinden Sie die richtige Wallet.'
+                        );
+                    } else {
+                        setConnectedAccount(currentAccount);
+                        const nftVotingContract = new web3Instance.eth.Contract(NFT_VOTING_ABI, NFT_VOTING_ADDRESS);
+                        setContract(nftVotingContract);
+                        await fetchPolls(nftVotingContract);
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Initialisieren von Web3 oder Vertrag:', error);
+                    setErrorMessage('Fehler beim Initialisieren von Web3 oder Vertrag.');
+                }
+            } else {
+                alert('Bitte installieren Sie MetaMask!');
+            }
+        } else {
+            try {
+                const readOnlyWeb3 = new Web3(getRpcUrl());
+                setWeb3(readOnlyWeb3);
+                const readOnlyContract = new readOnlyWeb3.eth.Contract(NFT_VOTING_ABI, NFT_VOTING_ADDRESS);
+                setContract(readOnlyContract);
+                await fetchPolls(readOnlyContract);
+            } catch (error) {
+                console.error('Fehler beim Einrichten von Read-Only Web3:', error);
+                setErrorMessage('Fehler beim Einrichten von Read-Only Web3.');
+            }
+        }
 
-          setLoading(false);
-      };
+        setLoading(false);
+    };
 
-      init();
-  }, []);
+    init();
+}, []);
 
   const fetchPolls = async (contractInstance) => {
       setLoading(true);
