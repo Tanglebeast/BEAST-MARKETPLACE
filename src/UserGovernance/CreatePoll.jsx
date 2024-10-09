@@ -129,7 +129,7 @@ const CreatePoll = ({ onClose }) => {
           }
       
           // Gasabschätzung aufrufen
-          const { gasEstimate, gasPrice } = await getGasEstimate(web3, method, {}, accounts[0]);
+          const { gasEstimate, gasPrice } = await getGasEstimate(method, {}, accounts[0]);
       
           // Transaktion senden
           await method.send({
