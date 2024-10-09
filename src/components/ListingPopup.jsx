@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import BeastToIotaPrice from '../components/BeastToIotaPrice'; // Import the price conversion component
 import '../styles/ListingPopup.css';
+import CurrencyBeastIcon from '../Assets/currency-beast';
+import CurrencyIotaIcon from '../Assets/currency-iota';
 
 const Popup = ({ listingPrice, setListingPrice, handleList, closePopup, currency }) => {
   const [paymentToken, setPaymentToken] = useState("0x6852f7B4ba44667F2Db80E6f3A9f8A173b03cD15");
@@ -9,7 +11,7 @@ const Popup = ({ listingPrice, setListingPrice, handleList, closePopup, currency
 
   useEffect(() => {
     if (paymentToken === "0x0000000000000000000000000000000000000000") { // IOTA
-      setFees('4% Total Fee ︱ 2% Artist Fee + 2% Service Fee');
+      setFees('6% Total Fee ︱ 3% Artist Fee + 3% Service Fee');
     } else if (paymentToken === "0x6852f7B4ba44667F2Db80E6f3A9f8A173b03cD15") { // Beast
       setFees('0% Total Fee');
     } else {
@@ -55,9 +57,17 @@ const Popup = ({ listingPrice, setListingPrice, handleList, closePopup, currency
             <div className="custom-dropdown">
               <div className="dropdown-selected" onClick={() => document.querySelector('.dropdown-options').classList.toggle('show')}>
                 {paymentToken === "0x0000000000000000000000000000000000000000" ? (
-                  <span className='centered'><img src="/currency-iota.png" alt="IOTA Icon" className="token-icon w25" /> IOTA</span>
+                  <span className='centered'>
+                    <CurrencyIotaIcon
+                  filled={false} 
+                  textColor="currentColor" 
+                  size={24} /> <span className='ml5'>IOTA</span></span>
                 ) : (
-                  <span className='centered'><img src="/currency-beast.webp" alt="BEAST Icon" className="token-icon w25" /> BEAST</span>
+                  <span className='centered'>
+                    <CurrencyBeastIcon
+                  filled={false} 
+                  textColor="currentColor" 
+                  size={24} /> <span className='ml5'>BEAST</span></span>
                 )}
               </div>
               <div className="dropdown-options">
@@ -65,13 +75,21 @@ const Popup = ({ listingPrice, setListingPrice, handleList, closePopup, currency
                   className="dropdown-option center-ho"
                   onClick={() => { setPaymentToken("0x0000000000000000000000000000000000000000"); document.querySelector('.dropdown-options').classList.remove('show'); }}
                 >
-                  <img src="/currency-iota.png" alt="IOTA Icon" className="token-icon w25" /> IOTA
+                  <CurrencyIotaIcon
+                                             filled={false} 
+                                             textColor="currentColor" 
+                                             size={24} /> 
+                                             <span className='ml5'>IOTA</span>
                 </div>
                 <div 
                   className="dropdown-option center-ho"
                   onClick={() => { setPaymentToken("0x6852f7B4ba44667F2Db80E6f3A9f8A173b03cD15"); document.querySelector('.dropdown-options').classList.remove('show'); }}
                 >
-                  <img src="/currency-beast.webp" alt="BEAST Icon" className="token-icon w25" /> BEAST
+                  <CurrencyBeastIcon
+                                             filled={false} 
+                                             textColor="currentColor" 
+                                             size={24} /> 
+                                             <span className='ml5'>BEAST</span>
                 </div>
               </div>
             </div>
@@ -86,7 +104,7 @@ const Popup = ({ listingPrice, setListingPrice, handleList, closePopup, currency
             )}
           </h3>
         </button>
-        <h5 className='grey'>
+        <h5 className=''>
           {fees}
         </h5>
 

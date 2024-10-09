@@ -15,7 +15,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: black;
+  background-color: var(--card-background-color);
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -24,6 +24,7 @@
   height: 300px;
   position: relative; /* Wichtig für die Positionierung des Close-Buttons */
   overflow: scroll;
+  color: var(--text-color) !important;
 }
 
 .popup-content h5{
@@ -52,7 +53,7 @@
 
 .listinginput-list {
   color: #fff;
-  background-color: rgb(28,28,30);
+  background-color: var(--background-color);
   box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
   border-radius: 20px;
   border: none;
@@ -63,8 +64,8 @@
 }
 
 .listinginput-name {
-  color: #fff;
-  background-color: rgb(28,28,30);
+  color: var(--text-color);
+  background-color: var(--background-color);
   box-shadow: 0 0 .4vw rgba(0,0,0,0.5), 0 0 0 .15vw transparent;
   border-radius: 20px;
   border: none;
@@ -155,7 +156,7 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  background-color: rgb(28, 28, 30);
+  background-color: var(--background-color);
   box-shadow: 0 0 .4vw rgba(0, 0, 0, 0.5), 0 0 0 .15vw transparent;
   border-radius: 20px;
   display: flex;
@@ -171,7 +172,7 @@
 .dropdown-options {
   position: absolute;
   z-index: 1000;
-  background-color: rgb(28, 28, 30);
+  background-color: var(--background-color);
   border: none;
   width: 100%;
   display: none; /* Standardmäßig verborgen */
