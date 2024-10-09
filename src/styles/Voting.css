@@ -125,7 +125,7 @@
   input[type="number"]:focus {
     border-color: var(--branding-color);
     outline: none;
-    color: var(--text-color);
+    color: var(--branding-color);
   }
   
   /* Button styles */
