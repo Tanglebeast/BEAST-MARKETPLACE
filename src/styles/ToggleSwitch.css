@@ -2,8 +2,8 @@
 
 .toggle-switch {
     position: relative;
-    width: 60px !important;
-    height: 34px;
+    width: 55px !important;
+    height: 28px;
   }
   
   .switch-label {
@@ -29,8 +29,8 @@
     top: 50% !important; /* Vertikal zentrieren */
     left: 4px !important;
     transform: translateY(-50%); /* Vertikal zentrieren */
-    width: 26px !important;
-    height: 26px;
+    width: 22px !important;
+    height: 22px;
     border-radius: 50%;
     background-color: white;
     transition: transform 0.3s ease, background-color 0.3s ease;

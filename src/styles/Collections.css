@@ -43,15 +43,16 @@
 
 .collection-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    /* grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); */
+    grid-template-columns: repeat(auto-fit, minmax(270px, max-content));
     gap: 10px;
     margin-top: 10px;
+    min-width: 100%;
     max-width: 100%;
 }
 
 .collection-cards.centered-cards {
     display: flex;
-    justify-content: center;
     flex-wrap: wrap;
 }
 
