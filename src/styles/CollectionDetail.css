@@ -11,7 +11,7 @@
     .CollectionBanner {
     width: 95%;
     border-radius: 15px;
-    height: 500px; /* oder wie groß du es haben möchtest */
+    height: 400px; /* oder wie groß du es haben möchtest */
     background-size: cover;
     background-position: center;
     box-shadow: var(--card-box-shadow);

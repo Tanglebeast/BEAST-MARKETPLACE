@@ -10,16 +10,15 @@
   }
   
   .banner {
-    height: 500px; /* Adjust height as needed */
+    height: 400px; /* Adjust height as needed */
     background-size: cover;
     background-position: center;
-    margin-bottom: 20px;
     border-radius: 15px;
     box-shadow: var(--card-box-shadow);
   }
 
   .content {
-    padding-top: 40px;
+    padding-top: 20px;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--text-color);
     width: 80%;

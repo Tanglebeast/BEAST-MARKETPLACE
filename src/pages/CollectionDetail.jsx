@@ -340,10 +340,7 @@ const CollectionNFTs = () => {
             </div>
 
             <div className="nft-list">
-                <div className='SearchandFilterDiv'>
-                    {/* Weitere Komponenten können hier eingefügt werden */}
-                </div>
-                <div className='w100 flex space-between CollectionDetail-mediaDiv'>
+                <div className='w100 flex space-between CollectionDetail-mediaDiv mt20'>
                     <div className='w20 Coll-FilterDiv ButtonandFilterMedia'>
                         {/* Übergabe von totalNFTsCount */}
                         <CollectionDetailFilter onFilterChange={setFilters} allAttributes={allAttributes} totalNFTsCount={allNFTs.length} />
