@@ -29,7 +29,7 @@
   }
 
   .view-details-button.expired {
-    background-color: #535bf2; /* Beispiel: Grauer Hintergrund für abgelaufene Umfragen */
+    background-color: var(--branding-color);
     cursor: pointer;
     /* Weitere gewünschte Stile */
 }

@@ -272,25 +272,23 @@ export const initializeMarketplace = async (setMarketplace, refreshData) => {
     const account = localStorage.getItem('account');
     const web3Instance = account ? web3 : web3OnlyRead;
 
-    if (window.ethereum && window.ethereum.isMetaMask) { // Nur MetaMask zulassen
-      const networkId = await web3Instance.eth.net.getId();
-      const marketplaceData = nftMarketplaceAbi.networks[networkId];
-      if (marketplaceData) {
-        const marketplace = new web3Instance.eth.Contract(nftMarketplaceAbi.abi, marketplaceData.address);
-        setMarketplace(marketplace);
-        await refreshData(marketplace);
-      } else {
-        showAlert('Marketplace contract not deployed to detected network.');
-      }
+    // Logge, welche Web3-Instanz verwendet wird
+    // console.log(`Using Web3 instance: ${account ? 'web3' : 'web3OnlyRead'}`);
+
+    const networkId = await web3Instance.eth.net.getId();
+    const marketplaceData = nftMarketplaceAbi.networks[networkId];
+    if (marketplaceData) {
+      const marketplace = new web3Instance.eth.Contract(nftMarketplaceAbi.abi, marketplaceData.address);
+      setMarketplace(marketplace);
+      await refreshData(marketplace);
     } else {
-      showAlert('MetaMask is required to interact with the marketplace.');
+      showAlert('Marketplace contract not deployed to detected network.');
     }
   } catch (error) {
     console.error("Error initializing marketplace:", error);
     showAlert('Failed to initialize marketplace.');
   }
 };
-
 
 
 

@@ -41,6 +41,7 @@
     max-width: 100%; /* Limit its maximum width */
     min-width: 100%;
     gap: 10px;
+    padding-bottom: 10px;
 }
 
 .nft-card {
