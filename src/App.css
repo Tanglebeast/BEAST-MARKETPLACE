@@ -1,0 +1,9 @@
+.Groupfi-iconBG {
+    position: fixed;
+    bottom: 14px;
+    right: 10px;
+    background-color: var(--branding-color);
+    width: 65px;
+    height: 65px;
+    border-radius: 50% 50% 0px 50%;
+}

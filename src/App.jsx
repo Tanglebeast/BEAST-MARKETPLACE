@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import ArtistProfile from './pages/ArtistProfile';
 import AllNFTs from './pages/AllNFTs';
 import About from './pages/About';
+import './App.css';
 import NetworkselectionDropdown from './components/NetworkselectionDropdown'; // Importieren Sie die Dropdown-Komponente
 import { 
   connectWallet, 
@@ -46,6 +47,9 @@ import BeastToIotaPrice from './components/BeastToIotaPrice';
 import BEASTFaucet from './components/Test-Beast-Faucet';
 import KontaktFormular from './components/ArtistContactFormula';
 
+import 'groupfi-chatbox-sdk/dist/esm/assets/style.css';
+import ChatboxSDK from 'groupfi-chatbox-sdk'
+
 
 const App = () => {
   const [account, setAccount] = useState(localStorage.getItem('account') || '');
@@ -55,9 +59,99 @@ const App = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState(localStorage.getItem('selectedNetwork') || 'iotaevm');
   const [blogPosts, setBlogPosts] = useState([]);
-
   const web3 = new Web3(window.ethereum);
-  checkAccountInLocalStorage();
+
+
+
+
+
+
+
+
+  const [chatboxLoaded, setChatboxLoaded] = useState(false);
+
+  useEffect(() => {
+    // Funktion zur Initialisierung der Chatbox
+    const initializeChatbox = async () => {
+      const config = {
+        isWalletConnected: isConnected,
+        provider: isConnected ? web3.currentProvider : undefined, // Verwenden Sie den aktuellen Provider
+        theme: 'dark', // Optional: 'light' oder 'dark'
+        uiConfig: {
+          accent: 'violet', // Optional: Farbe anpassen
+          title: 'TANGLESPACE CHATBOX', // Optional: Titel anpassen
+          subTitle: 'Welcome to the TANGLESPACE Community-Chat', // Optional: Untertitel anpassen
+          logoUrl: 'https://firebasestorage.googleapis.com/v0/b/fractalz-blog.appspot.com/o/banner_images%2Fcurrency-beast-black.png?alt=media&token=6cb964d5-c7e8-4ab2-baf0-79f5b72aebef', // Optional: Logo-URL
+          iconPosition: {
+            left: 10, // Optional: Position anpassen
+            top: 10
+          }
+        }
+      };
+
+      ChatboxSDK.loadChatbox(config);
+
+      // Event Listener für 'chatbox-ready'
+      ChatboxSDK.events.on('chatbox-ready', (data) => {
+        console.log(`Chatbox is ready with Version: ${data.chatboxVersion}`);
+        setChatboxLoaded(true);
+      });
+    };
+
+    initializeChatbox();
+
+    // Bereinigen Sie den Event Listener beim Unmounten
+    return () => {
+      ChatboxSDK.removeChatbox();
+    };
+  }, [isConnected, account]);
+
+  useEffect(() => {
+    if (chatboxLoaded) {
+      // Verarbeiten des Wallet-Status
+      ChatboxSDK.processWallet({
+        isWalletConnected: isConnected,
+        provider: isConnected ? web3.currentProvider : undefined
+      });
+
+      if (isConnected && account) {
+        // Verarbeiten des Account
+        ChatboxSDK.processAccount({ account });
+      }
+    }
+  }, [chatboxLoaded, isConnected, account]);
+
+  useEffect(() => {
+    if (chatboxLoaded) {
+      ChatboxSDK.request({
+        method: 'setGroups',
+        params: {
+          includes: [
+            { groupId: 'groupfiGTESTd2b7278595668cc19192e6d4fd0b49cb8615b5f240e00cf58c80565c5274eab7' },
+            { groupId: 'groupfifeaaf94b17ca0c792a174b02afa44028cfb8c8271597c1c39f84b5de0e1d717c' },
+            { groupId: 'groupfiTANGLESPACEADMINca687edbbe408c1d29e396517ed5d3a68dda563e8f91b44d21a63ba92fd22cfb' },
+            // Weitere Gruppen hinzufügen
+          ],
+          announcement: [
+            { groupId: 'groupfiTANGLESPACEADMINca687edbbe408c1d29e396517ed5d3a68dda563e8f91b44d21a63ba92fd22cfb' }
+          ]
+        }
+      });
+    }
+  }, [chatboxLoaded]);
+
+
+
+
+
+
+
+
+
+  useEffect(() => {
+    checkAccountInLocalStorage();
+  }, []);
+  
 
   useEffect(() => {
     if (account !== '') {
@@ -132,6 +226,7 @@ const App = () => {
       </Routes>
     </div>
     <Footer />
+    <div className='Groupfi-iconBG'></div>
   </div>
 </Router>
   );
