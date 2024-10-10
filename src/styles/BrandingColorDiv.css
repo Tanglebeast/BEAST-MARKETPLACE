@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s ease;
-  background-color: var(--branding-color);
+  background-color: transparent;
   color: white;
   border-radius: 50%;
   cursor: pointer;
@@ -20,14 +20,6 @@
   border: none;
 }
 
-.toggleButton:hover {
-  background-color: var(--branding-color-hover);
-}
-
-.toggleButton img {
-  width: 24px;
-  height: 24px;
-}
 
 .brandingColorDiv {
   position: absolute;

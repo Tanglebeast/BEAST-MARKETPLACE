@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../index.css';
 import '../styles/BrandingColorDiv.css';
 import '../styles/ToggleSwitch.css'; // Stelle sicher, dass du die CSS-Datei importierst
+import SettingsIcon from '../Assets/SettingsIcon';
 
 const ChangeTheme = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -106,7 +107,12 @@ const ChangeTheme = () => {
         </div>
       </div>
       <button className="toggleButton">
-        <img src="/setting.png" alt="Farbwähler Icon" />
+                                    <SettingsIcon
+                                    filled={false} 
+                                    textColor="currentColor" 
+                                    size={28} 
+                                    className="currency-icon"
+                                    />
       </button>
     </div>
   );
