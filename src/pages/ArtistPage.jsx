@@ -1,12 +1,18 @@
 // src/pages/ArtistPage.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { artistList } from '../ArtistList';
 import { Link } from 'react-router-dom';
 import '../styles/ArtistPage.css';
 import SearchBar from '../components/SearchBar';
 import ArtistFilter from '../components/ArtistFilter';
 import { getFollowers, isFollowingProject, getCurrentAccount } from '../components/utils'; // Import der Utility-Funktionen
+
+// Funktion zum Abrufen der Ergebnisse pro Seite aus dem localStorage
+const getSavedResultsPerPage = () => {
+  const savedResults = localStorage.getItem('results-per-page');
+  return savedResults ? Number(savedResults) : 30; // Standardwert ist 30
+};
 
 const ArtistPage = () => {
   // Suchzustand
@@ -17,7 +23,7 @@ const ArtistPage = () => {
   
   // Pagination-Zustände
   const [currentPage, setCurrentPage] = useState(1);
-  const resultsPerPage = 30;
+  const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
   
   // Ladezustände
   const [loading, setLoading] = useState(false);
@@ -32,24 +38,24 @@ const ArtistPage = () => {
   const [followedProjects, setFollowedProjects] = useState([]);
   const [userAddress, setUserAddress] = useState(null);
 
+  const userCache = useRef({}); // Falls du Caching benötigst
+
   useEffect(() => {
     console.log('showFollowing:', showFollowing);
     console.log('followedProjects:', followedProjects);
   }, [showFollowing, followedProjects]);
 
   // Funktion zum Abrufen der Benutzeradresse
-// Funktion zum Abrufen der Benutzeradresse
-const fetchUserAddress = async () => {
-  const account = await getCurrentAccount();
-  if (account) {
-    const lowerCaseAccount = account.toLowerCase();
-    setUserAddress(lowerCaseAccount);
-    console.log('User Address:', lowerCaseAccount); // Debugging-Log
-  } else {
-    console.log('Keine Benutzeradresse gefunden'); // Debugging-Log
-  }
-};
-
+  const fetchUserAddress = async () => {
+    const account = await getCurrentAccount();
+    if (account) {
+      const lowerCaseAccount = account.toLowerCase();
+      setUserAddress(lowerCaseAccount);
+      console.log('User Address:', lowerCaseAccount); // Debugging-Log
+    } else {
+      console.log('Keine Benutzeradresse gefunden'); // Debugging-Log
+    }
+  };
 
   // Funktion zum Abrufen der Follower-Anzahlen für alle Künstler
   const fetchAllFollowerCounts = async () => {
@@ -69,30 +75,28 @@ const fetchUserAddress = async () => {
   };
 
   // Funktion zum Abrufen der gefolgten Projekte
-// Funktion zum Abrufen der gefolgten Projekte
-const fetchFollowedProjects = async () => {
-  if (!userAddress) {
-    console.log('Keine Benutzeradresse vorhanden');
-    return;
-  }
-
-  const followed = [];
-
-  try {
-    for (let artist of artistList) {
-      const isFollowing = await isFollowingProject(artist.name.toLowerCase(), userAddress);
-      console.log(`Is following ${artist.name}:`, isFollowing); // Debugging-Log
-      if (isFollowing) {
-        followed.push(artist.name.toLowerCase());
-      }
+  const fetchFollowedProjects = async () => {
+    if (!userAddress) {
+      console.log('Keine Benutzeradresse vorhanden');
+      return;
     }
-    setFollowedProjects(followed);
-    console.log('Gefolgte Projekte:', followed); // Debugging-Log
-  } catch (error) {
-    console.error('Fehler beim Abrufen der gefolgten Projekte:', error);
-  }
-};
 
+    const followed = [];
+
+    try {
+      for (let artist of artistList) {
+        const isFollowing = await isFollowingProject(artist.name.toLowerCase(), userAddress);
+        console.log(`Is following ${artist.name}:`, isFollowing); // Debugging-Log
+        if (isFollowing) {
+          followed.push(artist.name.toLowerCase());
+        }
+      }
+      setFollowedProjects(followed);
+      console.log('Gefolgte Projekte:', followed); // Debugging-Log
+    } catch (error) {
+      console.error('Fehler beim Abrufen der gefolgten Projekte:', error);
+    }
+  };
 
   // Handler für Sortieränderungen
   const handleSortChange = (order) => {
@@ -119,28 +123,34 @@ const fetchFollowedProjects = async () => {
   });
 
   // Sortieren der gefilterten Künstler basierend auf sortOrder
-  const sortedArtists = [...filteredArtists].sort((a, b) => {
-    if (sortOrder === 'newest') {
-      return parseInt(b.timestamp) - parseInt(a.timestamp);
-    } else if (sortOrder === 'oldest') {
-      return parseInt(a.timestamp) - parseInt(b.timestamp);
-    } else if (sortOrder === 'communityRank') {
-      const followersA = followerCounts[a.name.toLowerCase()] || 0;
-      const followersB = followerCounts[b.name.toLowerCase()] || 0;
-      return followersB - followersA;
-    } else {
-      return 0; // Keine Sortierung
-    }
-  });
+  const sortedArtists = useMemo(() => {
+    return [...filteredArtists].sort((a, b) => {
+      if (sortOrder === 'newest') {
+        return parseInt(b.timestamp) - parseInt(a.timestamp);
+      } else if (sortOrder === 'oldest') {
+        return parseInt(a.timestamp) - parseInt(b.timestamp);
+      } else if (sortOrder === 'communityRank') {
+        const followersA = followerCounts[a.name.toLowerCase()] || 0;
+        const followersB = followerCounts[b.name.toLowerCase()] || 0;
+        return followersB - followersA;
+      } else {
+        return 0; // Keine Sortierung
+      }
+    });
+  }, [filteredArtists, sortOrder, followerCounts]);
 
   // Berechnung der Gesamtseiten
-  const totalPages = Math.ceil(sortedArtists.length / resultsPerPage);
+  const totalPagesCalculated = useMemo(() => {
+    return Math.ceil(sortedArtists.length / resultsPerPage) || 1;
+  }, [sortedArtists.length, resultsPerPage]);
 
   // Begrenzen der angezeigten Künstler basierend auf der aktuellen Seite
-  const artistsToShow = sortedArtists.slice(
-    (currentPage - 1) * resultsPerPage,
-    currentPage * resultsPerPage
-  );
+  const artistsToShow = useMemo(() => {
+    return sortedArtists.slice(
+      (currentPage - 1) * resultsPerPage,
+      currentPage * resultsPerPage
+    );
+  }, [sortedArtists, currentPage, resultsPerPage]);
 
   // Effekt zum Laden der Seite bei Seitenwechsel
   useEffect(() => {
@@ -186,6 +196,23 @@ const fetchFollowedProjects = async () => {
     }, 50); // Simuliere Fortschritt alle 50ms
   };
 
+  // useEffect zur Überwachung von Änderungen im localStorage
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'results-per-page') {
+        const newResults = event.newValue ? Number(event.newValue) : 30;
+        setResultsPerPage(newResults);
+        setCurrentPage(1); // Optional: Setze die aktuelle Seite zurück, wenn sich die Ergebnisse pro Seite ändern
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   return (
     <div className="collection-nfts">
       {/* Banner hinzufügen, falls gewünscht */}
@@ -221,26 +248,30 @@ const fetchFollowedProjects = async () => {
               <div className='SearchbarDesktop text-align-left w30 w100media'>
                 <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
               </div>
+
+              {/* Paginierung */}
               <div className="custom-pagination">
                 <button 
                   className="custom-pagination-btn previous-btn"
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
                   disabled={currentPage === 1}
+                  aria-label="Vorherige Seite"
                 >
                   &lt; 
                 </button>
                 <span className="custom-pagination-info">
-                  {currentPage} OF {totalPages}
+                  {currentPage} OF {totalPagesCalculated}
                 </span>
 
                 <button 
                   className="custom-pagination-btn next-btn custom-pagination-info-2 margin0"
                   onClick={() => {
-                    if (currentPage < totalPages) {
+                    if (currentPage < totalPagesCalculated) {
                       setCurrentPage(prev => prev + 1);
                     }
                   }} 
-                  disabled={currentPage === totalPages || loading}
+                  disabled={currentPage === totalPagesCalculated || loading}
+                  aria-label="Nächste Seite"
                 >
                   {loading ? (
                     <img src="/basic-loading.gif" alt="Loading..." className="loading-gif" />
@@ -258,6 +289,7 @@ const fetchFollowedProjects = async () => {
                   className="progress-bar" 
                   style={{ width: `${progressPercentage}%` }}
                 ></div>
+                <span className="progress-text">{`${Math.round(progressPercentage)}%`}</span>
               </div>
             )}
 
@@ -271,13 +303,13 @@ const fetchFollowedProjects = async () => {
                   </div>
                 ) : (
                   artistsToShow.map((artist, index) => (
-                    <Link to={`/projects/${artist.name}`} key={index} className="nft-card">
+                    <Link to={`/projects/${artist.name.toLowerCase()}`} key={index} className="nft-card">
                       <div className='artistCard-image'>
                         <img src={artist.profilepicture} alt={`${artist.name} profile`} className="artist-profile-picture" />
                       </div>
                       <div className='w95'>
                         <h3 className="artist-name text-align-left blue">{artist.name}</h3>
-                        <p>{followerCounts[artist.name.toLowerCase()] || 0} Follower</p>
+                        <p className='followercount'>{followerCounts[artist.name.toLowerCase()] || 0} Follower</p>
                         {/* Optional: Chains anzeigen */}
                       </div>
                     </Link>

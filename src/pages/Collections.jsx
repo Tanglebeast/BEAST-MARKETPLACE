@@ -23,12 +23,18 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
   // State für Loading und Pagination
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const resultsPerPage = 30; // Anpassen nach Bedarf
+  const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
   const [progressPercentage, setProgressPercentage] = useState(0);
 
   // Neue States für optimiertes Laden
   const [loadedPages, setLoadedPages] = useState([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Funktion zum Laden der Ergebnisse pro Seite aus dem localStorage
+  function getSavedResultsPerPage() {
+    const savedResults = localStorage.getItem('results-per-page');
+    return savedResults ? Number(savedResults) : 30; // Standardwert ist 30
+  }
 
   // Optimierte fetchPageData Funktion mit parallelen Abfragen
   const fetchPageData = useCallback(async (page) => {
@@ -73,6 +79,7 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
     }
   }, [resultsPerPage]);
 
+  // Initiale Daten laden
   useEffect(() => {
     const loadInitialData = async () => {
       setIsLoading(true);
@@ -84,11 +91,29 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
     loadInitialData();
   }, [fetchPageData]);
 
+  // Laden von Daten für die aktuelle Seite
   useEffect(() => {
     if (!isInitialLoad && !loadedPages.includes(currentPage)) {
       fetchPageData(currentPage);
     }
   }, [currentPage, isInitialLoad, loadedPages, fetchPageData]);
+
+  // Effekt zum Überwachen von Änderungen in localStorage
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'results-per-page') {
+        const newResults = event.newValue ? Number(event.newValue) : 30;
+        setResultsPerPage(newResults);
+        setCurrentPage(1); // Optional: Setze die aktuelle Seite zurück
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   // Update Network if it changes
   useEffect(() => {
@@ -225,11 +250,11 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
           {isInitialLoad ? (
             <div className="loading-container flex centered mt150 mb150">
               <LoadingSpinner
-                                        filled={false} 
-                                                        textColor="currentColor" 
-                                                        size={100} 
-                                                        className="loading-gif"
-                                        />
+                filled={false} 
+                textColor="currentColor" 
+                size={100} 
+                className="loading-gif"
+              />
             </div>
           ) : sortedCollections.length === 0 ? (
             <div className="no-nfts-container flex centered column">
@@ -241,13 +266,13 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
               {currentCollections.map((collection, index) => (
                 <a href={`/collections/${collection.address}`} key={index} className="collection-card">
                   <div className='collection-banner'>
-                  <ImageWithLoading src={collection.banner} alt={collection.name} />
+                    <ImageWithLoading src={collection.banner} alt={collection.name} />
                   </div>
 
                   <div className='text-align-left w90 mb5 collection-infoCardDiv'>
                     <div className='mb5 card-footer-infoDiv'>
                       <h3 className='mb10'>{collection.name}</h3>
-                      <span className='s18 grey modetext opacity-70 bold'>{collection.artist}</span>
+                      <span className='s16 grey modetext opacity-70'>{collection.artist}</span>
                     </div>
                     {collectionDetails[collection.address] && (
                       <>

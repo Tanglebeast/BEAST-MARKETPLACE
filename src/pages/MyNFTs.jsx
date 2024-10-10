@@ -36,12 +36,16 @@ import ImageWithLoading from '../components/ImageWithLoading';
 import AddProjectPopup from '../components/AddProjectPopup';
 import LoadingSpinner from '../Assets/loading-spinner';
 
-// import RedeemPopup from '../components/RedeemPopup';
-
 // Funktion zum Abrufen des Kollektion-Namens
 const getCollectionName = (address) => {
   const collection = nftCollections.find(col => col.address.toLowerCase() === address.toLowerCase());
   return collection ? collection.name : 'Unknown Collection';
+};
+
+// Funktion zum Abrufen der Ergebnisse pro Seite aus dem localStorage
+const getSavedResultsPerPage = () => {
+  const savedResults = localStorage.getItem('results-per-page');
+  return savedResults ? Number(savedResults) : 30; // Standardwert ist 30
 };
 
 const MyNFTs = () => {
@@ -81,8 +85,8 @@ const MyNFTs = () => {
   const [loadedPages, setLoadedPages] = useState(0);
   const [isAddProjectPopupOpen, setIsAddProjectPopupOpen] = useState(false); // Neuer State für das AddProjectPopup
 
-
-  const resultsPerPage = 30;
+  // Ersetzen der festen Zuweisung durch einen State, der den Wert aus localStorage liest
+  const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
   const userCache = useRef({});
 
   // Initialisierung des Marktplatzes
@@ -150,7 +154,7 @@ const MyNFTs = () => {
       loadPage(currentPage); // Lade die aktuelle Seite
       fetchUserNames();
     }
-  }, [account, marketplace]);
+  }, [account, marketplace, currentPage, resultsPerPage]); // Füge resultsPerPage als Abhängigkeit hinzu
 
   // Funktion zum Abrufen des Kollektion-Namens ist bereits definiert oben
 
@@ -338,7 +342,7 @@ const MyNFTs = () => {
     if (allPagesData[currentPage] && !isPreloading) {
       preloadPages();
     }
-  }, [allPagesData, currentPage, isPreloading]);
+  }, [allPagesData, currentPage, isPreloading, resultsPerPage]);
 
   // Caching der Benutzernamen
   const fetchUserNames = async () => {
@@ -417,7 +421,7 @@ const MyNFTs = () => {
   // Berechne die Gesamtanzahl der gefilterten Seiten
   const totalFilteredPages = useMemo(() => {
     return Math.ceil(filteredNFTs.length / resultsPerPage) || 1;
-  }, [filteredNFTs.length]);
+  }, [filteredNFTs.length, resultsPerPage]);
 
   // Berechne die NFTs für die aktuelle Seite basierend auf den gefilterten NFTs
   const currentNFTs = useMemo(() => {
@@ -459,6 +463,23 @@ const MyNFTs = () => {
     return artistwalletAddresses.some(walletAddress => walletAddress.toLowerCase() === account.toLowerCase());
   };
 
+  // useEffect zur Überwachung von Änderungen im localStorage
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'results-per-page') {
+        const newResults = event.newValue ? Number(event.newValue) : 30;
+        setResultsPerPage(newResults);
+        setCurrentPage(1); // Optional: Setze die aktuelle Seite zurück, wenn sich die Ergebnisse pro Seite ändern
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   return (
     <div className="my-nfts">
       {/* <div className='ProfileBannerDiv'>
@@ -490,7 +511,7 @@ const MyNFTs = () => {
 
                   {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
                     <>
-                    <button className='SetArtistWalletButton yellow white' onClick={() => setIsAddProjectPopupOpen(true)}>ADD PROJECT NAME</button>
+                      <button className='SetArtistWalletButton yellow white' onClick={() => setIsAddProjectPopupOpen(true)}>ADD PROJECT NAME</button>
                       <button className='SetArtistWalletButton yellow white' onClick={() => setIsArtistWalletPopupOpen(true)}>SET ARTIST WALLET</button>
                       <button className='PauseToggleButton alert-color white' onClick={handlePauseToggle}>
                         {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
@@ -601,13 +622,13 @@ const MyNFTs = () => {
                       <div key={`${nft.contractAddress}-${nft.tokenId}`} className="my-nft-card">
                         <Link to={`/collections/${nft.contractAddress}/${nft.tokenId}`}>
                           <div className='my-nft-image'>
-                          <ImageWithLoading src={nft.image || '/default-nft.png'} alt={nft.name || 'Unnamed NFT'} />
+                            <ImageWithLoading src={nft.image || '/default-nft.png'} alt={nft.name || 'Unnamed NFT'} />
                           </div>
                           <div className='text-align-left w95 pt12 My-nft-details-Div'>
                             <div>
                               <h3>{nft.name}</h3>
                               <div className='flex center-ho owner-note'>
-                                <span>{getCollectionName(nft.contractAddress)}</span>
+                                <span className='s16 grey opacity-70 artistmynfts'>{getCollectionName(nft.contractAddress)}</span>
                               </div>
                               {/* <div className='flex center-ho grey'>
                                 <span className='mt5'>Position: {nft.position}</span>
@@ -677,12 +698,12 @@ const MyNFTs = () => {
       )}
 
       {isAddProjectPopupOpen && (
-          <AddProjectPopup
-            isOpen={isAddProjectPopupOpen}
-            onClose={() => setIsAddProjectPopupOpen(false)}
-            handleSave={handleAddProject}
-          />
-        )}
+        <AddProjectPopup
+          isOpen={isAddProjectPopupOpen}
+          onClose={() => setIsAddProjectPopupOpen(false)}
+          handleSave={handleAddProject}
+        />
+      )}
 
       {isArtistWalletPopupOpen && (
         <SetArtistWalletPopup

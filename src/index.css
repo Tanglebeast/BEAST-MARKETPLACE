@@ -85,6 +85,10 @@ h1, h2, h3 {
   color: var(--text-color) !important;
 }
 
+h3 {
+  font-size: 18px !important;
+}
+
 p,span {
   font-family: "Roboto", sans-serif;
   font-weight: 400;

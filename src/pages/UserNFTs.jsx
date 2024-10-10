@@ -28,10 +28,16 @@ import ImageWithLoading from '../components/ImageWithLoading';
 import LoadingSpinner from '../Assets/loading-spinner';
 // import RedeemPopup from '../components/RedeemPopup';
 
-// **Definiere getCollectionName vor ihrer ersten Verwendung**
+// Funktion zum Abrufen des Kollektion-Namens
 const getCollectionName = (address) => {
   const collection = nftCollections.find(col => col.address.toLowerCase() === address.toLowerCase());
   return collection ? collection.name : 'Unknown Collection';
+};
+
+// Funktion zum Abrufen der Ergebnisse pro Seite aus dem localStorage
+const getSavedResultsPerPage = () => {
+  const savedResults = localStorage.getItem('results-per-page');
+  return savedResults ? Number(savedResults) : 30; // Standardwert ist 30
 };
 
 const UserNFTs = () => {
@@ -67,7 +73,8 @@ const UserNFTs = () => {
   const [isPreloading, setIsPreloading] = useState(false);
   const [loadedPages, setLoadedPages] = useState(0);
 
-  const resultsPerPage = 30;
+  // Ersetzen der festen Zuweisung durch einen State, der den Wert aus localStorage liest
+  const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
   const userCache = useRef({});
 
   // Initialisierung des Marktplatzes
@@ -116,10 +123,10 @@ const UserNFTs = () => {
           setProfilePictureState('/placeholder-PFP-black.png');
           setBannerPicture('/placeholder-PFP-banner.png');
         });
-      loadPage(currentPage);
+      loadPage(currentPage); // Lade die aktuelle Seite
       fetchUserNames();
     }
-  }, [account, marketplace]);
+  }, [account, marketplace, currentPage, resultsPerPage]); // Füge resultsPerPage als Abhängigkeit hinzu
 
   // Funktion zum Abrufen der NFTs für eine bestimmte Seite (für Anzeige)
   const loadPage = async (page) => {
@@ -155,7 +162,10 @@ const UserNFTs = () => {
 
       const nftPromises = paginatedTokenIds.map(async ({ collection, tokenId }) => {
         const nft = await fetchSingleNFT(collection.address, marketplace, tokenId);
-        return nft;
+        return {
+          ...nft,
+          collectionName: getCollectionName(collection.address) // Hinzufügen des collectionName-Feldes
+        };
       });
 
       const nfts = await Promise.all(nftPromises);
@@ -239,7 +249,10 @@ const UserNFTs = () => {
 
       const nftPromises = paginatedTokenIds.map(async ({ collection, tokenId }) => {
         const nft = await fetchSingleNFT(collection.address, marketplace, tokenId);
-        return nft;
+        return {
+          ...nft,
+          collectionName: getCollectionName(collection.address) // Hinzufügen des collectionName-Feldes
+        };
       });
 
       const nfts = await Promise.all(nftPromises);
@@ -268,7 +281,7 @@ const UserNFTs = () => {
     if (allPagesData[currentPage] && !isPreloading) {
       preloadPages();
     }
-  }, [allPagesData, currentPage, isPreloading]);
+  }, [allPagesData, currentPage, isPreloading, resultsPerPage]);
 
   // Caching der Benutzernamen
   const fetchUserNames = async () => {
@@ -342,7 +355,7 @@ const UserNFTs = () => {
   // Berechne die Gesamtanzahl der gefilterten Seiten
   const totalFilteredPages = useMemo(() => {
     return Math.ceil(filteredNFTs.length / resultsPerPage) || 1;
-  }, [filteredNFTs.length]);
+  }, [filteredNFTs.length, resultsPerPage]);
 
   // Berechne die NFTs für die aktuelle Seite basierend auf den gefilterten NFTs
   const currentNFTs = useMemo(() => {
@@ -366,6 +379,23 @@ const UserNFTs = () => {
   const isAddressInArtistWallets = () => {
     return artistwalletAddresses.some(walletAddress => walletAddress.toLowerCase() === account.toLowerCase());
   };
+
+  // useEffect zur Überwachung von Änderungen im localStorage
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'results-per-page') {
+        const newResults = event.newValue ? Number(event.newValue) : 30;
+        setResultsPerPage(newResults);
+        setCurrentPage(1); // Optional: Setze die aktuelle Seite zurück, wenn sich die Ergebnisse pro Seite ändern
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   // Debugging: Überprüfen auf Duplikate
   useEffect(() => {
@@ -525,13 +555,13 @@ const UserNFTs = () => {
                       <Link to={`/collections/${nft.contractAddress.toLowerCase()}/${nft.tokenId}`}>
 
                         <div className='my-nft-image'>
-                        <ImageWithLoading src={nft.image || '/default-nft.png'} alt={nft.name || 'Unnamed NFT'} />
+                          <ImageWithLoading src={nft.image || '/default-nft.png'} alt={nft.name || 'Unnamed NFT'} />
                         </div>
                         <div className='text-align-left w95 pt12 My-nft-details-Div'>
                           <div>
                             <h3>{nft.name}</h3>
                             <div className='flex center-ho owner-note'>
-                              <span>{getCollectionName(nft.contractAddress)}</span>
+                              <span className='s16 grey opacity-70 artistmynfts'>{getCollectionName(nft.contractAddress)}</span>
                             </div>
                           </div>
                           <div>

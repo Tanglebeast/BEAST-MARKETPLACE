@@ -69,6 +69,7 @@
 .modeOptions {
   display: flex;
   gap: 10px;
+  align-items: end;
 }
 
 
@@ -98,6 +99,62 @@
   width: 20px;
   height: 20px;
 }
+
+/* Stil für den Slider-Track mit dynamischem Hintergrund */
+.results-per-page-slider input[type="range"] {
+  -webkit-appearance: none; /* Entfernt das Standard-Aussehen in WebKit-Browsern */
+  width: 150px;
+  height: 8px;
+  border-radius: 5px;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+  /* Der Hintergrund wird nun dynamisch über Inline-Stile gesetzt */
+}
+
+/* Stil für den Slider-Thumb in WebKit-Browsern (Chrome, Safari) */
+.results-per-page-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #535bf2; /* Blaue Farbe für den Daumen */
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+  margin-top: -6px; /* Zentriert den Daumen vertikal */
+}
+
+/* Stil für den Slider-Thumb in Mozilla Firefox */
+.results-per-page-slider input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #535bf2; /* Blaue Farbe für den Daumen */
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+}
+
+.results-per-page-slider input[type="range"]::-moz-range-thumb:hover {
+  background: #404375; /* Optional: Farbe beim Hover */
+}
+
+/* Entferne die Standard-Track-Stile in Firefox */
+.results-per-page-slider input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 5px;
+  background: transparent; /* Hintergrund wird durch den Gradient ersetzt */
+}
+
+.results-per-page-slider input[type="range"]::-webkit-slider-runnable-track {
+  background: transparent; /* Hintergrund wird durch den Gradient ersetzt */
+  height: 8px;
+  border-radius: 5px;
+}
+
+
 
 /* Responsive Anpassungen */
 @media (max-width: 768px) {

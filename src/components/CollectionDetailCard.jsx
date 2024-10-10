@@ -58,7 +58,7 @@ const CollectionDetailCard = ({ nft, account, currencyIcon, userNames }) => {
                     <h3>{ownerDisplay}</h3>
                 </div>
 
-                <div className="price-container center-ho mt15 space-between">
+                <div className="price-container center-ho space-between">
                     {parseFloat(nft.price) !== 0 ? (
                         <>
                             <div className='center-ho' style={{ color: 'var(--text-color)' }}>
@@ -95,7 +95,7 @@ const CollectionDetailCard = ({ nft, account, currencyIcon, userNames }) => {
                             )}
                         </>
                     ) : (
-                        <span>Not Listed</span>
+                        <span className='not-listedtext'>Not listed</span>
                     )}
                 </div>
             </div>

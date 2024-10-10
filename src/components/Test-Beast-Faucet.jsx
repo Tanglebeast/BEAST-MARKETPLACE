@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import { getGasEstimate } from '../components/utils';
 import CustomPopup from '../components/AlertPopup'; // Importiere die CustomPopup-Komponente
 import '../styles/BEASTFaucet.css'; // Optional: Eigene CSS für BEASTFaucet
+import CurrencyBeastIcon from '../Assets/currency-beast';
 
 const BEASTFaucet = () => {
   const [isMinting, setIsMinting] = useState(false);
@@ -108,10 +109,15 @@ const BEASTFaucet = () => {
 
   return (
     <div className="beast-faucet-container">
-      <h1>BEAST FAUCET</h1>
+      <h2>BEAST FAUCET</h2>
       <div className="info-section">
         <p className='grey'>Grab your test BEAST Tokens now and pay 0 fees!</p>
-        <img className='wh100px mt10' src='/currency-beast.webp' alt="Beast Token" />
+        <CurrencyBeastIcon
+                filled={false} 
+                textColor="currentColor" 
+                size={100} 
+                className="currency-icon"
+                />
       </div>
       <button 
         onClick={mintTokens} 

@@ -49,7 +49,29 @@ const CollectionNFTs = () => {
     const [hasLiked, setHasLiked] = useState(false);
     const [likeLoading, setLikeLoading] = useState(false);
 
-    const resultsPerPage = 30;
+    // State für Ergebnisse pro Seite
+    const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
+
+    // Funktion zum Laden der Ergebnisse pro Seite aus dem localStorage
+    function getSavedResultsPerPage() {
+      const savedResults = localStorage.getItem('results-per-page');
+      return savedResults ? Number(savedResults) : 30; // Standardwert ist 30
+    }
+
+    // Effekt zum Überwachen von Änderungen in localStorage
+    useEffect(() => {
+      const handleStorageChange = () => {
+        const savedResults = getSavedResultsPerPage();
+        setResultsPerPage(savedResults);
+        setCurrentPage(1); // Optional: Setze die aktuelle Seite zurück, wenn sich die Ergebnisse pro Seite ändern
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+      };
+    }, []);
 
     useEffect(() => {
         initializeMarketplace(setMarketplace, async (marketplace) => {
@@ -132,7 +154,7 @@ const CollectionNFTs = () => {
             };
             fetchStats();
         }
-    }, [collectionaddress, marketplace]);
+    }, [collectionaddress, marketplace, resultsPerPage]); // Füge resultsPerPage als Abhängigkeit hinzu
 
     // Sammeln aller Attribute aus den NFTs mit Zählung
     useEffect(() => {
@@ -182,7 +204,7 @@ const CollectionNFTs = () => {
     // Setzt die aktuelle Seite zurück, wenn sich die Filter ändern
     useEffect(() => {
         setCurrentPage(1);
-    }, [filters, searchQuery]);
+    }, [filters, searchQuery, resultsPerPage]); // Füge resultsPerPage als Abhängigkeit hinzu
 
     const getUniqueOwners = (nfts) => {
         const owners = nfts.map(nft => nft.owner.toLowerCase());
@@ -351,43 +373,43 @@ const CollectionNFTs = () => {
                         <div className='w95 flex center-ho space-between items-center'>
                             <h2 className='mt15 OnlyDesktop mb15'>{collectionName}</h2>
                             <div className='flex center-ho'>
-                            <h3 className='mr5'>Leave a Like</h3>
-                            <button 
-                                className="like-button centered" 
-                                onClick={handleLikeToggle}
-                                disabled={likeLoading}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    outline: 'none'
-                                }}
-                                aria-label={hasLiked ? "Unlike Collection" : "Like Collection"}
-                            >
-                                  {likeLoading ? (
-                                    <LoadingSpinner
-                                    filled={false} 
-                                                    textColor="currentColor" 
-                                                    size={24} 
-                                                    className="img22"
-                                    />
-                                ) : (
-                                    hasLiked ? (
-                                        <img 
-                                            src="/heart-filled.png" 
-                                            alt="Liked" 
-                                            className="heart-icon"
-                                            style={{ width: '24px', height: '24px' }}
-                                        />
-                                    ) : (
-                                        <HeartIcon 
+                                <h3 className='mr5'>Leave a Like</h3>
+                                <button 
+                                    className="like-button centered" 
+                                    onClick={handleLikeToggle}
+                                    disabled={likeLoading}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        outline: 'none'
+                                    }}
+                                    aria-label={hasLiked ? "Unlike Collection" : "Like Collection"}
+                                >
+                                    {likeLoading ? (
+                                        <LoadingSpinner
                                             filled={false} 
                                             textColor="currentColor" 
-                                            size={22} 
+                                            size={24} 
+                                            className="img22"
                                         />
-                                    )
-                                )}
-                            </button>
+                                    ) : (
+                                        hasLiked ? (
+                                            <img 
+                                                src="/heart-filled.png" 
+                                                alt="Liked" 
+                                                className="heart-icon"
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        ) : (
+                                            <HeartIcon 
+                                                filled={false} 
+                                                textColor="currentColor" 
+                                                size={22} 
+                                            />
+                                        )
+                                    )}
+                                </button>
                             </div>
                         </div>
 
@@ -403,9 +425,9 @@ const CollectionNFTs = () => {
                                         <div className='flex center-ho'>
                                             <div className='bold ml5 mr5'>{nativeVolume !== null ? `${nativeVolume}` : '0'}</div>
                                             <CurrencyIotaIcon
-                                            filled={false} 
-                                            textColor="currentColor" 
-                                            size={24} />
+                                                filled={false} 
+                                                textColor="currentColor" 
+                                                size={24} />
                                         </div>
                                     </div>
                                 </div>
@@ -416,9 +438,9 @@ const CollectionNFTs = () => {
                                         <div className='flex center-ho'>
                                             <div className='bold ml5 mr5'>{specialTokenVolume !== null ? `${specialTokenVolume}` : '0'}</div>
                                             <CurrencyBeastIcon
-                                             filled={false} 
-                                             textColor="currentColor" 
-                                             size={24} />
+                                                filled={false} 
+                                                textColor="currentColor" 
+                                                size={24} />
                                         </div>
                                     </div>
                                 </div>
@@ -436,8 +458,8 @@ const CollectionNFTs = () => {
                                 <div className='collection-stats-div text-align-left'>
                                     <p className='s16 grey'>LIKES</p>
                                     <div className='flex center-ho'>
-                                    <div className='bold ml5 mr5'>{likes}</div>
-                                    <HeartIcon 
+                                        <div className='bold ml5 mr5'>{likes}</div>
+                                        <HeartIcon 
                                             filled={false} 
                                             textColor="currentColor" 
                                             size={18} 
@@ -475,10 +497,10 @@ const CollectionNFTs = () => {
                                 >
                                     {currentPage < totalPages && currentPage + 1 > loadedBatches ? (
                                         <LoadingSpinner
-                                        filled={false} 
-                                                        textColor="currentColor" 
-                                                        size={16} 
-                                                        className="loading-gif"
+                                            filled={false} 
+                                            textColor="currentColor" 
+                                            size={16} 
+                                            className="loading-gif"
                                         />
                                     ) : (
                                         '>'
@@ -504,10 +526,10 @@ const CollectionNFTs = () => {
                                 <div className="loading-container flex centered mt150 mb150">
                                     <LoadingSpinner
                                         filled={false} 
-                                                        textColor="currentColor" 
-                                                        size={100} 
-                                                        className="loading-gif"
-                                        />
+                                        textColor="currentColor" 
+                                        size={100} 
+                                        className="loading-gif"
+                                    />
                                 </div>
                             ) : (
                                 displayedNFTs.length === 0 ? (

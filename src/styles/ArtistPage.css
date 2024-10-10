@@ -11,6 +11,14 @@
   overflow-x: hidden;
 }
 
+.followercount {
+  text-align: left;
+  font-size: 16px;
+  color: rgba(128, 128, 128, 0.845) !important;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
 .CollectionBanner {
   width: 95%;
   border-radius: 15px;
@@ -155,7 +163,7 @@
   padding: 6px 14px;
   border: none;
   background-color: var(--branding-color);
-  color: white;
+  color: white !important;
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;

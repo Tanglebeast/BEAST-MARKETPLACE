@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import '../index.css';
 import '../styles/BrandingColorDiv.css';
 import '../styles/ToggleSwitch.css'; // Stelle sicher, dass du die CSS-Datei importierst
@@ -9,6 +9,7 @@ const ChangeTheme = () => {
   const [color, setColor] = useState(getSavedColor().color);
   const [hoverColor, setHoverColor] = useState(getSavedColor().hoverColor);
   const [mode, setMode] = useState(getSavedMode());
+  const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
 
   // Funktion zum Laden der Branding-Farbe aus dem localStorage
   function getSavedColor() {
@@ -26,6 +27,15 @@ const ChangeTheme = () => {
     return savedMode || 'dark'; // Standardmodus ist Dunkelmodus
   }
 
+  // Funktion zum Laden der Ergebnisse pro Seite aus dem localStorage
+  function getSavedResultsPerPage() {
+    const savedResults = localStorage.getItem('results-per-page');
+    const parsedResults = savedResults ? Number(savedResults) : 30; // Standardwert ist 30
+    return parsedResults >= 10 && parsedResults <= 1000 && parsedResults % 10 === 0 
+      ? parsedResults 
+      : 30; // Sicherstellen, dass der Wert ein Vielfaches von 10 ist
+  }
+
   // Funktion zum Ändern der Branding-Farbe
   const handleColorChange = (newColor, newHoverColor) => {
     setColor(newColor);
@@ -39,6 +49,20 @@ const ChangeTheme = () => {
     const newMode = mode === 'dark' ? 'light' : 'dark';
     setMode(newMode);
     localStorage.setItem('theme-mode', newMode);
+  };
+
+  // Handler für den Slider
+  const handleSliderChange = (event) => {
+    let newValue = Number(event.target.value);
+    // Sicherstellen, dass der Wert ein Vielfaches von 10 ist
+    if (newValue % 10 !== 0) {
+      newValue = Math.round(newValue / 10) * 10;
+    }
+    setResultsPerPage(newValue);
+    localStorage.setItem('results-per-page', newValue);
+    
+    // Optional: Event zur Aktualisierung anderer Komponenten senden
+    window.dispatchEvent(new Event('storage'));
   };
 
   // Aktualisiert CSS-Variablen und den Modus bei Änderung
@@ -55,6 +79,16 @@ const ChangeTheme = () => {
     }
   }, [color, hoverColor, mode]);
 
+  // Berechne den Prozentsatz basierend auf dem minimalen und maximalen Wert
+  const min = 10;
+  const max = 1000;
+  const percentage = ((resultsPerPage - min) * 100) / (max - min);
+
+  // Inline-Stil für den Slider
+  const sliderStyle = {
+    background: `linear-gradient(to right, #535bf2 0%, #535bf2 ${percentage}%, #d3d3d3 ${percentage}%, #d3d3d3 100%)`
+  };
+
   return (
     <div
       className='brandingColorContainer'
@@ -64,6 +98,7 @@ const ChangeTheme = () => {
       <div className={`brandingColorDiv ${isOpen ? 'open' : ''}`}>
         <div className="optionsContainer">
           <div className="colorOptions">
+            {/* Farboptionen bleiben unverändert */}
             <div
               className={`colorOption ${color === '#535bf2' ? 'selected' : ''}`}
               style={{ backgroundColor: '#535bf2' }}
@@ -103,16 +138,33 @@ const ChangeTheme = () => {
                 <span className="slider"></span>
               </label>
             </div>
+            {/* Slider für Ergebnisse pro Seite */}
+            <div className="results-per-page-slider flex center-ho space-between column">
+              <label htmlFor="results-slider">
+                <span className='white s14'>Results per page: </span>
+                <span className='s14 white'>{resultsPerPage}</span>
+              </label>
+              <input
+                type="range"
+                id="results-slider"
+                min={min}
+                max={max}
+                step="10" // Schrittweite auf 10 setzen
+                value={resultsPerPage}
+                onChange={handleSliderChange}
+                style={sliderStyle} // Füge den Stil hinzu
+              />
+            </div>
           </div>
         </div>
       </div>
       <button className="toggleButton">
-                                    <SettingsIcon
-                                    filled={false} 
-                                    textColor="currentColor" 
-                                    size={28} 
-                                    className="currency-icon"
-                                    />
+        <SettingsIcon
+          filled={false} 
+          textColor="currentColor" 
+          size={28} 
+          className="currency-icon"
+        />
       </button>
     </div>
   );
