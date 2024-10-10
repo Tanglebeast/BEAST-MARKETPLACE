@@ -30,6 +30,7 @@ import BeastToIotaPrice from '../components/BeastToIotaPrice';
 import NFTAttributesStats from '../components/NFTAttributesStats';
 import CurrencyBeastIcon from '../Assets/currency-beast';
 import CurrencyIotaIcon from '../Assets/currency-iota';
+import LoadingSpinner from '../Assets/loading-spinner';
 
 // import NFTHistory from '../components/NFTHistory';
 
@@ -269,8 +270,13 @@ const NFTDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="loading-container">
-        <img src="/loading.gif" alt="Loading..." />
+      <div className="loading-container mb150 mt150">
+        <LoadingSpinner
+          filled={false} 
+          textColor="currentColor" 
+          size={100} 
+          className="loading-gif"
+        />
       </div>
     );
   }
@@ -425,18 +431,18 @@ const NFTDetail = () => {
                     !isForSale ? (
                       <>
                         <button className="actionbutton w60" onClick={() => setIsPopupOpen(true)}>
-                          <h3 className='margin-0 s16'>LIST</h3>
+                          <h3 className='margin-0 s16 white'>LIST</h3>
                         </button>
                       </>
                     ) : (
                       <button className="actionbutton w60" onClick={handleCancelListing}>
-                        <h3 className='margin-0 s16'>CANCEL LISTING</h3>
+                        <h3 className='margin-0 s16 white'>CANCEL LISTING</h3>
                       </button>
                     )
                   ) : (
                     isForSale ? (
                       <button className="actionbutton w60" onClick={handleBuy}>
-                        <h3 className='margin-0 s16'>BUY</h3>
+                        <h3 className='margin-0 s16 white'>BUY</h3>
                       </button>
                     ) : (
                       <p>NOT FOR SALE</p>

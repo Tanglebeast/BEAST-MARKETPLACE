@@ -168,11 +168,21 @@
   }
 
   .collectionCategoryDiv:hover {
-    background-color: rgb(57, 57, 57);
+    background-color: var(--branding-color-hover);
+    color: white !important;
+  }
+
+  .collectionCategoryDiv:hover h3{
+    color: white !important;
   }
 
   .collectionCategoryDiv.active {
     background-color: var(--branding-color);
+    color: white !important;
+  }
+
+  .collectionCategoryDiv.active h3{
+    color: white !important;
   }
 
   .collection-progress-bar-container {

@@ -25,6 +25,7 @@ import BlogListPage from '../Blog/Bloglistpage';
 import PopupContainer from '../Blog/BlogFormPupup';
 import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
 import ImageWithLoading from '../components/ImageWithLoading';
+import LoadingSpinner from '../Assets/loading-spinner';
 // import RedeemPopup from '../components/RedeemPopup';
 
 // **Definiere getCollectionName vor ihrer ersten Verwendung**
@@ -386,11 +387,11 @@ const UserNFTs = () => {
 
   return (
     <div className="my-nfts">
-      <div className='ProfileBannerDiv'>
+      {/* <div className='ProfileBannerDiv'>
         <div className='ProfileBanner flex centered'>
           <img src={bannerPicture || '/placeholder-PFP-banner.png'} alt="Banner" />
         </div>
-      </div>
+      </div> */}
       {!account && (
         <p className="error-message">Bitte verbinde deine Wallet, um deine NFTs anzuzeigen.</p>
       )}
@@ -487,8 +488,13 @@ const UserNFTs = () => {
 
               {/* Loading-GIF für die erste Seite */}
               {isFirstPageLoading && (
-                <div className="loading-container flex centered">
-                  <img src="/loading.gif" alt="Loading" className="loading-gif" />
+                <div className="loading-container flex centered mt150 mb150">
+                  <LoadingSpinner
+                    filled={false} 
+                    textColor="currentColor" 
+                    size={100} 
+                    className="loading-gif"
+                  />
                 </div>
               )}
 

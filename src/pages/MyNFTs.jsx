@@ -34,6 +34,7 @@ import PopupContainer from '../Blog/BlogFormPupup';
 import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
 import ImageWithLoading from '../components/ImageWithLoading';
 import AddProjectPopup from '../components/AddProjectPopup';
+import LoadingSpinner from '../Assets/loading-spinner';
 
 // import RedeemPopup from '../components/RedeemPopup';
 
@@ -460,13 +461,13 @@ const MyNFTs = () => {
 
   return (
     <div className="my-nfts">
-      <div className='ProfileBannerDiv'>
+      {/* <div className='ProfileBannerDiv'>
         <div className='ProfileBanner flex centered'>
           <img src={bannerPicture || '/placeholder-PFP-banner.png'} alt="Banner" />
         </div>
-      </div>
+      </div> */}
       {!account && (
-        <p className="error-message">Bitte verbinde deine Wallet, um deine NFTs anzuzeigen.</p>
+        <p className="error-message">No wallet connected.</p>
       )}
       {account && (
         <div className='w100'>
@@ -483,22 +484,22 @@ const MyNFTs = () => {
               </div>
               <div className="user-name-section">
                 <div className='flex column w80'>
-                  <button className='ChangeNamebutton' onClick={() => setIsPopupOpen(true)}>CHANGE USERNAME</button>
-                  <button className='ChangeProfilePicturebutton' onClick={() => setIsProfilePopupOpen(true)}>CHANGE PROFILE PICTURE</button>
+                  <button className='ChangeNamebutton white' onClick={() => setIsPopupOpen(true)}>CHANGE USERNAME</button>
+                  <button className='ChangeProfilePicturebutton white' onClick={() => setIsProfilePopupOpen(true)}>CHANGE PROFILE PICTURE</button>
                   {/* <button className='ChangeProfilePicturebutton' onClick={() => setIsRedeemPopupOpen(true)}>REDEEM ARTWORK</button> */}
 
                   {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
                     <>
-                    <button className='SetArtistWalletButton yellow' onClick={() => setIsAddProjectPopupOpen(true)}>ADD PROJECT NAME</button>
-                      <button className='SetArtistWalletButton yellow' onClick={() => setIsArtistWalletPopupOpen(true)}>SET ARTIST WALLET</button>
-                      <button className='PauseToggleButton alert-color' onClick={handlePauseToggle}>
+                    <button className='SetArtistWalletButton yellow white' onClick={() => setIsAddProjectPopupOpen(true)}>ADD PROJECT NAME</button>
+                      <button className='SetArtistWalletButton yellow white' onClick={() => setIsArtistWalletPopupOpen(true)}>SET ARTIST WALLET</button>
+                      <button className='PauseToggleButton alert-color white' onClick={handlePauseToggle}>
                         {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
                       </button>
                     </>
                   )}
                   {isAddressInArtistWallets() && (
                     <>
-                      <button className='CreatePollButton yellow' onClick={() => setIsCreatePollPopupOpen(true)}>CREATE POLL</button>
+                      <button className='CreatePollButton yellow white' onClick={() => setIsCreatePollPopupOpen(true)}>CREATE POLL</button>
                       {/* <button className='CreateBlogButton yellow' onClick={() => setIsBloglistpageOpen(true)}>CREATE BLOG ARTICLE</button>
                       <button className='SubmitCollectionButton yellow' onClick={() => setIsSubmitCollectionPopupOpen(true)}>SUBMIT COLLECTION</button> */}
                     </>
@@ -562,8 +563,13 @@ const MyNFTs = () => {
 
               {/* Loading-GIF für die erste Seite */}
               {isFirstPageLoading && (
-                <div className="loading-container flex centered">
-                  <img src="/loading.gif" alt="Loading" className="loading-gif" />
+                <div className="loading-container flex centered mt150 mb150">
+                  <LoadingSpinner
+                    filled={false} 
+                    textColor="currentColor" 
+                    size={100} 
+                    className="loading-gif"
+                  />
                 </div>
               )}
 

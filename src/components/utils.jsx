@@ -139,29 +139,38 @@ export const checkNetwork = async (expectedChainId) => {
 
       if (currentChainId !== expectedChainId) {
         try {
+          // MetaMask sofort auffordern, ins richtige Netzwerk zu wechseln
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: expectedChainId }],
           });
         } catch (switchError) {
           if (switchError.code === 4902) {
+            // Netzwerk ist nicht bekannt, füge es zu MetaMask hinzu
             const chain = getChainById(expectedChainId);
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [chain],
-            });
+            if (chain) {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [chain],
+              });
+            } else {
+              showAlert("Unknown network. Please add it manually.");
+            }
           } else {
-            throw switchError;
+            console.error('Error switching network:', switchError);
+            // showAlert("Error switching network. Please try again.");
           }
         }
       }
     } catch (error) {
       console.error('Error checking network:', error);
+      showAlert("Error checking network. Please try again.");
     }
   } else {
-    console.error("Please install MetaMask!");
+    showAlert("Please install MetaMask!");
   }
 };
+
 
 const getChainById = (chainId) => {
   const chains = {
@@ -177,7 +186,7 @@ const getChainById = (chainId) => {
 
 
 
-const getNetworkConfig = (network) => {
+export const getNetworkConfig = (network) => {
   switch (network) {
     // case 'shimmerevm':
     //   return shimmerTestnet;
@@ -270,10 +279,7 @@ export const initializeMarketplace = async (setMarketplace, refreshData) => {
   try {
     // Überprüfe, ob ein Account im lokalen Speicher vorhanden ist
     const account = localStorage.getItem('account');
-    const web3Instance = account ? web3 : web3OnlyRead;
-
-    // Logge, welche Web3-Instanz verwendet wird
-    // console.log(`Using Web3 instance: ${account ? 'web3' : 'web3OnlyRead'}`);
+    const web3Instance = account ? new Web3(window.ethereum) : web3OnlyRead;
 
     const networkId = await web3Instance.eth.net.getId();
     const marketplaceData = nftMarketplaceAbi.networks[networkId];
@@ -282,13 +288,14 @@ export const initializeMarketplace = async (setMarketplace, refreshData) => {
       setMarketplace(marketplace);
       await refreshData(marketplace);
     } else {
-      showAlert('Marketplace contract not deployed to detected network.');
+      // showAlert('Marketplace contract not deployed to detected network.');
     }
   } catch (error) {
     console.error("Error initializing marketplace:", error);
     showAlert('Failed to initialize marketplace.');
   }
 };
+
 
 
 

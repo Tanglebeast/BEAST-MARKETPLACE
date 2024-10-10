@@ -236,7 +236,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
                 )}
               </div>
             ) : (
-              <button className="button" onClick={connectWallet}>CONNECT</button>
+              <button className="button white" onClick={connectWallet}><h3 className='mbt2 white'>CONNECT</h3></button>
             )}
             <ChangeTheme />
           </div>

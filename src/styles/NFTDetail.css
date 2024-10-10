@@ -73,6 +73,7 @@ button:hover{
 
 .loading-container {
     text-align: center;
+    width: 100% !important;
 }
 
 .loading-container img{
@@ -80,6 +81,13 @@ button:hover{
     width: auto;
     margin-top: 150px;
     margin-bottom: 150px;
+}
+
+.loading-container svg{
+    width: auto;
+    margin-top: 150px;
+    margin-bottom: 150px;
+    text-align: center;
 }
 
 .BottomButtons {

@@ -17,7 +17,9 @@ import {
   initializeMarketplace, 
   fetchAllNFTs, 
   refreshData,
-  checkAccountInLocalStorage
+  checkAccountInLocalStorage,
+  checkNetwork,
+  getNetworkConfig
 } from './components/utils';
 import NFTDetail from './pages/NFTDetail';
 import MyNFTs from './pages/MyNFTs';
@@ -60,38 +62,50 @@ const App = () => {
   const [selectedNetwork, setSelectedNetwork] = useState(localStorage.getItem('selectedNetwork') || 'iotaevm');
   const [blogPosts, setBlogPosts] = useState([]);
   const web3 = new Web3(window.ethereum);
-
-
-
-
-
-
-
-
   const [chatboxLoaded, setChatboxLoaded] = useState(false);
 
+
+
+  const updateAccount = (newAccount) => {
+    setAccount(newAccount);
+    localStorage.setItem('account', newAccount);
+  };
+
   useEffect(() => {
-    // Funktion zur Initialisierung der Chatbox
+    const expectedChainId = getNetworkConfig(selectedNetwork).chainId;
+    if (account !== '') {
+      // Überprüfe das Netzwerk, wenn die Wallet verbunden ist
+      checkNetwork(expectedChainId);
+    }
+  }, [account, selectedNetwork]);
+
+  // Wallet verbinden und Account setzen
+  const connectWalletHandler = async () => {
+    try {
+      await connectWallet(updateAccount);
+    } catch (error) {
+      console.error("Failed to connect wallet:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Initialisiere Chatbox
     const initializeChatbox = async () => {
       const config = {
         isWalletConnected: isConnected,
-        provider: isConnected ? web3.currentProvider : undefined, // Verwenden Sie den aktuellen Provider
-        theme: 'dark', // Optional: 'light' oder 'dark'
+        provider: isConnected ? web3.currentProvider : undefined,
+        theme: 'dark',
         uiConfig: {
-          accent: 'violet', // Optional: Farbe anpassen
-          title: 'TANGLESPACE CHATBOX', // Optional: Titel anpassen
-          subTitle: 'Welcome to the TANGLESPACE Community-Chat', // Optional: Untertitel anpassen
-          logoUrl: 'https://firebasestorage.googleapis.com/v0/b/fractalz-blog.appspot.com/o/banner_images%2Fcurrency-beast-black.png?alt=media&token=6cb964d5-c7e8-4ab2-baf0-79f5b72aebef', // Optional: Logo-URL
-          iconPosition: {
-            left: 10, // Optional: Position anpassen
-            top: 10
-          }
+          accent: 'violet',
+          title: 'TANGLESPACE CHATBOX',
+          subTitle: 'Welcome to the TANGLESPACE Community-Chat',
+          logoUrl: 'https://firebasestorage.googleapis.com/.../currency-beast-black.png',
+          iconPosition: { left: 10, top: 10 }
         }
       };
 
       ChatboxSDK.loadChatbox(config);
 
-      // Event Listener für 'chatbox-ready'
       ChatboxSDK.events.on('chatbox-ready', (data) => {
         console.log(`Chatbox is ready with Version: ${data.chatboxVersion}`);
         setChatboxLoaded(true);
@@ -100,7 +114,6 @@ const App = () => {
 
     initializeChatbox();
 
-    // Bereinigen Sie den Event Listener beim Unmounten
     return () => {
       ChatboxSDK.removeChatbox();
     };
@@ -108,14 +121,12 @@ const App = () => {
 
   useEffect(() => {
     if (chatboxLoaded) {
-      // Verarbeiten des Wallet-Status
       ChatboxSDK.processWallet({
         isWalletConnected: isConnected,
         provider: isConnected ? web3.currentProvider : undefined
       });
 
       if (isConnected && account) {
-        // Verarbeiten des Account
         ChatboxSDK.processAccount({ account });
       }
     }
@@ -140,31 +151,51 @@ const App = () => {
     }
   }, [chatboxLoaded]);
 
-
-
-
-
-
-
-
-
   useEffect(() => {
     checkAccountInLocalStorage();
   }, []);
-  
 
   useEffect(() => {
     if (account !== '') {
-      // console.log('Wallet connected');
       setIsConnected(true);
       initializeMarketplace(setMarketplace, (marketplaceInstance) => {
         refreshData(marketplaceInstance, nftCollections[0].address, setNftsForSale, setAllNFTs, fetchAllNFTs);
       });
     } else {
-      // console.log('Wallet disconnected');
       setIsConnected(false);
     }
   }, [account]);
+
+  // Event Listener für Account-Änderungen
+  useEffect(() => {
+    if (window.ethereum) {
+      const handleAccountsChanged = (accounts) => {
+        if (accounts.length > 0) {
+          updateAccount(accounts[0]);
+        } else {
+          // Wallet ist möglicherweise getrennt
+          updateAccount('');
+          setIsConnected(false);
+        }
+      };
+
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+
+      // Optional: Event Listener für Netzwerkänderungen
+      const handleChainChanged = (_chainId) => {
+        // Hier können Sie die Logik zur Behandlung von Netzwerkänderungen hinzufügen
+        window.location.reload();
+      };
+
+      window.ethereum.on('chainChanged', handleChainChanged);
+
+      // Bereinigen der Event Listener beim Unmount
+      return () => {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      };
+    }
+  }, []);
 
   return (
 <Router>

@@ -97,7 +97,7 @@ const Popup = ({ listingPrice, setListingPrice, handleList, closePopup, currency
         </div>
 
         <button className="sell-button w40media" onClick={() => handleList(paymentToken)}>
-          <h3 className='margin-0 s16'>
+          <h3 className='margin-0 s16 white'>
             LIST FOR {listingPrice || '...'} {getPaymentTokenLabel()}
             {paymentToken === "0x6852f7B4ba44667F2Db80E6f3A9f8A173b03cD15" && convertedPrice && (
               ` (${convertedPrice} IOTA)` // Show the converted price in IOTA
