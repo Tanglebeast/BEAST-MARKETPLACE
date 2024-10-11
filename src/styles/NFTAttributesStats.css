@@ -36,6 +36,7 @@
   .trait-type, .stat-key {
     margin-right: 5px;
     color: #858585;
+    font-size: 18px !important;
   }
   
   .value, .stat-value {
