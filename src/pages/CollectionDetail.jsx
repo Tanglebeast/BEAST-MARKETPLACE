@@ -10,7 +10,8 @@ import {
     likeCollection,
     unlikeCollection,
     getCollectionLikes,
-    hasUserLikedCollection
+    hasUserLikedCollection,
+    fetchSingleNFT, // Stellen Sie sicher, dass diese Funktion importiert ist
 } from '../components/utils';
 import SearchBar from '../components/SearchBar';
 import { nftCollections } from '../NFTCollections';
@@ -27,6 +28,7 @@ const CollectionNFTs = () => {
     const [account, setAccount] = useState(localStorage.getItem('account') || '');
     const [marketplace, setMarketplace] = useState(null);
     const [allNFTs, setAllNFTs] = useState([]);
+    const [nftsForSale, setNftsForSale] = useState([]); // Neuer Zustand für nftsForSale
     const [loading, setLoading] = useState(true);
     const [collectionName, setCollectionName] = useState('');
     const [collectionDescription, setCollectionDescription] = useState('');
@@ -84,13 +86,27 @@ const CollectionNFTs = () => {
             if (!marketplace) return;
             setLoading(true);
             setAllNFTs([]); // Reset der NFTs bei Adressänderung
+            setNftsForSale([]); // Reset nftsForSale
             setLoadedBatches(0); // Reset der geladenen Seiten
             setTotalBatches(1); // Reset der Gesamtchargen
 
+            // Zuerst NFTs zum Verkauf abrufen
+            const nftsForSaleRaw = await marketplace.methods.getNFTsForSale().call();
+            const nftsForSaleFiltered = nftsForSaleRaw.filter(nft => nft.contractAddress.toLowerCase() === collectionaddress.toLowerCase());
+
+            // Detaillierte Daten für nftsForSale abrufen
+            const nftsForSaleDetails = await Promise.all(nftsForSaleFiltered.map(async (nft) => {
+                const nftData = await fetchSingleNFT(nft.contractAddress, marketplace, nft.tokenId);
+                return nftData;
+            }));
+
+            setNftsForSale(nftsForSaleDetails);
+
+            // Jetzt alle NFTs abrufen
             const supply = await getMaxSupply(collectionaddress);
             const totalSupply = Number(supply);
             const batches = Math.ceil(totalSupply / resultsPerPage);
-            setTotalBatches(batches); // Setze die Gesamtanzahl der Chargen
+            setTotalBatches(batches);
 
             // Laden der ersten Charge
             const firstBatch = await fetchAllNFTs(collectionaddress, marketplace, 0, resultsPerPage);
@@ -99,7 +115,11 @@ const CollectionNFTs = () => {
                 return { ...nft, ...details };
             }));
 
-            setAllNFTs(detailedFirstBatch);
+            // NFTs zum Verkauf von allen NFTs ausschließen
+            const nftsForSaleIds = nftsForSaleDetails.map(nft => `${nft.contractAddress}-${nft.tokenId}`);
+            const allNFTsFiltered = detailedFirstBatch.filter(nft => !nftsForSaleIds.includes(`${nft.contractAddress}-${nft.tokenId}`));
+
+            setAllNFTs(allNFTsFiltered);
             setLoadedBatches(1);
             setLoading(false);
 
@@ -118,14 +138,16 @@ const CollectionNFTs = () => {
                     return { ...nft, ...details };
                 }));
 
+                // NFTs zum Verkauf von den geladenen NFTs ausschließen
+                const batchNFTsFiltered = detailedNFTs.filter(nft => !nftsForSaleIds.includes(`${nft.contractAddress}-${nft.tokenId}`));
+
                 setAllNFTs(prevNFTs => {
-                    const combinedNFTs = [...prevNFTs, ...detailedNFTs];
+                    const combinedNFTs = [...prevNFTs, ...batchNFTsFiltered];
                     const uniqueNFTs = combinedNFTs.filter((nft, index, self) =>
                         index === self.findIndex((t) => (
                             t.tokenId === nft.tokenId && t.contractAddress.toLowerCase() === nft.contractAddress.toLowerCase()
                         ))
                     );
-                    console.log(`Total NFTs after adding batch ${batch + 1}:`, uniqueNFTs.length);
                     return uniqueNFTs;
                 });
                 setLoadedBatches(batch + 1);
@@ -158,9 +180,10 @@ const CollectionNFTs = () => {
 
     // Sammeln aller Attribute aus den NFTs mit Zählung
     useEffect(() => {
-        if (allNFTs.length > 0) {
+        const combinedNFTs = [...nftsForSale, ...allNFTs];
+        if (combinedNFTs.length > 0) {
             const attributes = {};
-            allNFTs.forEach(nft => {
+            combinedNFTs.forEach(nft => {
                 if (nft.attributes) {
                     nft.attributes.forEach(attr => {
                         const traitType = attr.trait_type;
@@ -177,12 +200,13 @@ const CollectionNFTs = () => {
             });
             setAllAttributes(attributes);
         }
-    }, [allNFTs]);
+    }, [nftsForSale, allNFTs]);
 
     const fetchUserNames = async () => {
         if (!marketplace) return;
         
-        const owners = Array.from(new Set(allNFTs.map(nft => nft.owner.toLowerCase())));
+        const combinedNFTs = [...nftsForSale, ...allNFTs];
+        const owners = Array.from(new Set(combinedNFTs.map(nft => nft.owner.toLowerCase())));
         const names = {};
         
         for (const owner of owners) {
@@ -199,90 +223,115 @@ const CollectionNFTs = () => {
     
     useEffect(() => {
         fetchUserNames();
-    }, [marketplace, allNFTs]);
+    }, [marketplace, nftsForSale, allNFTs]);
 
     // Setzt die aktuelle Seite zurück, wenn sich die Filter ändern
     useEffect(() => {
         setCurrentPage(1);
     }, [filters, searchQuery, resultsPerPage]); // Füge resultsPerPage als Abhängigkeit hinzu
 
-    const getUniqueOwners = (nfts) => {
-        const owners = nfts.map(nft => nft.owner.toLowerCase());
+    const getUniqueOwners = () => {
+        const combinedNFTs = [...nftsForSale, ...allNFTs];
+        const owners = combinedNFTs.map(nft => nft.owner.toLowerCase());
         return new Set(owners).size;
     };
 
-    const getFloorPrice = (nfts) => {
-        const prices = nfts
+    const getFloorPrice = () => {
+        const prices = nftsForSale
             .filter(nft => nft.price && parseFloat(nft.price) > 0)
             .map(nft => parseFloat(nft.price));
         return prices.length > 0 ? Math.min(...prices) : '0';
     };
 
-    const sortNFTs = (nfts, sortByPrice) => {
-        const sortedNFTs = [...nfts];
-        
-        if (sortByPrice === 'LOW TO HIGH') {
-            return sortedNFTs.sort((a, b) => parseFloat(a.price || '0') - parseFloat(b.price || '0'));
-        }
-        if (sortByPrice === 'HIGH TO LOW') {
-            return sortedNFTs.sort((a, b) => parseFloat(b.price || '0') - parseFloat(a.price || '0'));
-        }
-        return sortedNFTs;
-    };
-
-    const filterNFTsByAvailability = (nfts) => {
-        let filteredNFTs = [...nfts];
-
-        if (filters.availability.includes('LISTED')) {
-            filteredNFTs = filteredNFTs.filter(nft => nft.price && parseFloat(nft.price) > 0);
-        }
-        if (filters.availability.includes('NOT FOR SALE')) {
-            filteredNFTs = filteredNFTs.filter(nft => !nft.price || parseFloat(nft.price) <= 0);
-        }
-        if (filters.availability.includes('MY NFTS')) {
-            filteredNFTs = filteredNFTs.filter(nft => nft.owner.toLowerCase() === account.toLowerCase());
-        }
-
-        return filteredNFTs;
-    };
-
-    const getFilteredNFTs = (nfts, searchQuery, sortByPrice) => {
-        let filteredNFTs = [...nfts];
+    const getFilteredNFTs = (nftsForSale, allNFTs, searchQuery, sortByPrice) => {
+        // Apply filters to nftsForSale and allNFTs separately
+        let filteredNFTsForSale = [...nftsForSale];
+        let filteredAllNFTs = [...allNFTs];
 
         if (searchQuery) {
-            filteredNFTs = filteredNFTs.filter(nft => 
-                nft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                nft.owner.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            const searchLower = searchQuery.toLowerCase();
+            filteredNFTsForSale = filteredNFTsForSale.filter(nft => 
+                nft.name.toLowerCase().includes(searchLower) ||
+                nft.owner.toLowerCase().includes(searchLower) ||
+                nft.tokenId.toString().includes(searchQuery)
+            );
+            filteredAllNFTs = filteredAllNFTs.filter(nft => 
+                nft.name.toLowerCase().includes(searchLower) ||
+                nft.owner.toLowerCase().includes(searchLower) ||
                 nft.tokenId.toString().includes(searchQuery)
             );
         }
 
-        filteredNFTs = filterNFTsByAvailability(filteredNFTs);
-        filteredNFTs = sortNFTs(filteredNFTs, sortByPrice);
-
         // Filtern basierend auf ausgewählten Attributen
         if (Object.keys(filters.attributes).length > 0) {
-            filteredNFTs = filteredNFTs.filter(nft => {
-                if (!nft.attributes) return false;
-                return Object.keys(filters.attributes).every(traitType => {
-                    const selectedValues = filters.attributes[traitType];
-                    if (selectedValues.length === 0) return true;
-                    const nftAttribute = nft.attributes.find(attr => attr.trait_type === traitType);
-                    if (!nftAttribute) return false;
-                    return selectedValues.includes(nftAttribute.value);
+            const filterByAttributes = (nfts) => {
+                return nfts.filter(nft => {
+                    if (!nft.attributes) return false;
+                    return Object.keys(filters.attributes).every(traitType => {
+                        const selectedValues = filters.attributes[traitType];
+                        if (selectedValues.length === 0) return true;
+                        const nftAttribute = nft.attributes.find(attr => attr.trait_type === traitType);
+                        if (!nftAttribute) return false;
+                        return selectedValues.includes(nftAttribute.value);
+                    });
                 });
-            });
+            };
+            filteredNFTsForSale = filterByAttributes(filteredNFTsForSale);
+            filteredAllNFTs = filterByAttributes(filteredAllNFTs);
         }
 
-        return filteredNFTs;
+        if (filters.currency && filters.currency.length > 0) {
+            filteredNFTsForSale = filteredNFTsForSale.filter((nft) => {
+              if (!nft.paymentToken) return false;
+        
+              const tokenAddressToName = {
+                '0x0000000000000000000000000000000000000000': 'IOTA',
+                '0x6852f7b4ba44667f2db80e6f3a9f8a173b03cd15': 'BEAST', // Replace with your BEAST token address
+              };
+        
+              const currencyName =
+                tokenAddressToName[nft.paymentToken.toLowerCase()] || 'UNKNOWN';
+              return filters.currency.includes(currencyName);
+            });
+          }
+
+        // Verfügbarkeit filtern
+        if (filters.availability.includes('LISTED')) {
+            filteredAllNFTs = [];
+        }
+        if (filters.availability.includes('NOT FOR SALE')) {
+            filteredNFTsForSale = [];
+        }
+        if (filters.availability.includes('MY NFTS')) {
+            const accountLower = account.toLowerCase();
+            filteredNFTsForSale = filteredNFTsForSale.filter(nft => nft.owner.toLowerCase() === accountLower);
+            filteredAllNFTs = filteredAllNFTs.filter(nft => nft.owner.toLowerCase() === accountLower);
+        }
+
+        // Jetzt, sortiere nftsForSale
+        if (sortByPrice === 'LOW TO HIGH') {
+            filteredNFTsForSale.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+            // Wenn nach Preis sortiert wird, zeigen wir nur die NFTs zum Verkauf an
+            return filteredNFTsForSale;
+        } else if (sortByPrice === 'HIGH TO LOW') {
+            filteredNFTsForSale.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+            // Wenn nach Preis sortiert wird, zeigen wir nur die NFTs zum Verkauf an
+            return filteredNFTsForSale;
+        }
+
+        // Kombiniere die beiden Arrays, wobei nftsForSale zuerst angezeigt werden
+        return [...filteredNFTsForSale, ...filteredAllNFTs];
     };
 
-    const displayedNFTs = getFilteredNFTs(allNFTs, searchQuery, filters.price[0]);
+    const displayedNFTs = getFilteredNFTs(nftsForSale, allNFTs, searchQuery, filters.price[0]);
 
     // Berechne die Gesamtseitenzahl dynamisch
-    const totalPages = filters.price.length > 0 || filters.availability.length > 0 || Object.keys(filters.attributes).length > 0 || searchQuery
+    const isFilterApplied = filters.price.length > 0 || filters.availability.length > 0 || Object.keys(filters.attributes).length > 0 || searchQuery;
+
+        const totalPages = isFilterApplied
         ? Math.ceil(displayedNFTs.length / resultsPerPage)
         : Math.ceil(maxSupply / resultsPerPage);
+
 
     // NFTs für die aktuelle Seite
     const getCurrentNFTs = () => {
@@ -292,8 +341,9 @@ const CollectionNFTs = () => {
 
     // Debugging: Überprüfen auf Duplikate
     useEffect(() => {
+        const combinedNFTs = [...nftsForSale, ...allNFTs];
         const seen = new Set();
-        const duplicates = allNFTs.filter(nft => {
+        const duplicates = combinedNFTs.filter(nft => {
             const identifier = `${nft.contractAddress}-${nft.tokenId}`;
             if (seen.has(identifier)) {
                 return true;
@@ -306,7 +356,7 @@ const CollectionNFTs = () => {
         } else {
             console.log('No duplicates found in allNFTs.');
         }
-    }, [allNFTs]);
+    }, [nftsForSale, allNFTs]);
 
     // Berechnung des Ladefortschritts
     const progressPercentage = totalBatches > 0 ? (loadedBatches / totalBatches) * 100 : 0;
@@ -365,7 +415,7 @@ const CollectionNFTs = () => {
                 <div className='w100 flex space-between CollectionDetail-mediaDiv mt20'>
                     <div className='w20 Coll-FilterDiv ButtonandFilterMedia'>
                         {/* Übergabe von totalNFTsCount */}
-                        <CollectionDetailFilter onFilterChange={setFilters} allAttributes={allAttributes} totalNFTsCount={allNFTs.length} />
+                        <CollectionDetailFilter onFilterChange={setFilters} allAttributes={allAttributes} totalNFTsCount={nftsForSale.length + allNFTs.length} />
                     </div>
                     <div className='w100 flex column flex-start ml20 ml0-media'>
                         
@@ -451,7 +501,7 @@ const CollectionNFTs = () => {
                                 </div>
                                 <div className='collection-stats-div text-align-left'>
                                     <p className='s16 grey'>OWNERS</p>
-                                    <div className='bold ml5'>{getUniqueOwners(allNFTs)}</div>
+                                    <div className='bold ml5'>{getUniqueOwners()}</div>
                                 </div>
 
                                 {/* Hinzufügen der Likes zur Statistik */}

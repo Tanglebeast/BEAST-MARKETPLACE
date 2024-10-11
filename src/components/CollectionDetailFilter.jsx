@@ -4,16 +4,17 @@ import '../styles/CollectionFilter.css';
 const CollectionDetailFilter = ({ onFilterChange, allAttributes, totalNFTsCount }) => {
     const contentRef = useRef([]);
 
-    // Initialisieren von activeIndices mit Indizes 0 und 1 (PRICE und AVAILABILITY)
+    // Initialisieren von activeIndices mit Indizes 0, 1 und 2 (PRICE, AVAILABILITY und CURRENCY)
     const [activeIndices, setActiveIndices] = useState(() => {
         if (typeof window !== 'undefined' && window.innerWidth > 768) {
-            return [0, 1]; // PRICE und AVAILABILITY geöffnet
+            return [0, 1, 2]; // PRICE, AVAILABILITY und CURRENCY geöffnet
         } else {
             return []; // Alle Filter eingeklappt
         }
     });
 
-    const [selectedWords, setSelectedWords] = useState({ price: [], availability: [], attributes: {} });
+    // Hinzufügen von 'currency' zum Zustand
+    const [selectedWords, setSelectedWords] = useState({ price: [], availability: [], currency: [], attributes: {} });
 
     const toggleAccordion = (index) => {
         setActiveIndices(prevState =>
@@ -53,12 +54,17 @@ const CollectionDetailFilter = ({ onFilterChange, allAttributes, totalNFTsCount 
         });
     };
 
-    // FAQ-Items für PRICE und AVAILABILITY
+    // FAQ-Items für PRICE, AVAILABILITY und CURRENCY
     const faqItems = [
         {
             question: 'PRICE',
             words: ['LOW TO HIGH', 'HIGH TO LOW'],
             type: 'price'
+        },
+        {
+            question: 'CURRENCY',
+            words: ['IOTA', 'BEAST'],
+            type: 'currency'
         },
         {
             question: 'AVAILABILITY',
@@ -88,8 +94,8 @@ const CollectionDetailFilter = ({ onFilterChange, allAttributes, totalNFTsCount 
                     // Auf mobilen Geräten alle Filter einklappen
                     return [];
                 } else {
-                    // Auf Desktop: PRICE und AVAILABILITY offen lassen, ohne Benutzerinteraktionen zu überschreiben
-                    const indicesToKeepOpen = [0, 1];
+                    // Auf Desktop: PRICE, AVAILABILITY und CURRENCY offen lassen, ohne Benutzerinteraktionen zu überschreiben
+                    const indicesToKeepOpen = [0, 1, 2];
                     const combinedIndices = Array.from(new Set([...prevActiveIndices, ...indicesToKeepOpen]));
                     return combinedIndices;
                 }
