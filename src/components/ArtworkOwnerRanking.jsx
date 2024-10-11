@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import { fetchAllNFTs, getUserName, getProfilePicture, getMaxSupply } from '../components/utils';
 import '../styles/ArtworkOwnerRanking.css';
 import ShortenAddress from './ShortenAddress';
+import LoadingSpinner from '../Assets/loading-spinner';
 
 const web3 = new Web3(window.ethereum);
 
@@ -60,8 +61,15 @@ const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
     <div className="artwork-owner-ranking">
       <h2 className='mt5'>Top Owners</h2>
       {loading ? (
-        <div className="loading-container">
-          <img src="/basic-loading.gif" alt="Loading..." className="loading-gif" />
+        <div className="loading-container mt150 mb150">
+          <div className="loading-container flex centered mt150 mb150">
+                  <LoadingSpinner
+                    filled={false} 
+                    textColor="currentColor" 
+                    size={100} 
+                    className="loading-gif"
+                  />
+                </div>
         </div>
       ) : (
         <table>
