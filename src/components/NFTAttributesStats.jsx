@@ -27,7 +27,7 @@ const NFTAttributesStats = ({ attributes, stats }) => {
           <div className="stats">
             {stats.map((stat, index) => (
               <div key={index} className="stat">
-                <span className="stat-key">{stat.name}</span>
+                <span className="stat-key s18">{stat.name}</span>
                 <span className="stat-value">{stat.value}</span>
               </div>
             ))}
