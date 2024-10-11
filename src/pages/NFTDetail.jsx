@@ -327,7 +327,7 @@ const NFTDetail = () => {
                   <span className='s18 blue bold mb10'>
                     {collectionDetails.category.split(',').map((cat, index) => (
                       <span
-                      className='bold' 
+                      className='bold s18 blue' 
                       key={index}>
                         {cat.trim()}
                         {index < collectionDetails.category.split(',').length - 1 && ', '}
@@ -393,7 +393,7 @@ const NFTDetail = () => {
                 />
 
                 
-                <p className='mt5 mb5 ml5'>{nftDetails.price} BEAST</p>
+                <p className='mt5 mb5 ml5 s18'>{nftDetails.price} BEAST</p>
                 <BeastToIotaPrice
                   listingPrice={parseFloat(nftDetails.price)}
                   onConversion={(convertedPrice) => {
@@ -415,7 +415,7 @@ const NFTDetail = () => {
                                     size={24} 
                                     className="currency-icon"
                                     />
-                <p className='mt5 mb5 ml5'>{nftDetails.price} IOTA</p>
+                <p className='mt5 mb5 ml5 s18'>{nftDetails.price} IOTA</p>
                 {/* Zeige den IOTA-Preis nicht an */}
               </>
             )}

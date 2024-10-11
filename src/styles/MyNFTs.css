@@ -1,7 +1,7 @@
 
 .nft-list-my {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(270px, 0fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 0fr));
     max-width: 100%;
     gap: 10px;
     justify-content: left;
@@ -45,7 +45,7 @@
   box-shadow: var(--card-box-shadow);
     margin: 0px;
     padding: 10px;
-    width: 250px;
+    width: 200px;
     border-radius: 10px;
     transition: all 0.25s;
 }
@@ -72,11 +72,11 @@
     justify-content: center;
     height: auto;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 .my-nft-image img{
-    width: 250px;
+    width: 200px;
     height: auto;
 }
 

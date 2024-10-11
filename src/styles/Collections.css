@@ -23,12 +23,12 @@
 .collection-banner,
 .collectionbannerDiv {
     height: auto;
-    width: 250px;
+    width: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 5px;
     position: relative; /* Hinzugefügt für das Positionieren des Netzwerklogos */
 }
 
@@ -38,12 +38,17 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 5px !important;
+}
+
+.actual-image {
+  border-radius: 5px !important;
 }
 
 .collection-cards {
     display: grid;
     /* grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); */
-    grid-template-columns: repeat(auto-fit, minmax(270px, max-content));
+    grid-template-columns: repeat(auto-fit, minmax(220px, max-content));
     gap: 10px;
     margin-top: 10px;
     min-width: 100%;
@@ -66,7 +71,7 @@
     color: var(--text-color);
     text-decoration: none;
     transition: all 0.25s;
-    width: 250px;
+    width: 200px;
     box-shadow: var(--card-box-shadow);
 
 }

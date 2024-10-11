@@ -5,7 +5,7 @@
   flex-direction: column;
   border-radius: 10px;
   background-color: var(--card-background-color);
-  width: 270px;
+  width: 220px;
   color: white;
   transition: all 0.25s;
 }
@@ -20,12 +20,12 @@
 
 .nft-image-container {
   height: auto; /* Beispielhafte Höhe für das Bildcontainer */
-  width: 250px;
+  width: 200px;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 
 .placeholder-image-loading-gif {

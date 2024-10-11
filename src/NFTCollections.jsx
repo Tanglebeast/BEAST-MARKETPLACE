@@ -3,7 +3,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 
   export const nftCollections = [
 	{
-		name: 'PFP-COLLECTION',
+		name: 'PFP-Collection',
 		description: 'A collection of 115 beautiful OG Tanglebest Tigers, perfect for a new PFP!',
 		banner: '/Artist-2.png',
 		grid: '/soon-grid.png',

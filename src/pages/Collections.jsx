@@ -269,9 +269,9 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
                     <ImageWithLoading src={collection.banner} alt={collection.name} />
                   </div>
 
-                  <div className='text-align-left w90 mb5 collection-infoCardDiv'>
+                  <div className='text-align-left w90 collection-infoCardDiv'>
                     <div className='mb5 card-footer-infoDiv'>
-                      <h3 className='mb10'>{collection.name}</h3>
+                      <h3 className='mb10 mt10'>{collection.name}</h3>
                       <span className='s16 grey modetext opacity-70'>{collection.artist}</span>
                     </div>
                     {collectionDetails[collection.address] && (
