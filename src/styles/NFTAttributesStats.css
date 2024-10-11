@@ -42,6 +42,7 @@
     color: var(--branding-color) !important;
     margin-top: 7px;
     font-weight: bold;
+    font-size: 18px !important;
   }
 
   .nft-attributes-stats {
