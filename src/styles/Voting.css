@@ -133,11 +133,16 @@
     background-color: var(--branding-color);
     font-family: 'Josefin Sans', sans-serif !important;
     border: none;
-    color: white;
+    color: white !important;
     padding: 5px 22px;
     font: inherit;
     border-radius: 30px;
     transition: background-color 0.2s ease;
+  }
+
+  .vote-button h2,
+  .remove-vote-button h2 {
+    color: white !important;
   }
 
   .remove-vote-button {

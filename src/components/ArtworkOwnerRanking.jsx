@@ -40,7 +40,7 @@ const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
           .map(([owner, count], index) => ({
             owner,
             username: ownerUsernames[owners.indexOf(owner)] || '', // Sicherstellen, dass der Index korrekt ist
-            profilePicture: ownerProfilePictures[owners.indexOf(owner)] || '/owner.png',
+            profilePicture: ownerProfilePictures[owners.indexOf(owner)] || '/placeholder-PFP-black.png',
             count,
             percentage: (count / Number(maxSupply)) * 100, // Verwendung von maxSupply als Zahl
           }));

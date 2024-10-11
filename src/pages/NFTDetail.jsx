@@ -51,7 +51,7 @@ const NFTDetail = () => {
   const [ownedNFTsCount, setOwnedNFTsCount] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ownerUsername, setOwnerUsername] = useState('');
-  const [ownerProfilePicture, setOwnerProfilePicture] = useState('/owner.png');
+  const [ownerProfilePicture, setOwnerProfilePicture] = useState('/placeholder-PFP-black.png');
   const [currency, setCurrency] = useState(''); // currency definieren
   const [paymentToken, setPaymentToken] = useState(null);
   const [convertedIotaPrice, setConvertedIotaPrice] = useState(null);
@@ -84,7 +84,7 @@ const NFTDetail = () => {
           setOwnerUsername(username || details.owner);
   
           const profilePicture = await getProfilePicture(details.owner, marketplaceInstance);
-          setOwnerProfilePicture(profilePicture || '/owner.png');
+          setOwnerProfilePicture(profilePicture || '/placeholder-PFP-black.png');
   
           setIsLoading(false);
         }
@@ -119,7 +119,7 @@ const NFTDetail = () => {
         setOwnerUsername(username || details.owner);
   
         const profilePicture = await getProfilePicture(details.owner, marketplaceInstance);
-        setOwnerProfilePicture(profilePicture || '/owner.png');
+        setOwnerProfilePicture(profilePicture || '/placeholder-PFP-black.png');
   
         setIsLoading(false);
       }
