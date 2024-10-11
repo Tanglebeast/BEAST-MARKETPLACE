@@ -62,7 +62,7 @@ const ArtworkOwnerRanking = ({ collectionAddress, marketplace }) => {
       <h2 className='mt5'>Top Owners</h2>
       {loading ? (
         <div className="loading-container mt150 mb150">
-          <div className="loading-container flex centered mt150 mb150">
+          <div className="loading-container flex centered">
                   <LoadingSpinner
                     filled={false} 
                     textColor="currentColor" 
