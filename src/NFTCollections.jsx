@@ -172,6 +172,23 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 		address: '0x511046D465AD172FbFA8a62FF586Cb814284367e',
 		abi: ABI,
 	  },
+	  {
+		name: 'Tangle Monsters',
+		description: 'A really disgusting collection consisting of 15 individually created monsters.',
+		banner: '/tangle-monster-pp.png',
+		grid: '/soon-grid.png',
+		Collectionbanner: '/Tangle-monsters-banner.png',
+		artist: 'Tanglebeasts',
+		artistwallet: '0x2FEA5b277e4a11406664691ac4A5315e6912ddC1',
+		network: 'iotaevm',
+		networkid: '0x433',
+		rpcurl: 'https://json-rpc.evm.testnet.iotaledger.net',
+		currency: '/currency-iota.png',
+		category: 'PFP',
+		timestamp: '1728727106',
+		address: '0xede440b6aFD00c8B7565c601C65AB88358e9bFd2',
+		abi: ABI,
+	  },
 
     // Add more collections as needed
   ];

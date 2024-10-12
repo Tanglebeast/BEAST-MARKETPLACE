@@ -76,6 +76,10 @@
   cursor: pointer;
 }
 
+.button h3{
+  color: #fff !important;
+}
+
 .button:hover {
   background-color: var(--branding-color-hover);
 }
