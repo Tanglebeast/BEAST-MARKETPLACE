@@ -107,7 +107,7 @@ const ProfilePicturePopup = ({ nfts, handleSave, closePopup }) => {
               onClick={handleSaveClick}
               disabled={!selectedNFT}
             >
-              SAVE
+              <span className='white'>SAVE</span>
             </button>
           </>
         )}

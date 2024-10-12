@@ -51,6 +51,7 @@ import KontaktFormular from './components/ArtistContactFormula';
 
 import 'groupfi-chatbox-sdk/dist/esm/assets/style.css';
 import ChatboxSDK from 'groupfi-chatbox-sdk'
+import Giveaway from './components/Giveaway';
 
 
 const App = () => {
@@ -62,8 +63,23 @@ const App = () => {
   const [selectedNetwork, setSelectedNetwork] = useState(localStorage.getItem('selectedNetwork') || 'iotaevm');
   const [blogPosts, setBlogPosts] = useState([]);
   const web3 = new Web3(window.ethereum);
+  const [isVisible, setIsVisible] = useState(true);
   const [chatboxLoaded, setChatboxLoaded] = useState(false);
 
+
+  useEffect(() => {
+    // Beim Laden der Komponente den gespeicherten Wert aus dem localStorage abrufen
+    const storedVisibility = localStorage.getItem('announcementVisibility');
+    if (storedVisibility !== null) {
+      setIsVisible(JSON.parse(storedVisibility));
+    }
+  }, []);
+
+  const handleHideClick = () => {
+    setIsVisible(false);
+    // Den Zustand in localStorage speichern
+    localStorage.setItem('announcementVisibility', false);
+  };
 
 
   const updateAccount = (newAccount) => {
@@ -201,6 +217,13 @@ const App = () => {
 <Router>
   <div>
     <div className='bg'></div>
+    {isVisible && (
+        <div className="flex centered announcement-bar space-between">
+          <span className="opacity-70">TANGLESPACE IS RUNNING ON THE IOTA EVM TESTNET VERSION</span>
+          <span className='hide-button' onClick={handleHideClick} style={{ cursor: 'pointer' }}>CLOSE INFOBOX</span>
+          <span className="opacity-70">NOTE THAT THE MOBILE VERSION IS NOT READY YET</span>
+        </div>
+      )}
     <Header
       isConnected={isConnected}
       account={account}
@@ -254,6 +277,9 @@ const App = () => {
         <Route path="/articles/:blogId" element={<BlogArticlePage blogPosts={blogPosts} />} />
 
         <Route path="*" element={<NotFound />} />
+
+
+        <Route path="/giveaway" element={<Giveaway />} />
       </Routes>
     </div>
     <Footer />

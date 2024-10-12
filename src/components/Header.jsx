@@ -201,6 +201,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
             <a href="/beast-faucet" className="nav-link">MINT TEST TOKENS!</a>
           </div>
           <div className="flex centered burder-account-network gap30">
+          <a href="/giveaway" className="nav-link">GIVEAWAY</a>
             <BeastPrice />
             {isInitializing ? (
               <LoadingSpinner

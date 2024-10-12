@@ -17,7 +17,7 @@ const UsernamePopup = ({ username, setUsername, handleSave, closePopup }) => {
           placeholder="Enter new username"
         />
         <button className="actionbutton w20 w40media" onClick={handleSave}>
-          SAVE
+          <span className='white'>SAVE</span>
         </button>
       </div>
     </div>

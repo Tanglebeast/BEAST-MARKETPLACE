@@ -2,6 +2,7 @@
 
 import React from 'react';
 import '../styles/Footer.css';
+import CurrencyIotaIcon from '../Assets/currency-iota';
 
 const Footer = () => {
     return (
@@ -105,7 +106,7 @@ const Footer = () => {
             </a>
             <div className='footerdescription'>
                     <p>
-                    The first NFT marketplace on IOTA, offering opportunities for EX-Soonaverse projects. From the community, for the community.
+                    TANGLESPACE supports Layer 1 NFT collections by bridging them to the EVM, making them accessible for everyone.
                     </p>
             </div>
 
@@ -123,7 +124,9 @@ const Footer = () => {
                     <h2>Information</h2>
                     <ul>
                         {/* <li><a href="https://fractalz.xyz">Homepage</a></li> */}
-                        <li><a href="/register">REGISTER YOUR NFT PROJECT</a></li>
+
+                        {/* <li><a href="/register">REGISTER YOUR NFT PROJECT</a></li> */}
+
                         {/* <li><a href="/faucet">Faucets</a></li>
                         <li><a href="https://fractalz.xyz/?artistmodalopen=true">Become Artist</a></li> */}
                         <li><a href="/faq">FAQ</a></li>
@@ -131,6 +134,7 @@ const Footer = () => {
                 </div>
                 <div className="footer-section contact VisibleLink">
                     <h2>Contact Us</h2>
+                    <span className='opacity-50'>coming soon</span>
                     {/* <ul>
                     <li><a href="https://fractalz.xyz/contact">Contact us</a></li>
                     </ul> */}
@@ -138,6 +142,19 @@ const Footer = () => {
             </div>
             <div className="footer-bottom VisibleLink">
                 &copy; 2024 TANGLESPACE all rights reserved | <a href="/imprint">Imprint</a> | <a href="/terms">Terms of Use</a> | <a href="/privacy">Privacy Policy</a>
+            
+                <div className='flex centered mt20'>
+                    <h3 className='mr5'>
+                    POWERED BY IOTA
+                    </h3>
+                    <CurrencyIotaIcon
+                                    filled={false} 
+                                    textColor="currentColor" 
+                                    size={24} 
+                                    className="currency-icon"
+                                    />
+              </div>
+
             </div>
             </div>
         </footer>

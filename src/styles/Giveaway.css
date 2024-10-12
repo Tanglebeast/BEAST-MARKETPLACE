@@ -1,0 +1,41 @@
+.giveaway-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    width: 80%;
+    margin-left: 10%;
+    margin-top: 20px;
+    gap: 50px;
+  }
+  
+  .giveaway-content {
+    width: 40%;
+  }
+  
+  .giveaway-description {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  
+  .giveaway-steps {
+    list-style-type: decimal;
+    padding-left: 20px;
+  }
+  
+  .giveaway-steps li {
+    margin-bottom: 10px;
+    font-size: 20px;
+    margin-left: 5%;
+  }
+  
+  .giveaway-video {
+    max-width: 60%;
+  }
+  
+  .giveaway-video video {
+    width: 100%;
+    border-radius: 10px;
+  }
+  

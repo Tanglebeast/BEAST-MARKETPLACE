@@ -16,8 +16,8 @@ const ChangeTheme = () => {
     const savedColor = localStorage.getItem('branding-color');
     const savedHoverColor = localStorage.getItem('branding-color-hover');
     return {
-      color: savedColor || '#535bf2', // Standardfarbe
-      hoverColor: savedHoverColor || '#535bf2bf', // Standard Hover-Farbe
+      color: savedColor || '#404375', // Standardfarbe
+      hoverColor: savedHoverColor || '#404375bf', // Standard Hover-Farbe
     };
   }
 
