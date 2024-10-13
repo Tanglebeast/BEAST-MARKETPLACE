@@ -5,7 +5,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	{
 		name: 'PFP-Collection',
 		description: 'A collection of 115 beautiful OG Tanglebest Tigers, perfect for a new PFP!',
-		banner: '/Artist-2.png',
+		banner: '/Artist-2.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/banner-pfp-collection.png',
 		artist: 'Tanglebeasts',
@@ -22,7 +22,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Little Cookies',
 		description: 'A collection of 333 Little Cookies',
-		banner: '/cookie-pfp.png',
+		banner: '/cookie-pfp.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/banner-cookies.png',
 		artist: 'Little Cookies',
@@ -39,7 +39,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Beast King Basic',
 		description: 'A collection of 34 basic Kongos, exclusively airdropped to BEASTs!',
-		banner: '/beast-king-basic.png',
+		banner: '/beast-king-basic.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/kongo-basic-banner.png',
 		artist: 'Tanglebeasts',
@@ -56,7 +56,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Beast King Rare',
 		description: 'A collection of 40 rare Kongos, exclusively airdropped to BEASTs!',
-		banner: '/kongo-rare.png',
+		banner: '/kongo-rare.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/beast-king-rare.jpg',
 		artist: 'Tanglebeasts',
@@ -73,7 +73,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Tangle Beasts',
 		description: 'A beautiful collection of 15 unique and super rare Beasts. The first Tanglebeast NFT collection ever created!',
-		banner: '/tangle-beasts-nft.png',
+		banner: '/tangle-beasts-nft.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/tb-banner-neu.png',
 		artist: 'Tanglebeasts',
@@ -90,7 +90,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Tangle Apes',
 		description: 'A beautiful collection of 15 unique Apes.',
-		banner: '/tangle-apes.png',
+		banner: '/tangle-apes.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/Banner-apes.png',
 		artist: 'Tanglebeasts',
@@ -124,7 +124,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Tangle Apes Partners',
 		description: 'A collection of a bunch of cool apes which were gifted to the community in cooperation with partner projects.',
-		banner: '/partnerapes.png',
+		banner: '/partnerapes.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/Banner-apes.png',
 		artist: 'Tanglebeasts',
@@ -141,7 +141,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Crypto-Gin - Soonaverse Collection',
 		description: 'A collection of 100 rare NFT bottles of Crypto-Gin. Each NFT represents a real bottle.',
-		banner: '/gin-pic.png',
+		banner: '/gin-pic.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/gin-cg-banner.png',
 		artist: 'Crypto-Gin',
@@ -158,7 +158,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Sick Iota Apes',
 		description: 'A collection of 100 handsome and handdrawn Sick Iota Apes.',
-		banner: '/sick-apes.png',
+		banner: '/sick-apes.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/sick-apes-banner.png',
 		artist: 'RASA NFT',
@@ -175,7 +175,7 @@ const ABI = [ { "inputs": [ { "internalType": "address", "name": "to", "type": "
 	  {
 		name: 'Tangle Monsters',
 		description: 'A really disgusting collection consisting of 15 individually created monsters.',
-		banner: '/tangle-monster-pp.png',
+		banner: '/tangle-monster-pp.jpeg',
 		grid: '/soon-grid.png',
 		Collectionbanner: '/Tangle-monsters-banner.png',
 		artist: 'Tanglebeasts',
