@@ -7,17 +7,17 @@ import PlatinumABI from '../Platinum-ABI.json';
 let web3;
 
 // Prüfe, ob MetaMask (window.ethereum) verfügbar ist
-if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
-  // Erstelle eine neue Web3-Instanz mit dem MetaMask-Provider
-  web3 = new Web3(window.ethereum);
+// if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
+//   // Erstelle eine neue Web3-Instanz mit dem MetaMask-Provider
+//   web3 = new Web3(window.ethereum);
 
-  // Fordere Kontozugriff an, falls erforderlich
-  window.ethereum.request({ method: 'eth_requestAccounts' });
-} else {
-  // MetaMask ist nicht installiert
-  alert('MetaMask ist nicht installiert. Bitte installieren Sie MetaMask, um diese Anwendung zu nutzen.');
-  throw new Error('MetaMask nicht installiert');
-}
+//   // Fordere Kontozugriff an, falls erforderlich
+//   window.ethereum.request({ method: 'eth_requestAccounts' });
+// } else {
+//   // MetaMask ist nicht installiert
+//   alert('MetaMask ist nicht installiert. Bitte installieren Sie MetaMask, um diese Anwendung zu nutzen.');
+//   throw new Error('MetaMask nicht installiert');
+// }
 
 // Smart-Contract-Adresse (special functions social media contract)
 const contractAddress = '0x17379bC597C942023c446F55c3AaBCfB69bFe7c3';
