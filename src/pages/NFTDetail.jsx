@@ -556,7 +556,7 @@ const [ownsRequiredNFT, setOwnsRequiredNFT] = useState(false);
                   )
                 ) : (
                   <button className="actionbutton w60" onClick={handleConnectWallet}>
-                    <h3 className='margin-0 s16'>CONNECT WALLET</h3>
+                    <h3 className='margin-0 s16 white'>CONNECT WALLET</h3>
                   </button>
                 )}
               </div>

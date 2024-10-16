@@ -2,22 +2,19 @@
 
 import Web3 from 'web3';
 import PlatinumABI from '../Platinum-ABI.json';
+import { web3OnlyRead } from '../components/utils'; // Importieren von web3OnlyRead
 
-// Initialisiere Web3 mit MetaMask
-let web3;
+// Funktion zum Abrufen des Web3-Providers
+const getWeb3 = () => {
+  if (typeof window !== 'undefined' && window.ethereum) {
+    return new Web3(window.ethereum);
+  } else {
+    console.warn('MetaMask nicht gefunden. Verwende web3OnlyRead für read-only Operationen.');
+    return web3OnlyRead;
+  }
+};
 
-// Prüfe, ob MetaMask (window.ethereum) verfügbar ist
-// if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
-//   // Erstelle eine neue Web3-Instanz mit dem MetaMask-Provider
-//   web3 = new Web3(window.ethereum);
-
-//   // Fordere Kontozugriff an, falls erforderlich
-//   window.ethereum.request({ method: 'eth_requestAccounts' });
-// } else {
-//   // MetaMask ist nicht installiert
-//   alert('MetaMask ist nicht installiert. Bitte installieren Sie MetaMask, um diese Anwendung zu nutzen.');
-//   throw new Error('MetaMask nicht installiert');
-// }
+const web3 = getWeb3();
 
 // Smart-Contract-Adresse (special functions social media contract)
 const contractAddress = '0x17379bC597C942023c446F55c3AaBCfB69bFe7c3';
@@ -57,8 +54,17 @@ export const getGasEstimate = async (method, params, fromAddress) => {
   }
 };
 
+// Hilfsfunktion zum Überprüfen, ob MetaMask verfügbar ist
+const isMetaMaskAvailable = () => {
+  return typeof window !== 'undefined' && window.ethereum;
+};
+
 // Funktion zum Aktualisieren des Profils
 export const updateProfile = async (twitter, instagram, discord, bio) => {
+  if (!isMetaMaskAvailable()) {
+    throw new Error('MetaMask ist nicht verfügbar. Bitte installieren Sie MetaMask, um Profile zu aktualisieren.');
+  }
+
   try {
     const accounts = await web3.eth.getAccounts();
     const fromAddress = accounts[0];
@@ -81,6 +87,10 @@ export const updateProfile = async (twitter, instagram, discord, bio) => {
 
 // Funktion zum Entfernen des Profils
 export const removeProfile = async () => {
+  if (!isMetaMaskAvailable()) {
+    throw new Error('MetaMask ist nicht verfügbar. Bitte installieren Sie MetaMask, um Profile zu entfernen.');
+  }
+
   try {
     const accounts = await web3.eth.getAccounts();
     const fromAddress = accounts[0];
@@ -151,6 +161,10 @@ export const isNFTHolder = async (userAddress) => {
 
 // Funktion zum Hinzufügen eines NFTs zur Watchlist
 export const addToWatchlist = async (contractAddressToAdd, tokenId) => {
+  if (!isMetaMaskAvailable()) {
+    throw new Error('MetaMask ist nicht verfügbar. Bitte installieren Sie MetaMask, um zur Watchlist hinzuzufügen.');
+  }
+
   try {
     const accounts = await web3.eth.getAccounts();
     const fromAddress = accounts[0];
@@ -173,6 +187,10 @@ export const addToWatchlist = async (contractAddressToAdd, tokenId) => {
 
 // Funktion zum Entfernen eines NFTs aus der Watchlist
 export const removeFromWatchlist = async (contractAddressToRemove, tokenId) => {
+  if (!isMetaMaskAvailable()) {
+    throw new Error('MetaMask ist nicht verfügbar. Bitte installieren Sie MetaMask, um aus der Watchlist zu entfernen.');
+  }
+
   try {
     const accounts = await web3.eth.getAccounts();
     const fromAddress = accounts[0];
@@ -208,25 +226,24 @@ export const getWatchlist = async (userAddress) => {
 
 // Funktion zum Abrufen der Anzahl der Watchlist-Hinzufügungen für ein NFT
 export const getNFTWatchlistCount = async (contractAddressToCheck, tokenId) => {
-    try {
-      const count = await contract.methods.getNFTWatchlistCount(contractAddressToCheck, tokenId).call();
-      return parseInt(count);
-    } catch (error) {
-      console.error('Fehler beim Abrufen der Watchlist-Anzahl:', error);
-      throw error;
-    }
-  };
+  try {
+    const count = await contract.methods.getNFTWatchlistCount(contractAddressToCheck, tokenId).call();
+    return parseInt(count);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Watchlist-Anzahl:', error);
+    throw error;
+  }
+};
 
-  export const isNFTInUserWatchlist = async (userAddress, contractAddressToCheck, tokenId) => {
-    try {
-      const isInWatchlist = await contract.methods.isNFTInWatchlist(userAddress, contractAddressToCheck, tokenId).call();
-      return isInWatchlist;
-    } catch (error) {
-      console.error('Fehler beim Überprüfen, ob NFT in der Watchlist ist:', error);
-      throw error;
-    }
-  };
-  
+export const isNFTInUserWatchlist = async (userAddress, contractAddressToCheck, tokenId) => {
+  try {
+    const isInWatchlist = await contract.methods.isNFTInWatchlist(userAddress, contractAddressToCheck, tokenId).call();
+    return isInWatchlist;
+  } catch (error) {
+    console.error('Fehler beim Überprüfen, ob NFT in der Watchlist ist:', error);
+    throw error;
+  }
+};
 
 // Exportiere die Web3-Instanz und den Vertrag für die Verwendung in anderen Komponenten
 export { web3, contract };
