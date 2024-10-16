@@ -1,6 +1,7 @@
 // src/components/PlatinumUserCheck.jsx
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
+import { web3OnlyRead } from '../components/utils';
 
 const PlatinumUserCheck = ({ account }) => {
   const [isPlatinum, setIsPlatinum] = useState(false);
@@ -17,20 +18,15 @@ const PlatinumUserCheck = ({ account }) => {
       }
 
       try {
-        if (window.ethereum) {
-          const web3 = new Web3(window.ethereum);
-          const contract = new web3.eth.Contract(platinumABI, contractAddress);
+        // Verwende das web3OnlyRead Gateway
+        const contract = new web3OnlyRead.eth.Contract(platinumABI, contractAddress);
 
-          // Annahme: Der Vertrag implementiert ERC-721 oder ERC-1155 und hat eine balanceOf-Funktion
-          const balance = await contract.methods.balanceOf(account).call();
+        // Annahme: Der Vertrag implementiert ERC-721 oder ERC-1155 und hat eine balanceOf-Funktion
+        const balance = await contract.methods.balanceOf(account).call();
 
-          if (parseInt(balance, 10) > 0) {
-            setIsPlatinum(true);
-          } else {
-            setIsPlatinum(false);
-          }
+        if (parseInt(balance, 10) > 0) {
+          setIsPlatinum(true);
         } else {
-          console.error('Ethereum provider not found');
           setIsPlatinum(false);
         }
       } catch (error) {
