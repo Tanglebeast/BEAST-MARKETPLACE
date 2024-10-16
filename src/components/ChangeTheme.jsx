@@ -3,13 +3,17 @@ import '../index.css';
 import '../styles/BrandingColorDiv.css';
 import '../styles/ToggleSwitch.css'; // Stelle sicher, dass du die CSS-Datei importierst
 import SettingsIcon from '../Assets/SettingsIcon';
+import { isNFTHolder } from '../PlatinumFunctions/PlatinumUtils'; // Importiere die isNFTHolder Funktion
+import Web3 from 'web3'; // Stelle sicher, dass Web3 installiert ist
 
-const ChangeTheme = () => {
+const ChangeTheme = ({ isConnected }) => { // Empfang des isConnected Props
   const [isOpen, setIsOpen] = useState(false);
   const [color, setColor] = useState(getSavedColor().color);
   const [hoverColor, setHoverColor] = useState(getSavedColor().hoverColor);
   const [mode, setMode] = useState(getSavedMode());
   const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
+  const [isNFTHolderState, setIsNFTHolderState] = useState(false); // Neuer State für NFT-Besitz
+  const [loading, setLoading] = useState(true); // Optionaler State für Ladezustand
 
   // Funktion zum Laden der Branding-Farbe aus dem localStorage
   function getSavedColor() {
@@ -79,6 +83,41 @@ const ChangeTheme = () => {
     }
   }, [color, hoverColor, mode]);
 
+  // Funktion zur Überprüfung des NFT-Besitzes
+  useEffect(() => {
+    const checkNFTHoldership = async () => {
+      if (!isConnected) { // Wenn keine Wallet verbunden ist, setze den Status entsprechend
+        setIsNFTHolderState(false);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Initialisiere Web3
+        if (window.ethereum) {
+          const web3 = new Web3(window.ethereum);
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const accounts = await web3.eth.getAccounts();
+          const userAddress = accounts[0];
+          
+          // Überprüfe, ob der Benutzer ein NFT-Besitzer ist
+          const holder = await isNFTHolder(userAddress);
+          setIsNFTHolderState(holder);
+        } else {
+          console.error('Ethereum Wallet nicht gefunden');
+          setIsNFTHolderState(false);
+        }
+      } catch (error) {
+        console.error('Fehler bei der NFT-Besitzprüfung:', error);
+        setIsNFTHolderState(false);
+      } finally {
+        setLoading(false); // Ladezustand beenden
+      }
+    };
+
+    checkNFTHoldership();
+  }, [isConnected]); // Abhängigkeit hinzugefügt
+
   // Berechne den Prozentsatz basierend auf dem minimalen und maximalen Wert
   const min = 10;
   const max = 1000;
@@ -138,23 +177,37 @@ const ChangeTheme = () => {
                 <span className="slider"></span>
               </label>
             </div>
-            {/* Slider für Ergebnisse pro Seite */}
-            <div className="results-per-page-slider flex center-ho space-between column">
-              <label htmlFor="results-slider">
-                <span className='white s14'>Results per page: </span>
-                <span className='s14 white'>{resultsPerPage}</span>
-              </label>
-              <input
-                type="range"
-                id="results-slider"
-                min={min}
-                max={max}
-                step="10" // Schrittweite auf 10 setzen
-                value={resultsPerPage}
-                onChange={handleSliderChange}
-                style={sliderStyle} // Füge den Stil hinzu
-              />
-            </div>
+            {/* Slider für Ergebnisse pro Seite - nur sichtbar für NFT-Besitzer und wenn eine Wallet verbunden ist */}
+            {isConnected && !loading && isNFTHolderState && (
+              <div className="results-per-page-slider flex center-ho space-between column">
+                <label htmlFor="results-slider">
+                  <span className='white s14'>Results per page: </span>
+                  <span className='s14 white'>{resultsPerPage}</span>
+                </label>
+                <input
+                  type="range"
+                  id="results-slider"
+                  min={min}
+                  max={max}
+                  step="10" // Schrittweite auf 10 setzen
+                  value={resultsPerPage}
+                  onChange={handleSliderChange}
+                  style={sliderStyle} // Füge den Stil hinzu
+                />
+              </div>
+            )}
+            {/* Optional: Nachricht anzeigen, wenn der Benutzer kein NFT-Besitzer ist */}
+            {!loading && isConnected && !isNFTHolderState && (
+              <div className="no-nft-message">
+                {/* <span className='s14 white'>Du besitzt keine NFTs.</span> */}
+              </div>
+            )}
+            {/* Optional: Ladeanzeige */}
+            {loading && (
+              <div className="loading-message">
+                <span className='s14 white'>Lade...</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

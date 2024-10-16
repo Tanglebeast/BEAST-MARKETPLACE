@@ -11,7 +11,7 @@ const NFTAttributesStats = ({ attributes, stats }) => {
       <div className="attributes">
         {attributes && attributes.length > 0 ? (
           attributes.map((attr, index) => (
-            <div key={index} className="attribute">
+            <div key={index} className="attribute w100media-left">
               <span className="trait-type">{attr.trait_type}</span>
               <span className="value">{attr.value}</span>
             </div>
@@ -24,9 +24,9 @@ const NFTAttributesStats = ({ attributes, stats }) => {
       {hasStats && (
         <>
           <h3>Stats</h3>
-          <div className="stats">
+          <div className="stats rowmobile">
             {stats.map((stat, index) => (
-              <div key={index} className="stat">
+              <div key={index} className="stat w100media-left">
                 <span className="stat-key s18">{stat.name}</span>
                 <span className="stat-value">{stat.value}</span>
               </div>

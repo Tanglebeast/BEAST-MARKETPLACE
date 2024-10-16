@@ -31,6 +31,18 @@ import NFTAttributesStats from '../components/NFTAttributesStats';
 import CurrencyBeastIcon from '../Assets/currency-beast';
 import CurrencyIotaIcon from '../Assets/currency-iota';
 import LoadingSpinner from '../Assets/loading-spinner';
+import PlatinumUserCheck from '../PlatinumFunctions/PlatinumUserCheck';
+import WatchlistEyeIcon from '../Assets/WatchlistEye';
+import {
+  // ... andere Importe ...
+  getNFTWatchlistCount,
+  addToWatchlist,
+  removeFromWatchlist,
+  getWatchlist,
+  isNFTInUserWatchlist,
+  isNFTHolder
+} from '../PlatinumFunctions/PlatinumUtils';
+
 
 // import NFTHistory from '../components/NFTHistory';
 
@@ -55,6 +67,10 @@ const NFTDetail = () => {
   const [currency, setCurrency] = useState(''); // currency definieren
   const [paymentToken, setPaymentToken] = useState(null);
   const [convertedIotaPrice, setConvertedIotaPrice] = useState(null);
+  const [watchlistCount, setWatchlistCount] = useState(0);
+const [isInWatchlist, setIsInWatchlist] = useState(false);
+const [ownsRequiredNFT, setOwnsRequiredNFT] = useState(false);
+
 
 
   const closePopup = () => {
@@ -128,6 +144,70 @@ const NFTDetail = () => {
       setIsLoading(false);
     }
   };
+
+
+  useEffect(() => {
+    const checkNFTHolder = async () => {
+      if (account) {
+        try {
+          const isHolder = await isNFTHolder(account);
+          setOwnsRequiredNFT(isHolder);
+        } catch (error) {
+          console.error('Fehler bei der Überprüfung des NFT-Besitzes:', error);
+        }
+      }
+    };
+    checkNFTHolder();
+  }, [account]);
+  
+  useEffect(() => {
+    const fetchWatchlistData = async () => {
+      try {
+        if (account && ownsRequiredNFT) {
+          const count = await getNFTWatchlistCount(collectionaddress, tokenid);
+          setWatchlistCount(count);
+  
+          const isInList = await isNFTInUserWatchlist(account, collectionaddress, tokenid);
+          setIsInWatchlist(isInList);
+        } else {
+          // Wenn der Benutzer nicht angemeldet ist oder kein NFT besitzt, setzen wir die Zustände auf Standardwerte
+          setWatchlistCount(0);
+          setIsInWatchlist(false);
+        }
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Watchlist-Daten:', error);
+      }
+    };
+    fetchWatchlistData();
+  }, [account, ownsRequiredNFT, collectionaddress, tokenid]);
+  
+  
+  
+  const handleAddToWatchlist = async () => {
+    try {
+      await addToWatchlist(collectionaddress, tokenid);
+      setIsInWatchlist(true);
+      setWatchlistCount(watchlistCount + 1);
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen zur Watchlist:', error);
+    }
+  };
+  
+  const handleRemoveFromWatchlist = async () => {
+    try {
+      await removeFromWatchlist(collectionaddress, tokenid);
+      setIsInWatchlist(false);
+      setWatchlistCount(watchlistCount - 1);
+    } catch (error) {
+      console.error('Fehler beim Entfernen aus der Watchlist:', error);
+    }
+  };
+  
+
+
+
+
+
   
 
   const handleBuy = async () => {
@@ -292,7 +372,31 @@ const NFTDetail = () => {
       <div className="nft-detail">
         <div className='flex'>
         <div className='flex column w100'>
+
+          <div className='flex center-ho space-between'>
         <h2 className='blue mt5 s28 text-align-left'>{nftDetails.name}</h2>
+        <div className='flex align-center ml10'>
+        {account && ownsRequiredNFT && (
+    <div className='flex align-center ml10 center-ho watchlist-field'>
+      <button
+        className='watchlist-button mr10'
+        onClick={isInWatchlist ? handleRemoveFromWatchlist : handleAddToWatchlist}
+      >
+        {isInWatchlist ? '-' : '+'}
+      </button>
+      <span className='ml5'>
+      <WatchlistEyeIcon
+                filled={false} 
+                textColor="currentColor" 
+                size={24} 
+                className="currency-icon"
+                />
+      </span>
+      <span className='s18 bold ml5'>{watchlistCount}</span>
+    </div>
+  )}
+  </div>
+  </div>
 
         <div className='flex flex-start mediacolumn'>
     <div className='h500px'>
@@ -363,9 +467,11 @@ const NFTDetail = () => {
                     <p className='grey margin-0 s16'>OWNER</p>
                     <div className='flex center-ho mt5'>
                       <img className='wh27 mr10 r50' src={ownerProfilePicture} alt='Owner' />
-                      <p className='VisibleLink margin-0 s16 w100'>
-                        <Link to={`/users/${nftDetails.owner}`}>{ownerUsername}</Link>
-                      </p>
+                      <p className='VisibleLink margin-0 s16 w100 flex center-ho'>
+                            <Link to={`/users/${nftDetails.owner}`}>{ownerUsername}</Link>
+                            {/* PlatinumUserCheck-Komponente hinzufügen */}
+                            <PlatinumUserCheck account={nftDetails.owner.toLowerCase()} />
+                          </p>
                     </div>
                   </div>
 
@@ -474,7 +580,7 @@ const NFTDetail = () => {
 )}
 
       </div>
-      <div className='w70 h100'>
+      <div className='w70 h100 w100media'>
       {/* <PriceHistory contractAddress={collectionaddress} marketplace={marketplace} currencyIcon={collectionDetails.currency} network={collectionDetails.network}/> */}
       <NFTAttributesStats
                   attributes={nftDetails.attributes}

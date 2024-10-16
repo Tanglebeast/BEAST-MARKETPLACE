@@ -26,23 +26,24 @@ import PopupContainer from '../Blog/BlogFormPupup';
 import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
 import ImageWithLoading from '../components/ImageWithLoading';
 import LoadingSpinner from '../Assets/loading-spinner';
-// import RedeemPopup from '../components/RedeemPopup';
+import PlatinumUserCheck from '../PlatinumFunctions/PlatinumUserCheck';
+// Importiere die notwendigen Funktionen aus platinumUtils.jsx
+import { getProfile, isNFTHolder } from '../PlatinumFunctions/PlatinumUtils';
 
-// Funktion zum Abrufen des Kollektion-Namens
 const getCollectionName = (address) => {
   const collection = nftCollections.find(col => col.address.toLowerCase() === address.toLowerCase());
   return collection ? collection.name : 'Unknown Collection';
 };
 
-// Funktion zum Abrufen der Ergebnisse pro Seite aus dem localStorage
 const getSavedResultsPerPage = () => {
   const savedResults = localStorage.getItem('results-per-page');
   return savedResults ? Number(savedResults) : 30; // Standardwert ist 30
 };
 
 const UserNFTs = () => {
-  const { walletAddress } = useParams();
+  const { walletAddress } = useParams(); // Adresse des angezeigten Benutzers
   const [account, setAccount] = useState(walletAddress?.toLowerCase() || '');
+  const [connectedAccount, setConnectedAccount] = useState(''); // Verbundene Wallet-Adresse
   const [marketplace, setMarketplace] = useState(null);
   const [allNFTs, setAllNFTs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -72,8 +73,17 @@ const UserNFTs = () => {
   const [allPagesData, setAllPagesData] = useState({});
   const [isPreloading, setIsPreloading] = useState(false);
   const [loadedPages, setLoadedPages] = useState(0);
+  const [isAccountInLocalStorage, setIsAccountInLocalStorage] = useState(false);
+  const [bio, setBio] = useState(''); // Zustand für die Bio
 
-  // Ersetzen der festen Zuweisung durch einen State, der den Wert aus localStorage liest
+
+  const [ownsRequiredNFT, setOwnsRequiredNFT] = useState(false); // Zustand für NFT-Besitz
+  const [socialMediaLinks, setSocialMediaLinks] = useState({
+    twitter: '',
+    instagram: '',
+    discord: ''
+  }); // Zustand für die Social-Media-Links
+
   const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
   const userCache = useRef({});
 
@@ -81,6 +91,35 @@ const UserNFTs = () => {
   useEffect(() => {
     initializeMarketplace(setMarketplace, () => { /* Nicht benötigt */ });
   }, []);
+
+  // Abrufen der verbundenen Wallet-Adresse
+  useEffect(() => {
+    const getConnectedAccount = async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          if (accounts.length > 0) {
+            setConnectedAccount(accounts[0].toLowerCase());
+          }
+        } catch (error) {
+          console.error('Fehler beim Abrufen der verbundenen Wallet-Adresse:', error);
+        }
+      } else {
+        console.warn('MetaMask ist nicht installiert.');
+      }
+    };
+    getConnectedAccount();
+  }, []);
+
+  useEffect(() => {
+    const storedAccount = localStorage.getItem('account');
+    if (storedAccount) {
+      setIsAccountInLocalStorage(true);
+    } else {
+      setIsAccountInLocalStorage(false);
+    }
+  }, []);
+  
 
   // Überprüfen, ob der Vertrag pausiert ist
   useEffect(() => {
@@ -93,20 +132,20 @@ const UserNFTs = () => {
     checkContractPaused();
   }, [marketplace]);
 
-  // Handhabung des Pause-Toggles
-  const handlePauseToggle = async () => {
-    try {
-      if (isContractPausedState) {
-        await unpauseContract(account, marketplace);
-      } else {
-        await pauseContract(account, marketplace);
+  // Überprüfen, ob die verbundene Wallet ein NFT-Besitzer ist
+  useEffect(() => {
+    const checkNFTHolder = async () => {
+      if (connectedAccount) {
+        try {
+          const isHolder = await isNFTHolder(connectedAccount);
+          setOwnsRequiredNFT(isHolder);
+        } catch (error) {
+          console.error('Fehler bei der Überprüfung des NFT-Besitzes:', error);
+        }
       }
-      setIsContractPausedState(!isContractPausedState);
-    } catch (error) {
-      console.error("Failed to toggle pause state:", error);
-      setError("Fehler beim Umschalten des Vertragsstatus.");
-    }
-  };
+    };
+    checkNFTHolder();
+  }, [connectedAccount]);
 
   // Initiales Laden der Benutzerdaten und NFTs
   useEffect(() => {
@@ -127,6 +166,24 @@ const UserNFTs = () => {
       fetchUserNames();
     }
   }, [account, marketplace, currentPage, resultsPerPage]); // Füge resultsPerPage als Abhängigkeit hinzu
+
+  // Abrufen der Social-Media-Links des angezeigten Benutzers
+  useEffect(() => {
+    const fetchSocialMediaLinks = async () => {
+      if (ownsRequiredNFT && account && isAccountInLocalStorage) {
+        try {
+          const profile = await getProfile(account);
+          setSocialMediaLinks(profile);
+          setBio(profile.bio || '');
+        } catch (error) {
+          console.error('Fehler beim Abrufen der Social-Media-Links:', error);
+        }
+      }
+    };
+    fetchSocialMediaLinks();
+  }, [ownsRequiredNFT, account, isAccountInLocalStorage]);
+  
+  
 
   // Funktion zum Abrufen der NFTs für eine bestimmte Seite (für Anzeige)
   const loadPage = async (page) => {
@@ -417,11 +474,6 @@ const UserNFTs = () => {
 
   return (
     <div className="my-nfts">
-      {/* <div className='ProfileBannerDiv'>
-        <div className='ProfileBanner flex centered'>
-          <img src={bannerPicture || '/placeholder-PFP-banner.png'} alt="Banner" />
-        </div>
-      </div> */}
       {!account && (
         <p className="error-message">Bitte verbinde deine Wallet, um deine NFTs anzuzeigen.</p>
       )}
@@ -430,52 +482,93 @@ const UserNFTs = () => {
           <div className='flex space-between w100 mt50 myNFTMainDivMedia'>
             {/* Filter- und Benutzerdaten Bereich */}
             <div className='w20 ButtonandFilterMedia'>
-              <div className='UserData onlymedia'>
+              <div className='UserData onlymedia flex center-ho'>
                 <div className='ProfilePicture'>
                   <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
                 </div>
-                <h2>
-                  {userName ? userName : <ShortenAddress address={account} />}
+                <h2 className='user-name-container flex center-ho'>
+                  <h2 className='margin-0'>
+                    {userName ? userName : <ShortenAddress address={account} />}
+                  </h2>
+                  <PlatinumUserCheck account={account} /> {/* Herz-Icon hinzufügen */}
+                   {/* Bio anzeigen */}
+  {ownsRequiredNFT && isAccountInLocalStorage && bio && (
+    <p className='user-bio'>{bio}</p>
+  )}
                 </h2>
               </div>
-              {/* Entfernte user-name-section Buttons */}
-              {/* 
-              <div className="user-name-section">
-                <div className='flex column w80'>
-                  <button className='ChangeNamebutton' onClick={() => setIsPopupOpen(true)}>CHANGE USERNAME</button>
-                  <button className='ChangeProfilePicturebutton' onClick={() => setIsProfilePopupOpen(true)}>CHANGE PROFILE PICTURE</button>
-                  {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
-                    <>
-                      <button className='SetArtistWalletButton yellow' onClick={() => setIsArtistWalletPopupOpen(true)}>SET ARTIST WALLET</button>
-                      <button className='PauseToggleButton alert-color' onClick={handlePauseToggle}>
-                        {isContractPausedState ? 'UNPAUSE CONTRACT' : 'PAUSE CONTRACT'}
-                      </button>
-                    </>
-                  )}
-                  {isAddressInArtistWallets() && (
-                    <>
-                      <button className='CreatePollButton yellow' onClick={() => setIsCreatePollPopupOpen(true)}>CREATE POLL</button>
-                      <button className='CreateBlogButton yellow' onClick={() => setIsBloglistpageOpen(true)}>CREATE BLOG ARTICLE</button>
-                      <button className='SubmitCollectionButton yellow' onClick={() => setIsSubmitCollectionPopupOpen(true)}>SUBMIT COLLECTION</button>
-                    </>
-                  )}
+
+ {/* Anzeige der Social-Media-Links, wenn die verbundene Wallet ein NFT-Besitzer ist */}
+ {ownsRequiredNFT && isAccountInLocalStorage &&(
+                <div className="social-media-links text-align-right mb30">
+                  <h3 className='mt5 mb10 flex center-ho flex-end'><img src='/crown.png' className='platinum-icon mr5'></img>CONTACT</h3>
+                  <div className='flex center-ho flex-end'>
+                    {socialMediaLinks.twitter && (
+                     <div>
+                     <a href={`https://x.com/${socialMediaLinks.twitter}`} target="_blank" rel="noopener noreferrer">
+                       <img src="/x.png" alt="X" className="social-icon" />
+                     </a>
+                   </div>
+                    )}
+                    {socialMediaLinks.instagram && (
+                      <div className='ml20'>
+                        <a href={`https://instagram.com/${socialMediaLinks.instagram}`} target="_blank" rel="noopener noreferrer">
+                        <img src="/instagram.png" alt="Instagram" className="social-icon" />
+                        </a>
+                      </div>
+                    )}
+                    {socialMediaLinks.discord && (
+                      <div className='ml20'>
+                        <a href={`https://discord.gg/${socialMediaLinks.discord}`} target="_blank" rel="noopener noreferrer">
+                        <img src="/discord.png" alt="Discord" className="social-icon" />
+                        </a>
+                      </div>
+                    )}
+                    {!socialMediaLinks.twitter && !socialMediaLinks.instagram && !socialMediaLinks.discord && (
+                      <div>No information</div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              */}
+              )}
+
+              {/* Hinweis anzeigen, wenn die verbundene Wallet kein NFT besitzt */}
+              {!ownsRequiredNFT && connectedAccount && (
+                <div className="no-access-message">
+                  <p></p>
+                </div>
+              )}
+
+
               <MyNFTsFilter onFilterChange={setFilters} ownedCollections={ownedCollections} />
             </div>
 
             {/* Hauptinhalt Bereich */}
             <div className='w80 flex column ml20 w100media'>
-              <div className='UserData OnlyDesktop'>
+              <div className='UserData OnlyDesktop flex center-ho space-between w95'>
+                <div className='flex center-ho column flex-start'>
+                  <div className='flex center-ho'>
                 <div className='ProfilePicture'>
                   <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
                 </div>
-                <h2>
-                  {userName ? userName : <ShortenAddress address={account} />}
+                <h2 className='user-name-container flex center-ho'>
+                  <h2 className='margin-0'>
+                    {userName ? userName : <ShortenAddress address={account} />}
+                  </h2>
+                  <PlatinumUserCheck account={account} /> {/* Herz-Icon hinzufügen */}
                 </h2>
+                </div>
+                <div className='opacity-70 w50'>
+                {ownsRequiredNFT && isAccountInLocalStorage && bio && (
+                    <p className='user-bio text-align-left'>{bio}</p>
+                  )}
+                  </div>
+                </div>
+
+
               </div>
 
+
+              {/* Rest des Codes bleibt unverändert */}
               {/* Suchleiste */}
               <div className='flex center-ho w95 space-between'>
                 <div className='w30 w100media'>
@@ -583,81 +676,7 @@ const UserNFTs = () => {
         </div>
       )}
 
-      {/* Popups */}
       {/* Entfernte Popups, die nicht mehr benötigt werden */}
-      {/* 
-      {isPopupOpen && (
-        <UsernamePopup
-          username={newUserName}
-          setUsername={setNewUserName}
-          handleSave={async () => {
-            try {
-              await changeUserName(account, newUserName, marketplace);
-              setUserName(newUserName);
-              setNewUserName('');
-              setIsPopupOpen(false);
-            } catch (error) {
-              console.error("Failed to change username:", error);
-              setError("Fehler beim Ändern des Benutzernamens.");
-            }
-          }}
-          closePopup={() => setIsPopupOpen(false)}
-        />
-      )}
-      {isProfilePopupOpen && (
-        <ProfilePicturePopup
-          nfts={allLoadedNFTs}
-          handleSave={async (contractAddress, tokenId, imageUrl) => {
-            try {
-              await setProfilePicture(account, contractAddress, tokenId, imageUrl, marketplace);
-              setProfilePictureState(imageUrl);
-              setBannerPicture(imageUrl);
-              setIsProfilePopupOpen(false);
-            } catch (error) {
-              console.error("Failed to set profile picture:", error);
-              setError("Fehler beim Ändern des Profilbildes.");
-            }
-          }}
-          closePopup={() => setIsProfilePopupOpen(false)}
-        />
-      )}
-      */}
-      {/* {isSubmitCollectionPopupOpen && (
-        <SubmitCollectionPopup 
-          isOpen={isSubmitCollectionPopupOpen} 
-          onClose={() => setIsSubmitCollectionPopupOpen(false)} 
-        />
-      )}
-      {isArtistWalletPopupOpen && (
-        <SetArtistWalletPopup
-          handleSave={async (contractAddress, artistWallet, artistFeePercent) => {
-            try {
-              if (!marketplace) throw new Error("Marketplace not initialized");
-              await setArtistWallet(contractAddress, artistWallet, artistFeePercent, account, marketplace);
-              console.log('Artist wallet and fee percentage set:', { contractAddress, artistWallet, artistFeePercent });
-              setIsArtistWalletPopupOpen(false);
-            } catch (error) {
-              console.error("Failed to set artist wallet:", error);
-              setError("Fehler beim Setzen der Künstler-Wallet.");
-            }
-          }}
-          closePopup={() => setIsArtistWalletPopupOpen(false)}
-        />
-      )}
-      {isCreatePollPopupOpen && (
-        <CreatePoll onClose={() => setIsCreatePollPopupOpen(false)} />
-      )}
-      {isBloglistpageOpen && (
-        <PopupContainer onClose={() => setIsBloglistpageOpen(false)}>
-          <BlogListPage
-            onClose={() => setIsBloglistpageOpen(false)}
-            onSave={(newPost) => {
-              console.log('New blog post:', newPost);
-              setIsBloglistpageOpen(false);
-            }}
-          />
-        </PopupContainer>
-      )} */}
     </div>
   );
 };

@@ -129,6 +129,7 @@ const Footer = () => {
 
                         {/* <li><a href="/faucet">Faucets</a></li>
                         <li><a href="https://fractalz.xyz/?artistmodalopen=true">Become Artist</a></li> */}
+                        {/* <li><a href="/platinum-drop">BECOME PLATINUM MEMBER</a></li> */}
                         <li><a href="/faq">FAQ</a></li>
                     </ul>
                 </div>

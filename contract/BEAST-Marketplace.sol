@@ -26,6 +26,13 @@ contract NFTMarketplace is Ownable, Pausable, ReentrancyGuard {
         address paymentToken;
     }
 
+    // Neue Struktur für Verkaufsinformationen
+    struct Sale {
+        uint256 timestamp;
+        uint256 price;
+        address paymentToken;
+    }
+
     NFT[] public nftsForSale;
     mapping(address => mapping(uint256 => uint256)) public nftPrice;
     mapping(address => string) public userNames;
@@ -34,18 +41,27 @@ contract NFTMarketplace is Ownable, Pausable, ReentrancyGuard {
     mapping(address => address) public collectionToArtistWallet;
     mapping(address => uint256) public collectionToArtistFee;
 
-    // Neue Mappings für kollektion-spezifische Volumina
     mapping(address => uint256) public collectionVolumeNative;
     mapping(address => uint256) public collectionVolumeSpecialToken;
 
-    // Neue mapping um die Verkaufshistorie zu speichern
     mapping(address => mapping(uint256 => uint256[])) public saleHistory;
+
+    // Mappings für die Like-Funktionalität
+    mapping(address => mapping(address => bool)) public userLikes; // user address => collection address => liked
+    mapping(address => uint256) public collectionLikes; // collection address => number of likes
+
+    // Neues Mapping für Verkäufe pro Kollektion
+    mapping(address => Sale[]) public collectionSales;
 
     event NFTListed(address indexed seller, address indexed contractAddress, uint256 tokenId, uint256 price, address paymentToken);
     event NFTSold(address indexed buyer, address indexed seller, address indexed contractAddress, uint256 tokenId, uint256 price, address paymentToken);
     event NFTListingCancelled(address indexed seller, address indexed contractAddress, uint256 tokenId);
     event UserNameChanged(address indexed user, string newUserName);
     event ProfilePictureChanged(address indexed user, string newProfilePicture);
+    event CollectionLiked(address indexed user, address indexed collection);
+    event CollectionUnliked(address indexed user, address indexed collection);
+    // Neues Event für Verkaufsaufzeichnung
+    event SaleRecorded(address indexed collection, uint256 price, address paymentToken);
 
     function pause() external onlyOwner whenNotPaused {
         _pause();
@@ -100,7 +116,6 @@ contract NFTMarketplace is Ownable, Pausable, ReentrancyGuard {
             (bool successSeller, ) = nft.seller.call{value: msg.value - artistFee}("");
             require(successSeller, "Ether transfer to seller failed");
 
-            // Erhöhe das kollektion-spezifische native Volumen
             collectionVolumeNative[nft.contractAddress] += msg.value;
         } else {
             require(IERC20(nft.paymentToken).balanceOf(msg.sender) >= nft.price, "Insufficient token balance");
@@ -108,15 +123,21 @@ contract NFTMarketplace is Ownable, Pausable, ReentrancyGuard {
 
             require(IERC20(nft.paymentToken).transferFrom(msg.sender, nft.seller, nft.price), "Token transfer to seller failed");
 
-            // Erhöhe das kollektion-spezifische Special Token Volumen
             collectionVolumeSpecialToken[nft.contractAddress] += nft.price;
         }
 
         IERC721(nft.contractAddress).safeTransferFrom(nft.seller, msg.sender, nft.tokenId);
         emit NFTSold(msg.sender, nft.seller, nft.contractAddress, nft.tokenId, nft.price, nft.paymentToken);
         
-        // Record the sale price in the history
         saleHistory[nft.contractAddress][nft.tokenId].push(nft.price);
+
+        // Neue Verkaufsinformation hinzufügen
+        collectionSales[nft.contractAddress].push(Sale({
+            timestamp: block.timestamp,
+            price: nft.price,
+            paymentToken: nft.paymentToken
+        }));
+        emit SaleRecorded(nft.contractAddress, nft.price, nft.paymentToken);
 
         removeNFT(_index);
     }
@@ -209,26 +230,48 @@ contract NFTMarketplace is Ownable, Pausable, ReentrancyGuard {
         return userProfilePictures[user];
     }
 
-    // Angepasste Funktionen zur Abfrage des Volumens pro Kollektion
-
-    /**
-     * @dev Gibt das native Volumen für eine spezifische Kollektion zurück.
-     * @param _collectionAddress Die Adresse der Kollektion.
-     */
     function getCollectionVolumeNative(address _collectionAddress) public view returns (uint256) {
         return collectionVolumeNative[_collectionAddress];
     }
 
-    /**
-     * @dev Gibt das Special Token Volumen für eine spezifische Kollektion zurück.
-     * @param _collectionAddress Die Adresse der Kollektion.
-     */
     function getCollectionVolumeSpecialToken(address _collectionAddress) public view returns (uint256) {
         return collectionVolumeSpecialToken[_collectionAddress];
     }
 
-    // Neue Funktion zum Abrufen der Verkaufshistorie für eine spezifische NFT
     function getSaleHistory(address _contractAddress, uint256 _tokenId) public view returns (uint256[] memory) {
         return saleHistory[_contractAddress][_tokenId];
+    }
+
+    function likeCollection(address _collectionAddress) public whenNotPaused {
+        require(_collectionAddress != address(0), "Invalid collection address");
+        require(!userLikes[msg.sender][_collectionAddress], "Collection already liked");
+
+        userLikes[msg.sender][_collectionAddress] = true;
+        collectionLikes[_collectionAddress]++;
+
+        emit CollectionLiked(msg.sender, _collectionAddress);
+    }
+
+    function unlikeCollection(address _collectionAddress) public whenNotPaused {
+        require(_collectionAddress != address(0), "Invalid collection address");
+        require(userLikes[msg.sender][_collectionAddress], "Collection not liked");
+
+        userLikes[msg.sender][_collectionAddress] = false;
+        collectionLikes[_collectionAddress]--;
+
+        emit CollectionUnliked(msg.sender, _collectionAddress);
+    }
+
+    function getCollectionLikes(address _collectionAddress) public view returns (uint256) {
+        return collectionLikes[_collectionAddress];
+    }
+
+    function hasUserLikedCollection(address _user, address _collectionAddress) public view returns (bool) {
+        return userLikes[_user][_collectionAddress];
+    }
+
+    // Neue Funktion zum Abrufen der Verkäufe einer Kollektion
+    function getCollectionSales(address _collectionAddress) public view returns (Sale[] memory) {
+        return collectionSales[_collectionAddress];
     }
 }

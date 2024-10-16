@@ -91,6 +91,8 @@
   border-bottom: 1px solid rgba(133, 133, 133, 0.412) !important;
   margin-top: 0px;
   padding-bottom: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .not-listedtext {

@@ -244,7 +244,7 @@ const ArtistPage = () => {
               </div>
             </div>
 
-            <div className='flex space-between w95'>
+            <div className='flex space-between w95 mediacolumn2'>
               <div className='SearchbarDesktop text-align-left w30 w100media'>
                 <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
               </div>

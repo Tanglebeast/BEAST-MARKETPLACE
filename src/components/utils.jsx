@@ -328,8 +328,8 @@ const sanitizeURI = (uri) => {
 // 1. Definieren Sie die Liste der speziellen Contract-Adressen in Kleinbuchstaben
 const specialContracts = [
   "0xa05135cc395b8e60aebe418594b2551b3b943960",
-  "0xa05135cc395b8e60adad418584b2551b3b942220",
-  "0xa05135ca120p8e60aehE091594b2551b3b943960" // Bitte überprüfen Sie diese Adresse auf Richtigkeit
+  "0x72e99DF172976a26de776EC55558ebd055D82B93",
+  "0x2a145839F09A447e462532Cb5D44123503384320" // platinum card
 ].map(addr => addr.toLowerCase());
 
 // 2. Hilfsfunktion zur Überprüfung, ob eine Adresse speziell ist
@@ -442,7 +442,7 @@ export const fetchAllNFTs = async (collectionAddress, marketplace, startIndex = 
           paymentToken: paymentToken, // Füge paymentToken hier hinzu
         };
       } catch (error) {
-        console.error(`Error fetching NFT data for index ${index}:`, error);
+        // console.error(`Error fetching NFT data for index ${index}:`, error);
         return null;
       }
     };
@@ -578,21 +578,48 @@ export const fetchSingleNFT = async (collectionAddress, marketplace, tokenId) =>
 
 export const getMaxSupply = async (collectionAddress) => {
   try {
-    const selectedCollection = nftCollections.find(collection => collection.address.toLowerCase() === collectionAddress.toLowerCase());
+    const selectedCollection = nftCollections.find(
+      collection => collection.address.toLowerCase() === collectionAddress.toLowerCase()
+    );
     if (!selectedCollection) {
       console.log('Collection not found for address:', collectionAddress);
-      return null;
+      return '0';
     }
 
     const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
     const maxSupply = await contract.methods.MAX_SUPPLY().call();
 
-    // console.log(`TOTAL SUPPLY IS EXACTLY ${maxSupply}`);
+    // Optional: Debugging-Log
+    // console.log(`MAX SUPPLY IS EXACTLY ${maxSupply}`);
 
-    return maxSupply;
+    return maxSupply.toString(); // Konvertiere zu String
   } catch (error) {
     console.error('Error fetching MAX_SUPPLY:', error);
-    return null;
+    return '0'; // Fallback-Wert als String
+  }
+};
+
+// Funktion zum Abrufen der aktuellen Gesamtanzahl der geminteten NFTs
+export const getTotalSupply = async (collectionAddress) => {
+  try {
+    const selectedCollection = nftCollections.find(
+      collection => collection.address.toLowerCase() === collectionAddress.toLowerCase()
+    );
+    if (!selectedCollection) {
+      console.log('Collection not found for address:', collectionAddress);
+      return '0';
+    }
+
+    const contract = new web3OnlyRead.eth.Contract(selectedCollection.abi, selectedCollection.address);
+    const totalSupply = await contract.methods.totalSupply().call();
+
+    // Optional: Debugging-Log
+    // console.log(`TOTAL SUPPLY IS EXACTLY ${totalSupply}`);
+
+    return totalSupply.toString(); // Konvertiere zu String
+  } catch (error) {
+    console.error('Error fetching totalSupply:', error);
+    return '0'; // Fallback-Wert als String
   }
 };
 
@@ -669,7 +696,7 @@ export const getNFTDetails = async (contractAddress, tokenId, marketplace) => {
       paymentToken: nftDetails.paymentToken || 'N/A', // Füge paymentToken hier hinzu mit Fallback
     };
   } catch (error) {
-    console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
+    // console.error(`Error getting NFT details for tokenId ${tokenId}:`, error);
     return null;
   }
 };
@@ -797,7 +824,7 @@ const approveERC20 = async (account, amount, marketplace, paymentToken) => {
       gasPrice: gasPrice
     });
 
-    showAlert("ERC20 token approval successful!");
+    // showAlert("ERC20 token approval successful!");
   } catch (error) {
     showAlert("Failed to approve ERC20 token transfer. Please try again.");
     throw error;

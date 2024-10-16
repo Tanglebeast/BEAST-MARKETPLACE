@@ -8,6 +8,7 @@ import BeastPrice from './BeastPrice';
 import FetchTokenAmount from './FetchTokenAmount';
 import ChangeTheme from './ChangeTheme';
 import LoadingSpinner from '../Assets/loading-spinner';
+import PlatinumUserCheck from '../PlatinumFunctions/PlatinumUserCheck';
 
 const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -199,9 +200,9 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
             <a href="/fairmint" className="nav-link">FAIRMINT</a>
             <a href="/fairvote" className="nav-link">FAIRVOTE</a>
             <a href="/beast-faucet" className="nav-link">MINT TEST TOKENS!</a>
+            <a href="/giveaway" className="nav-link">GIVEAWAY</a>
           </div>
           <div className="flex centered burder-account-network gap30">
-          <a href="/giveaway" className="nav-link">GIVEAWAY</a>
             <BeastPrice />
             {isInitializing ? (
               <LoadingSpinner
@@ -219,9 +220,11 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
                 <div className="PFPImage flex centered">
                   <img src={profilePicture} alt="Profile" className="profile-picture" />
                 </div>
-                <p className="account">
-                  {username ? username : <ShortenAddress address={account} />}
-                </p>
+                <p className="account centered flex">
+  {username ? username : <ShortenAddress address={account} />}
+  <PlatinumUserCheck account={account} /> {/* Hier wird das Herz-Icon angezeigt */}
+</p>
+
                 {showDropdown && (
                   <div className="dropdown">
                     {/* Einfügen der FetchTokenAmount Komponente */}
@@ -239,7 +242,7 @@ const Header = ({ isConnected, account, connectWallet, disconnectWallet }) => {
             ) : (
               <button className="button white" onClick={connectWallet}><h3 className='mbt2 white'>CONNECT</h3></button>
             )}
-            <ChangeTheme />
+            <ChangeTheme isConnected={isConnected}/>
           </div>
         </div>
       </nav>

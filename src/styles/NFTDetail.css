@@ -140,6 +140,27 @@ button:hover{
     max-height: 90%;
     cursor: pointer;
   }
+
+  .watchlist-field {
+    padding: 10px;
+    background-color: var(--background-color);
+    border-radius: 17px 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  .watchlist-button {
+    border-radius: 50%;
+    border: none;
+    background-color: var(--branding-color);
+    color: white !important;
+    padding: 7px;
+    display: flex;
+    width: 25px;
+    height: 25px;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+  }
   
 
 
@@ -153,6 +174,15 @@ button:hover{
         padding: 15px;
         width: 90%;
         border-radius: 10px;
+    }
+
+    .w100media-left {
+        width: 100% !important;
+        text-align: left;
+    }
+
+    .rowmobile {
+        flex-direction: row !important;
     }
 
     .MainDetailDivMedia {

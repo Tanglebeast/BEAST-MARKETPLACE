@@ -244,7 +244,7 @@ const CreatePoll = ({ onClose }) => {
                   />
                   {index > 0 && (
                     <button
-                      className="popup-form-button remove-option-button"
+                      className="popup-form-button remove-option-button white"
                       type="button"
                       onClick={() => removeOption(index)}
                     >
@@ -253,7 +253,7 @@ const CreatePoll = ({ onClose }) => {
                   )}
                   {index === options.length - 1 && (
                     <button
-                      className="popup-form-button add-option-button"
+                      className="popup-form-button add-option-button white"
                       type="button"
                       onClick={addOption}
                     >
@@ -276,7 +276,7 @@ const CreatePoll = ({ onClose }) => {
               <div className='flex column'>
                 <label className="popup-form-label text-align-left">Collections</label>
                 <button
-                  className="popup-form-button mb10 add-option-button fit-content"
+                  className="popup-form-button mb10 add-option-button fit-content white"
                   type="button"
                   onClick={openSelector}
                 >
@@ -307,7 +307,7 @@ const CreatePoll = ({ onClose }) => {
                 </select>
               </div>
             )}
-            <button className="actionbutton" type="submit">
+            <button className="actionbutton white" type="submit">
               Create Poll
             </button>
           </form>
@@ -323,7 +323,7 @@ const CreatePoll = ({ onClose }) => {
                   onChange={(e) => setNewCreatorAddress(e.target.value)}
                   placeholder="Wallet Address"
                 />
-                <button className="actionbutton" onClick={addPollCreator}>
+                <button className="actionbutton white" onClick={addPollCreator}>
                   Add
                 </button>
               </div>
@@ -336,7 +336,7 @@ const CreatePoll = ({ onClose }) => {
                   onChange={(e) => setRemoveCreatorAddress(e.target.value)}
                   placeholder="Wallet Address"
                 />
-                <button className="actionbutton red" onClick={removePollCreator}>
+                <button className="actionbutton red white" onClick={removePollCreator}>
                   Remove
                 </button>
               </div>

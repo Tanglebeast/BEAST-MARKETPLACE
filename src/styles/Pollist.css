@@ -123,5 +123,9 @@
         .mediacolumn3 {
             flex-direction: column;
         }
+        
+        .poll-Collection-Div {
+          justify-content: center;
+        }
       }
   

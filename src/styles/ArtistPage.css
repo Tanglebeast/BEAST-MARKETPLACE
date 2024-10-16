@@ -277,10 +277,13 @@
   }
 
   .NFT-Collection-Div {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      flex-direction: column;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    /* text-align: center; */
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .ml0-media {
@@ -293,5 +296,9 @@
   .SearchandFilterDiv {
       width: 0px;
       margin-top: 20px;
+  }
+
+  .artist-filter-container {
+    width: 100%;
   }
 }

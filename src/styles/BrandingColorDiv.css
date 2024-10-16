@@ -102,7 +102,7 @@
 
 /* Stil für den Slider-Track mit dynamischem Hintergrund */
 .results-per-page-slider input[type="range"] {
-  -webkit-appearance: none; /* Entfernt das Standard-Aussehen in WebKit-Browsern */
+  -webkit-appearance: none;
   width: 150px;
   height: 8px;
   border-radius: 5px;
@@ -111,6 +111,7 @@
   padding: 0;
   margin-top: 5px !important;
   margin-bottom: 5px !important;
+  background: white;
   /* Der Hintergrund wird nun dynamisch über Inline-Stile gesetzt */
 }
 
@@ -120,7 +121,7 @@
   appearance: none;
   width: 20px;
   height: 20px;
-  background: #535bf2; /* Blaue Farbe für den Daumen */
+  background: white; /* Blaue Farbe für den Daumen */
   cursor: pointer;
   border-radius: 50%;
   border: none;
@@ -131,14 +132,14 @@
 .results-per-page-slider input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  background: #535bf2; /* Blaue Farbe für den Daumen */
+  background: white; /* Blaue Farbe für den Daumen */
   cursor: pointer;
   border-radius: 50%;
   border: none;
 }
 
 .results-per-page-slider input[type="range"]::-moz-range-thumb:hover {
-  background: #404375; /* Optional: Farbe beim Hover */
+  background: white; /* Optional: Farbe beim Hover */
 }
 
 /* Entferne die Standard-Track-Stile in Firefox */

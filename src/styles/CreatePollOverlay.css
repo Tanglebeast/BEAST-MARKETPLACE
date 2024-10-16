@@ -43,8 +43,9 @@
     border-radius: 25px;
     box-sizing: border-box;
     border: none;
-    background-color: #1c1c1e;
-    color: white;
+    background-color: var(--background-color);
+    box-shadow: var(--card-box-shadow);
+    color: var(--text-color);
   }
   
   /* Schaltflächen innerhalb des Formulars */

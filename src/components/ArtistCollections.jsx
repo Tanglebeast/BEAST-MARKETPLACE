@@ -29,7 +29,7 @@ const ArtistCollectionCards = () => {
 
   return (
     <div className='CollectionDiv'>
-      <h2>{artistname.toUpperCase()}' S GALLERY</h2>
+      <h2>{artistname.toUpperCase()}' S COLLECTIONS</h2>
       <div className={`collection-cards ${artistCollections.length < 5 ? 'centered-cards' : ''}`}>
         {artistCollections.map((collection, index) => (
           <a href={`/collections/${collection.address}`} key={index} className="collection-card">

@@ -312,7 +312,10 @@
         width: 100%;
         display: flex;
         align-items: center;
-        flex-direction: column;
+        flex-direction: row;
+        /* text-align: center; */
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     .ml0-media {

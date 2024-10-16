@@ -313,8 +313,8 @@ const PollsList = ({ artistName }) => {
             </div>
 
             <div className="flex space-between w95">
-              <div className="w100 flex center-ho space-between">
-                <div className="w30">
+              <div className="w100 flex center-ho space-between mediacolumn2">
+                <div className="w30 w100media">
                   {/* Suchleiste */}
                   <SearchBar
                     searchQuery={searchQuery}

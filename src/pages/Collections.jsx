@@ -200,10 +200,10 @@ const CollectionCards = ({ limit, showSearchBar, showFilter }) => {
           </div>
           
           {/* Kategorie- und Pagination-Buttons */}
-          <div className='flex center-ho mt15 mb5 space-between w95'>
-            <div className='flex center-ho gap5'>
+          <div className='flex center-ho mt15 mb5 space-between w95 mobilecolumn'>
+            <div className='flex center-ho gap5 mobilescroll'>
               {/* Kategorie Buttons */}
-              {['ALL', 'ART', 'PFP', 'PHOTOGRAPHY', 'METAVERSE', 'GAMING', 'MUSIC'].map((category) => (
+              {['ALL', 'ART', 'PFP', 'UTILITY', 'PHOTOGRAPHY', 'METAVERSE', 'GAMING', 'MUSIC'].map((category) => (
                 <div
                   key={category}
                   className={`collectionCategoryDiv ${selectedCategory === category ? 'active' : ''}`}

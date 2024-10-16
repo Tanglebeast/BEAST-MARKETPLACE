@@ -1,4 +1,4 @@
-// src/components/MyNFTs.jsx
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -17,7 +17,8 @@ import {
   isContractPaused,
   getTokenIdsOfOwner,
   artistwalletAddresses,
-  addProject
+  addProject,
+  hasUserLikedCollection
 } from '../components/utils';
 import { nftCollections } from '../NFTCollections';
 import '../styles/MyNFTs.css';
@@ -35,12 +36,23 @@ import SubmitCollectionPopup from '../components/SubmitCollectionPopup';
 import ImageWithLoading from '../components/ImageWithLoading';
 import AddProjectPopup from '../components/AddProjectPopup';
 import LoadingSpinner from '../Assets/loading-spinner';
+import PlatinumUserCheck from '../PlatinumFunctions/PlatinumUserCheck';
+
+// Importiere die notwendigen Funktionen
+import { getProfile, updateProfile, removeProfile, isNFTHolder, getWatchlist } from '../PlatinumFunctions/PlatinumUtils';
+import PlatinumProfilePopup from '../PlatinumFunctions/PlatinumProfilePopup'; // Popup-Komponente importieren
 
 // Funktion zum Abrufen des Kollektion-Namens
 const getCollectionName = (address) => {
+  if (!address) {
+    console.warn('getCollectionName wurde mit undefinierter Adresse aufgerufen.');
+    return 'Unknown Collection';
+  }
+
   const collection = nftCollections.find(col => col.address.toLowerCase() === address.toLowerCase());
   return collection ? collection.name : 'Unknown Collection';
 };
+
 
 // Funktion zum Abrufen der Ergebnisse pro Seite aus dem localStorage
 const getSavedResultsPerPage = () => {
@@ -66,7 +78,6 @@ const MyNFTs = () => {
   const [isContractPausedState, setIsContractPausedState] = useState(false);
   const [isBloglistpageOpen, setIsBloglistpageOpen] = useState(false);
   const [isSubmitCollectionPopupOpen, setIsSubmitCollectionPopupOpen] = useState(false);
-  // const [isRedeemPopupOpen, setIsRedeemPopupOpen] = useState(false);
   const [filters, setFilters] = useState({
     availability: [],
     artist: [],
@@ -74,16 +85,33 @@ const MyNFTs = () => {
   });
   const [ownedCollections, setOwnedCollections] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [progressPercentage, setProgressPercentage] = useState(0);
+  // const [totalPages, setTotalPages] = useState(1);
+  // const [progressPercentage, setProgressPercentage] = useState(0);
   const [error, setError] = useState(null);
   const [userNames, setUserNames] = useState({});
   const [totalBatches, setTotalBatches] = useState(1);
   const [loadedBatches, setLoadedBatches] = useState(0);
-  const [allPagesData, setAllPagesData] = useState({});
+  // const [allPagesData, setAllPagesData] = useState({});
   const [isPreloading, setIsPreloading] = useState(false);
-  const [loadedPages, setLoadedPages] = useState(0);
-  const [isAddProjectPopupOpen, setIsAddProjectPopupOpen] = useState(false); // Neuer State für das AddProjectPopup
+  // const [loadedPages, setLoadedPages] = useState(0);
+  const [isAddProjectPopupOpen, setIsAddProjectPopupOpen] = useState(false);
+  const [selectedMenu, setSelectedMenu] = useState('myNFTs');
+  const [allPagesData, setAllPagesData] = useState({ myNFTs: {}, watchlist: {} });
+const [totalPages, setTotalPages] = useState({ myNFTs: 1, watchlist: 1 });
+const [loadedPages, setLoadedPages] = useState({ myNFTs: 0, watchlist: 0 });
+const [progressPercentage, setProgressPercentage] = useState({ myNFTs: 0, watchlist: 0 });
+
+
+
+  // Neue Zustandsvariablen für NFT-Besitz und Profilbearbeitung
+  const [ownsRequiredNFT, setOwnsRequiredNFT] = useState(false); // Zustand für NFT-Besitz
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false); // Zustand für das Edit-Profile-Popup
+  const [socialMediaLinks, setSocialMediaLinks] = useState({
+    twitter: '',
+    instagram: '',
+    discord: '',
+    bio: ''
+  }); // Zustand für die Social-Media-Links und Bio
 
   // Ersetzen der festen Zuweisung durch einen State, der den Wert aus localStorage liest
   const [resultsPerPage, setResultsPerPage] = useState(getSavedResultsPerPage());
@@ -93,6 +121,36 @@ const MyNFTs = () => {
   useEffect(() => {
     initializeMarketplace(setMarketplace, () => { /* Nicht benötigt */ });
   }, []);
+
+  // Überprüfen, ob der Benutzer ein NFT-Besitzer ist
+  useEffect(() => {
+    const checkNFTHolder = async () => {
+      if (account) {
+        try {
+          const isHolder = await isNFTHolder(account);
+          setOwnsRequiredNFT(isHolder);
+        } catch (error) {
+          console.error('Fehler bei der Überprüfung des NFT-Besitzes:', error);
+        }
+      }
+    };
+    checkNFTHolder();
+  }, [account]);
+
+  // Abrufen der Profilinformationen
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (ownsRequiredNFT && account) {
+        try {
+          const profile = await getProfile(account);
+          setSocialMediaLinks(profile);
+        } catch (error) {
+          console.error('Fehler beim Abrufen der Profilinformationen:', error);
+        }
+      }
+    };
+    fetchProfileData();
+  }, [ownsRequiredNFT, account]);
 
   // Überprüfen, ob der Vertrag pausiert ist
   useEffect(() => {
@@ -134,7 +192,6 @@ const MyNFTs = () => {
       alert('Fehler beim Hinzufügen des Projekts.');
     }
   };
-  
 
   // Initiales Laden der Benutzerdaten und NFTs
   useEffect(() => {
@@ -151,86 +208,73 @@ const MyNFTs = () => {
           setProfilePictureState('/placeholder-PFP-black.png');
           setBannerPicture('/placeholder-PFP-banner.png');
         });
-      loadPage(currentPage); // Lade die aktuelle Seite
+  
+      // Rufen Sie die richtige Ladefunktion basierend auf selectedMenu auf
+      if (selectedMenu === 'myNFTs') {
+        loadOwnedNFTs(currentPage);
+      } else if (selectedMenu === 'watchlist') {
+        loadWatchlistNFTs(currentPage);
+      }
+  
       fetchUserNames();
     }
-  }, [account, marketplace, currentPage, resultsPerPage]); // Füge resultsPerPage als Abhängigkeit hinzu
+  }, [account, marketplace, selectedMenu, currentPage, resultsPerPage]);
 
-  // Funktion zum Abrufen des Kollektion-Namens ist bereits definiert oben
-
-  // Funktion zum Abrufen der NFTs für eine bestimmte Seite (für Anzeige)
-  const loadPage = async (page) => {
-    // Überprüfe, ob die Daten für diese Seite bereits geladen wurden
-    if (allPagesData[page]) {
-      setAllNFTs(allPagesData[page]);
-      setLoadedPages(prev => (prev < 1 ? 1 : prev)); // Sicherstellen, dass mindestens die aktuelle Seite als geladen zählt
-
+  const loadOwnedNFTs = async (page) => {
+    if (allPagesData.myNFTs[page]) {
+      // Keine Notwendigkeit, setAllNFTs hier zu verwenden, da allLoadedNFTs alle Seiten berücksichtigt
       if (isFirstPageLoading) {
         setIsFirstPageLoading(false);
       }
-
       return;
     }
-
+  
     setLoading(true);
     setError(null);
     try {
-      // Sammle alle Token IDs für alle Kollektionen
       const tokenIdPromises = nftCollections.map(async (collection) => {
         const tokenIds = await getTokenIdsOfOwner(collection.address, account);
         return { collection, tokenIds };
       });
-
+  
       const tokenIdResults = await Promise.all(tokenIdPromises);
-      console.log('Token ID Results:', tokenIdResults);
-
-      // Flache die Token-IDs und berechne die Gesamtanzahl
       const allTokenIds = tokenIdResults.flatMap(result => result.tokenIds.map(tokenId => ({ collection: result.collection, tokenId })));
       const totalTokens = allTokenIds.length;
       const computedTotalPages = Math.ceil(totalTokens / resultsPerPage);
-      setTotalPages(computedTotalPages);
-      setTotalBatches(computedTotalPages);
-
-      // Berechne den Start- und Endindex für die aktuelle Seite
+      setTotalPages(prev => ({ ...prev, myNFTs: computedTotalPages }));
+  
       const start = (page - 1) * resultsPerPage;
       const end = page * resultsPerPage;
       const paginatedTokenIds = allTokenIds.slice(start, end);
-      console.log('Paginated Token IDs:', paginatedTokenIds);
-
-      // Lade die NFTs für die aktuelle Seite
-      const nftPromises = paginatedTokenIds.map(async ({ collection, tokenId }) => {
+  
+      const nftPromisesPage = paginatedTokenIds.map(async ({ collection, tokenId }) => {
         const nft = await fetchSingleNFT(collection.address, marketplace, tokenId);
         return {
           ...nft,
-          collectionName: getCollectionName(collection.address) // Hinzufügen des collectionName-Feldes
+          collectionName: getCollectionName(collection.address)
         };
       });
-
-      const nfts = await Promise.all(nftPromises);
-      console.log('Fetched NFTs:', nfts);
-
-      // Filtere Duplikate und validiere NFTs
+  
+      const nfts = await Promise.all(nftPromisesPage);
       const uniqueNFTs = nfts.filter(nft => 
         nft && 
-        !allPagesData[page]?.some(existingNft => 
+        !allPagesData.myNFTs[page]?.some(existingNft => 
           existingNft.tokenId === nft.tokenId && 
           existingNft.contractAddress.toLowerCase() === nft.contractAddress.toLowerCase()
         )
       );
-      console.log('Unique NFTs to add:', uniqueNFTs);
-
-      // Speichere die NFTs für diese Seite im allPagesData
+  
       setAllPagesData(prevData => ({
         ...prevData,
-        [page]: uniqueNFTs
+        myNFTs: {
+          ...prevData.myNFTs,
+          [page]: uniqueNFTs
+        }
       }));
-
-      setAllNFTs(uniqueNFTs); // Setze die NFTs der aktuellen Seite
-
-      // Setze die Anzahl der geladenen Seiten auf 1 (aktuelle Seite)
-      setLoadedPages(1);
-
-      // Wenn die erste Seite geladen ist, entferne das Loading-GIF
+  
+      // `allLoadedNFTs` wird automatisch durch `allPagesData` aktualisiert
+      setLoadedPages(prev => ({ ...prev, myNFTs: prev.myNFTs + 1 }));
+  
       if (isFirstPageLoading) {
         setIsFirstPageLoading(false);
       }
@@ -241,21 +285,107 @@ const MyNFTs = () => {
       setLoading(false);
     }
   };
+  
+  
+
+  useEffect(() => {
+    if (account && marketplace) {
+      if (selectedMenu === 'myNFTs') {
+        loadOwnedNFTs(currentPage);
+      } else if (selectedMenu === 'watchlist') {
+        loadWatchlistNFTs(currentPage);
+      }
+      fetchUserNames();
+    }
+  }, [account, marketplace, selectedMenu, currentPage, resultsPerPage]);
+
+
+  const loadWatchlistNFTs = async (page) => {
+    if (allPagesData.watchlist[page]) {
+      setAllNFTs(allPagesData.watchlist[page]);
+      setLoadedPages(prev => ({ ...prev, watchlist: prev.watchlist < 1 ? 1 : prev.watchlist }));
+      if (isFirstPageLoading) {
+        setIsFirstPageLoading(false); // Ladezeichen entfernen
+      }
+      return;
+    }
+  
+    setLoading(true);
+    setError(null);
+    try {
+      const watchlist = await getWatchlist(account);
+      const allTokenIds = watchlist.map(item => ({ contract: { address: item.contractAddress }, tokenId: item.tokenId }));
+  
+      const totalTokens = allTokenIds.length;
+      const computedTotalPages = Math.ceil(totalTokens / resultsPerPage);
+      setTotalPages(prev => ({ ...prev, watchlist: computedTotalPages }));
+      setTotalBatches(computedTotalPages);
+  
+      const start = (page - 1) * resultsPerPage;
+      const end = page * resultsPerPage;
+      const paginatedTokenIds = allTokenIds.slice(start, end);
+  
+      const nftPromises = paginatedTokenIds.map(async ({ contract, tokenId }) => {
+        const nft = await fetchSingleNFT(contract.address, marketplace, tokenId);
+        return {
+          ...nft,
+          collectionName: getCollectionName(contract.address)
+        };
+      });
+  
+      const nfts = await Promise.all(nftPromises);
+  
+      const uniqueNFTs = nfts.filter(nft =>
+        nft &&
+        !allPagesData.watchlist[page]?.some(existingNft =>
+          existingNft.tokenId === nft.tokenId &&
+          existingNft.contractAddress.toLowerCase() === nft.contractAddress.toLowerCase()
+        )
+      );
+  
+      setAllPagesData(prevData => ({
+        ...prevData,
+        watchlist: {
+          ...prevData.watchlist,
+          [page]: uniqueNFTs
+        }
+      }));
+  
+      setAllNFTs(uniqueNFTs);
+      setLoadedPages(prev => ({ ...prev, watchlist: 1 }));
+  
+      if (isFirstPageLoading) {
+        setIsFirstPageLoading(false); // Ladezeichen entfernen
+      }
+    } catch (err) {
+      console.error('Error fetching NFTs:', err);
+      setError('Fehler beim Laden der NFTs. Bitte versuche es später erneut.');
+      if (isFirstPageLoading) {
+        setIsFirstPageLoading(false); // Ladezeichen entfernen
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+
+ 
 
   // Funktion zum Vorabladen aller Seiten im Hintergrund
   const preloadPages = async () => {
     if (isPreloading) return; // Verhindere mehrfaches Vorabladen
     setIsPreloading(true);
-
-    const total = totalPages || Math.ceil(allNFTs.length / resultsPerPage);
+  
+    const total = totalPages[selectedMenu] || Math.ceil(allNFTs.length / resultsPerPage);
     const pagesToLoad = [];
-
+  
     for (let page = 1; page <= total; page++) {
-      if (!allPagesData[page] && page !== currentPage) { // Vermeide das erneute Laden der aktuellen Seite
+      if (!allPagesData[selectedMenu][page] && page !== currentPage) { // Vermeide das erneute Laden der aktuellen Seite
         pagesToLoad.push(page);
       }
     }
-
+  
     try {
       // Begrenze die Anzahl der gleichzeitig geladenen Seiten, z.B. 3 gleichzeitig
       const concurrency = 3;
@@ -271,79 +401,90 @@ const MyNFTs = () => {
       setIsPreloading(false);
     }
   };
-
+  
   // Hilfsfunktion zum Vorabladen einer einzelnen Seite ohne die Anzeige zu ändern
   const preloadPage = async (page) => {
     // Überprüfe, ob die Daten für diese Seite bereits geladen wurden
-    if (allPagesData[page]) {
+    if (allPagesData[selectedMenu][page]) {
       return;
     }
-
+  
     try {
       // Sammle alle Token IDs für alle Kollektionen
       const tokenIdPromises = nftCollections.map(async (collection) => {
         const tokenIds = await getTokenIdsOfOwner(collection.address, account);
         return { collection, tokenIds };
       });
-
+  
       const tokenIdResults = await Promise.all(tokenIdPromises);
       console.log('Token ID Results:', tokenIdResults);
-
+  
       // Flache die Token-IDs und berechne die Gesamtanzahl
       const allTokenIds = tokenIdResults.flatMap(result => result.tokenIds.map(tokenId => ({ collection: result.collection, tokenId })));
       const totalTokens = allTokenIds.length;
-      setTotalPages(Math.ceil(totalTokens / resultsPerPage));
+      setTotalPages(prev => ({ 
+        ...prev, 
+        [selectedMenu]: Math.ceil(totalTokens / resultsPerPage) 
+      }));
       setTotalBatches(Math.ceil(totalTokens / resultsPerPage));
-
+  
       // Berechne den Start- und Endindex für die Seite
       const start = (page - 1) * resultsPerPage;
       const end = page * resultsPerPage;
       const paginatedTokenIds = allTokenIds.slice(start, end);
       console.log('Paginated Token IDs:', paginatedTokenIds);
-
+  
       // Lade die NFTs für die Seite
-      const nftPromises = paginatedTokenIds.map(async ({ collection, tokenId }) => {
+      const nftPromisesPage = paginatedTokenIds.map(async ({ collection, tokenId }) => {
         const nft = await fetchSingleNFT(collection.address, marketplace, tokenId);
         return {
           ...nft,
           collectionName: getCollectionName(collection.address) // Hinzufügen des collectionName-Feldes
         };
       });
-
-      const nfts = await Promise.all(nftPromises);
+  
+      const nfts = await Promise.all(nftPromisesPage);
       console.log('Fetched NFTs for preloading:', nfts);
-
+  
       // Filtere Duplikate und validiere NFTs
       const uniqueNFTs = nfts.filter(nft => 
         nft && 
-        !allPagesData[page]?.some(existingNft => 
+        !allPagesData[selectedMenu][page]?.some(existingNft => 
           existingNft.tokenId === nft.tokenId && 
           existingNft.contractAddress.toLowerCase() === nft.contractAddress.toLowerCase()
         )
       );
       console.log('Unique NFTs to preload:', uniqueNFTs);
-
-      // Speichere die NFTs für diese Seite im allPagesData
+  
+      // Speichere die NFTs für diese Seite im allPagesData unter dem aktuellen Menü
       setAllPagesData(prevData => ({
         ...prevData,
-        [page]: uniqueNFTs
+        [selectedMenu]: {
+          ...prevData[selectedMenu],
+          [page]: uniqueNFTs
+        }
       }));
-
+  
       // Inkrementiere die Anzahl der geladenen Seiten
-      setLoadedPages(prev => prev + 1);
+      setLoadedPages(prev => ({
+        ...prev,
+        [selectedMenu]: prev[selectedMenu] + 1
+      }));
     } catch (err) {
       console.error(`Error preloading page ${page}:`, err);
       // Hier könntest du zusätzliche Fehlerbehandlungen einfügen
     }
   };
+  
+  
 
   // Starte das Vorladen der restlichen Seiten, sobald die aktuelle Seite geladen ist
   useEffect(() => {
-    if (allPagesData[currentPage] && !isPreloading) {
+    if (allPagesData[selectedMenu][currentPage] && !isPreloading) {
       preloadPages();
     }
-  }, [allPagesData, currentPage, isPreloading, resultsPerPage]);
-
+  }, [allPagesData, selectedMenu, currentPage, isPreloading, resultsPerPage]);
+  
   // Caching der Benutzernamen
   const fetchUserNames = async () => {
     if (!marketplace) return;
@@ -372,16 +513,24 @@ const MyNFTs = () => {
   };
 
   // Berechnung des Fortschritts
-  useEffect(() => {
-    if (totalPages > 0) {
-      setProgressPercentage((loadedPages / totalPages) * 100);
-    }
-  }, [loadedPages, totalPages]);
+// Berechnung des Fortschritts
+useEffect(() => {
+  if (totalPages[selectedMenu] > 0) {
+    setProgressPercentage(prev => ({
+      ...prev,
+      [selectedMenu]: (loadedPages[selectedMenu] / totalPages[selectedMenu]) * 100
+    }));
+  }
+}, [loadedPages, totalPages, selectedMenu]);
+
+  
 
   // Memoization für die vollständige Liste aller geladenen NFTs
   const allLoadedNFTs = useMemo(() => {
-    return Object.values(allPagesData).flat();
-  }, [allPagesData]);
+    return Object.values(allPagesData[selectedMenu] || {}).flat();
+  }, [allPagesData, selectedMenu]);
+  
+  
 
   // Neuer useEffect zur Aktualisierung von ownedCollections basierend auf allLoadedNFTs
   useEffect(() => {
@@ -393,35 +542,61 @@ const MyNFTs = () => {
   // Memoization für die gefilterte Liste der NFTs
   const filteredNFTs = useMemo(() => {
     return allLoadedNFTs.filter(nft => {
+      if (!nft) {
+        console.warn('Encountered undefined NFT:', nft);
+        return false;
+      }
+  
+      const nftName = nft.name ? nft.name.toLowerCase() : '';
+      const contractAddress = nft.contractAddress ? nft.contractAddress.toLowerCase() : '';
+  
+      const searchLower = searchQuery.toLowerCase();
+  
       const matchesSearchQuery =
-        nft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        getCollectionName(nft.contractAddress).toLowerCase().includes(searchQuery.toLowerCase());
-
+        nftName.includes(searchLower) ||
+        getCollectionName(contractAddress).toLowerCase().includes(searchLower);
+  
       const matchesAvailability = filters.availability.length === 0 || (
         (filters.availability.includes('LISTED') && parseFloat(nft.price) > 0) ||
         (filters.availability.includes('NOT LISTED') && parseFloat(nft.price) === 0)
       );
-
-      const collection = nftCollections.find(col => col.address.toLowerCase() === nft.contractAddress.toLowerCase());
+  
+      const collection = nftCollections.find(col => col.address.toLowerCase() === contractAddress);
       if (!collection) {
         console.warn(`No collection found for address: ${nft.contractAddress}`);
       }
-
+  
       const matchesArtist = filters.artist.length === 0 || (collection && filters.artist.includes(collection.artist));
       const matchesArtwork = filters.artwork.length === 0 || (collection && filters.artwork.includes(collection.name));
-
+  
       const isMatch = matchesSearchQuery && matchesAvailability && matchesArtist && matchesArtwork;
       if (!isMatch) {
-        console.log(`NFT ${nft.tokenId} aus ${nft.contractAddress} gefiltert.`);
+        console.log(`NFT ${nft.tokenId} from ${nft.contractAddress} gefiltert.`);
       }
       return isMatch;
     });
   }, [allLoadedNFTs, searchQuery, filters]);
+  
 
   // Berechne die Gesamtanzahl der gefilterten Seiten
   const totalFilteredPages = useMemo(() => {
-    return Math.ceil(filteredNFTs.length / resultsPerPage) || 1;
+    const totalNFTs = filteredNFTs.length;
+    const pages = Math.ceil(totalNFTs / resultsPerPage) || 1;
+    return pages;
   }, [filteredNFTs.length, resultsPerPage]);
+
+  console.log('Total Filtered Pages:', totalFilteredPages);
+
+  useEffect(() => {
+    console.log('Filtered NFTs Length:', filteredNFTs.length);
+  }, [filteredNFTs]);
+  
+
+  useEffect(() => {
+    console.log('All Loaded NFTs Length:', allLoadedNFTs.length);
+  }, [allLoadedNFTs]);
+  
+  
 
   // Berechne die NFTs für die aktuelle Seite basierend auf den gefilterten NFTs
   const currentNFTs = useMemo(() => {
@@ -429,6 +604,7 @@ const MyNFTs = () => {
     const end = start + resultsPerPage;
     return filteredNFTs.slice(start, end);
   }, [filteredNFTs, currentPage, resultsPerPage]);
+  
 
   // Setze die aktuelle Seite auf 1, wenn Filter oder Suchabfrage geändert werden
   useEffect(() => {
@@ -438,7 +614,13 @@ const MyNFTs = () => {
   // Handhabung der Seitennavigation
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
+    if (selectedMenu === 'myNFTs') {
+      loadOwnedNFTs(newPage);
+    } else if (selectedMenu === 'watchlist') {
+      loadWatchlistNFTs(newPage);
+    }
   };
+  
 
   // Debugging: Überprüfen auf Duplikate
   useEffect(() => {
@@ -495,18 +677,72 @@ const MyNFTs = () => {
           <div className='flex space-between w100 mt50 myNFTMainDivMedia'>
             {/* Filter- und Benutzerdaten Bereich */}
             <div className='w20 ButtonandFilterMedia'>
-              <div className='UserData onlymedia'>
+            <div className='UserData onlymedia flex center-ho mediacolumn2'>
                 <div className='ProfilePicture'>
                   <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
                 </div>
-                <h2>
-                  {userName ? userName : <ShortenAddress address={account} />}
-                </h2>
+                <div className='user-name-container flex center-ho'>
+  <h2 className='margin-0'>
+    {userName ? userName : <ShortenAddress address={account} />}
+  </h2>
+  <PlatinumUserCheck account={account} /> {/* Herz-Icon hinzufügen */}
+</div>
+
+              {/* Bio anzeigen */}
+              {ownsRequiredNFT && socialMediaLinks.bio && (
+                    <p className='user-bio'>{socialMediaLinks.bio}</p>
+                  )}
               </div>
+
+
+
+   {/* Anzeige der Social-Media-Links */}
+   {ownsRequiredNFT && (
+                <div className="social-media-links text-align-right mb30">
+                  <h3 className='mt5 mb5 flex center-ho flex-end'><img src='/crown.png' className='platinum-icon mr5'></img>CONTACT</h3>
+                  <div className='flex center-ho flex-end'>
+                    {socialMediaLinks.twitter && (
+                      <div>
+                        <a href={`https://x.com/${socialMediaLinks.twitter}`} target="_blank" rel="noopener noreferrer">
+                          <img src="/x.png" alt="X" className="social-icon" />
+                        </a>
+                      </div>
+                    )}
+                    {socialMediaLinks.instagram && (
+                      <div className='ml20'>
+                        <a href={`https://instagram.com/${socialMediaLinks.instagram}`} target="_blank" rel="noopener noreferrer">
+                          <img src="/instagram.png" alt="Instagram" className="social-icon" />
+                        </a>
+                      </div>
+                    )}
+                    {socialMediaLinks.discord && (
+                      <div className='ml20'>
+                        <a href={`https://discord.gg/${socialMediaLinks.discord}`} target="_blank" rel="noopener noreferrer">
+                          <img src="/discord.png" alt="Discord" className="social-icon" />
+                        </a>
+                      </div>
+                    )}
+                    {!socialMediaLinks.twitter && !socialMediaLinks.instagram && !socialMediaLinks.discord && (
+                      <li>No social medias.</li>
+                    )}
+                  </div>
+                </div>
+              )}
+
+
+
+
+
               <div className="user-name-section">
                 <div className='flex column w80'>
                   <button className='ChangeNamebutton white' onClick={() => setIsPopupOpen(true)}>CHANGE USERNAME</button>
                   <button className='ChangeProfilePicturebutton white' onClick={() => setIsProfilePopupOpen(true)}>CHANGE PROFILE PICTURE</button>
+
+              {/* "EDIT PROFILE"-Button für NFT-Besitzer */}
+              {ownsRequiredNFT && (
+                <button className='ChangeProfilePicturebutton white flex centered' onClick={() => setIsEditProfilePopupOpen(true)}>EDIT PROFILE<img src='/crown.png' className='platinum-icon'></img></button>
+              )}
+
                   {/* <button className='ChangeProfilePicturebutton' onClick={() => setIsRedeemPopupOpen(true)}>REDEEM ARTWORK</button> */}
 
                   {account.toLowerCase() === CONTRACT_OWNER_ADDRESS.toLowerCase() && (
@@ -533,54 +769,99 @@ const MyNFTs = () => {
 
             {/* Hauptinhalt Bereich */}
             <div className='w80 flex column ml20 w100media'>
-              <div className='UserData OnlyDesktop'>
+            <div className='UserData OnlyDesktop flex center-ho flex column text-align-left flex-start'>
+              <div className='flex center-ho'>
                 <div className='ProfilePicture'>
                   <img src={profilePicture || '/placeholder-PFP-black.png'} alt="Profile" />
                 </div>
-                <h2>
-                  {userName ? userName : <ShortenAddress address={account} />}
-                </h2>
+                <div className='user-name-container flex center-ho'>
+  <h2 className='margin-0'>
+    {userName ? userName : <ShortenAddress address={account} />}
+  </h2>
+  <PlatinumUserCheck account={account} /> {/* Herz-Icon hinzufügen */}
+</div>
+
+              </div>
+              {/* Bio anzeigen */}
+              {ownsRequiredNFT && socialMediaLinks.bio && (
+                    <p className='user-bio w50 opacity-70'>{socialMediaLinks.bio}</p>
+                  )}
               </div>
 
               {/* Suchleiste */}
               <div className='flex center-ho w95 space-between'>
-                <div className='w30 w100media'>
+                <div className='w30 w100media mt5'>
                   <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
                 </div>
 
-                {/* Paginierung */}
-                {totalFilteredPages > 1 && (
-                  <div className="custom-pagination">
-                    <button 
-                      className="custom-pagination-btn previous-btn"
-                      onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-                      disabled={currentPage === 1 || loading}
-                      aria-label="Vorherige Seite"
-                    >
-                      &lt; 
-                    </button>
-                    <span className="custom-pagination-info">
-                      {currentPage} OF {totalFilteredPages}
-                    </span>
-                    <button 
-                      className="custom-pagination-btn next-btn"
-                      onClick={() => handlePageChange(Math.min(currentPage + 1, totalFilteredPages))}
-                      disabled={currentPage === totalFilteredPages || loading}
-                      aria-label="Nächste Seite"
-                    >
-                      &gt;
-                    </button>
-                  </div>
-                )}
+               {/* Paginierung */}
+{totalFilteredPages > 1 && (
+  <div className="custom-pagination">
+    <button 
+      className="custom-pagination-btn previous-btn"
+      onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+      disabled={currentPage === 1 || loading}
+      aria-label="Vorherige Seite"
+    >
+      &lt; 
+    </button>
+    <span className="custom-pagination-info">
+      {currentPage} OF {totalFilteredPages}
+    </span>
+    <button 
+      className="custom-pagination-btn next-btn"
+      onClick={() => handlePageChange(Math.min(currentPage + 1, totalFilteredPages))}
+      disabled={currentPage === totalFilteredPages || loading}
+      aria-label="Nächste Seite"
+    >
+      &gt;
+    </button>
+  </div>
+)}
 
-                {/* Fehleranzeige */}
-                {error && (
-                  <div className="error-message">
-                    {error}
-                    <button onClick={() => loadPage(currentPage)}>Erneut versuchen</button>
-                  </div>
-                )}
+
+               {/* Fehleranzeige */}
+{error && (
+  <div className="error-message">
+    {error}
+    <button onClick={() => selectedMenu === 'myNFTs' ? loadOwnedNFTs(currentPage) : loadWatchlistNFTs(currentPage)}>
+      Erneut versuchen
+    </button>
+  </div>
+)}
+
               </div>
+
+              {ownsRequiredNFT && (
+  <div className="menu-myaccount mediacenter">
+<button
+  onClick={() => {
+    setSelectedMenu('myNFTs');
+    setCurrentPage(1);
+    setIsFirstPageLoading(true); // Ladezeichen anzeigen
+  }}
+  className={selectedMenu === 'myNFTs' ? 'active' : ''}
+>
+  <h3>My NFTs</h3>
+</button>
+<button
+  onClick={() => {
+    setSelectedMenu('watchlist');
+    setCurrentPage(1);
+    setIsFirstPageLoading(true); // Ladezeichen anzeigen
+  }}
+  className={selectedMenu === 'watchlist' ? 'active' : ''}
+>
+  <div className='flex center-ho'>
+    <img src='/crown.png' className='platinum-icon mr5' alt="Crown Icon" />
+    <h3>Watchlist</h3>
+  </div>
+</button>
+  </div>
+)}
+
+
+
 
               {/* Loading-GIF für die erste Seite */}
               {isFirstPageLoading && (
@@ -595,18 +876,20 @@ const MyNFTs = () => {
               )}
 
               {/* Fortschrittsbalken */}
-              {(loading || isPreloading) && !isFirstPageLoading && (
-                <div 
-                  className="progress-bar-container mt10r" 
-                  role="progressbar" 
-                  aria-valuenow={progressPercentage} 
-                  aria-valuemin="0" 
-                  aria-valuemax="100"
-                >
-                  <div className="progress-bar" style={{ width: `${progressPercentage}%` }}></div>
-                  <span className="progress-text">{`${Math.round(progressPercentage)}%`}</span>
-                </div>
-              )}
+            {/* Fortschrittsbalken */}
+{(loading || isPreloading) && !isFirstPageLoading && (
+  <div 
+    className="progress-bar-container mt10r" 
+    role="progressbar" 
+    aria-valuenow={progressPercentage[selectedMenu]} 
+    aria-valuemin="0" 
+    aria-valuemax="100"
+  >
+    <div className="progress-bar" style={{ width: `${progressPercentage[selectedMenu]}%` }}></div>
+    {/* <span className="progress-text">{`${Math.round(progressPercentage[selectedMenu])}%`}</span> */}
+  </div>
+)}
+
 
               {/* NFT-Anzeige */}
               <div className="nft-list-my">
@@ -731,6 +1014,14 @@ const MyNFTs = () => {
           account={account}
         />
       )} */}
+        {isEditProfilePopupOpen && (
+        <PlatinumProfilePopup
+          isOpen={isEditProfilePopupOpen}
+          onClose={() => setIsEditProfilePopupOpen(false)}
+          socialMediaLinks={socialMediaLinks}
+          setSocialMediaLinks={setSocialMediaLinks}
+        />
+      )}
       {isBloglistpageOpen && (
         <PopupContainer onClose={() => setIsBloglistpageOpen(false)}>
           <BlogListPage

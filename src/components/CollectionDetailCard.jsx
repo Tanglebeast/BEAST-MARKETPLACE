@@ -6,6 +6,7 @@ import '../styles/CollectionDetailCard.css';
 import CurrencyBeastIcon from '../Assets/currency-beast';
 import CurrencyIotaIcon from '../Assets/currency-iota';
 import LoadingSpinner from '../Assets/loading-spinner';
+import PlatinumUserCheck from '../PlatinumFunctions/PlatinumUserCheck';
 
 const CollectionDetailCard = ({ nft, account, currencyIcon, userNames }) => {
     const ownerAddress = nft.owner.toLowerCase();
@@ -55,7 +56,11 @@ const CollectionDetailCard = ({ nft, account, currencyIcon, userNames }) => {
             <div className="card-details">
                 <h3>{nft.name}</h3>
                 <div className="owner-note">
-                    <h3>{ownerDisplay}</h3>
+                    <h3>
+                        {ownerDisplay}
+                        {/* PlatinumUserCheck-Komponente hinzufügen */}
+                        <PlatinumUserCheck account={ownerAddress} />
+                    </h3>
                 </div>
 
                 <div className="price-container center-ho space-between">

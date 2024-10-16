@@ -11,6 +11,7 @@ import {
     unlikeCollection,
     getCollectionLikes,
     hasUserLikedCollection,
+    getTotalSupply,
     fetchSingleNFT, // Stellen Sie sicher, dass diese Funktion importiert ist
 } from '../components/utils';
 import SearchBar from '../components/SearchBar';
@@ -37,6 +38,7 @@ const CollectionNFTs = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filters, setFilters] = useState({ price: [], availability: [], attributes: {} });
     const [userNames, setUserNames] = useState({});
+    const [totalSupply, setTotalSupply] = useState(0);
     const [maxSupply, setMaxSupply] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [loadedBatches, setLoadedBatches] = useState(1);
@@ -89,83 +91,104 @@ const CollectionNFTs = () => {
             setNftsForSale([]); // Reset nftsForSale
             setLoadedBatches(0); // Reset der geladenen Seiten
             setTotalBatches(1); // Reset der Gesamtchargen
-
-            // Zuerst NFTs zum Verkauf abrufen
-            const nftsForSaleRaw = await marketplace.methods.getNFTsForSale().call();
-            const nftsForSaleFiltered = nftsForSaleRaw.filter(nft => nft.contractAddress.toLowerCase() === collectionaddress.toLowerCase());
-
-            // Detaillierte Daten für nftsForSale abrufen
-            const nftsForSaleDetails = await Promise.all(nftsForSaleFiltered.map(async (nft) => {
-                const nftData = await fetchSingleNFT(nft.contractAddress, marketplace, nft.tokenId);
-                return nftData;
-            }));
-
-            setNftsForSale(nftsForSaleDetails);
-
-            // Jetzt alle NFTs abrufen
-            const supply = await getMaxSupply(collectionaddress);
-            const totalSupply = Number(supply);
-            const batches = Math.ceil(totalSupply / resultsPerPage);
-            setTotalBatches(batches);
-
-            // Laden der ersten Charge
-            const firstBatch = await fetchAllNFTs(collectionaddress, marketplace, 0, resultsPerPage);
-            const detailedFirstBatch = await Promise.all(firstBatch.map(async (nft) => {
-                const details = await getNFTDetails(nft.contractAddress, nft.tokenId, marketplace);
-                return { ...nft, ...details };
-            }));
-
-            // NFTs zum Verkauf von allen NFTs ausschließen
-            const nftsForSaleIds = nftsForSaleDetails.map(nft => `${nft.contractAddress}-${nft.tokenId}`);
-            const allNFTsFiltered = detailedFirstBatch.filter(nft => !nftsForSaleIds.includes(`${nft.contractAddress}-${nft.tokenId}`));
-
-            setAllNFTs(allNFTsFiltered);
-            setLoadedBatches(1);
-            setLoading(false);
-
-            setMaxSupply(totalSupply);
-
-            // Hintergrundladen der restlichen Chargen
-            setBackgroundLoading(true);
-
-            for (let batch = 1; batch < batches; batch++) {
-                const start = batch * resultsPerPage;
-                const limit = resultsPerPage;
-
-                const nfts = await fetchAllNFTs(collectionaddress, marketplace, start, limit);
-                const detailedNFTs = await Promise.all(nfts.map(async (nft) => {
+    
+            try {
+                // Abrufen von NFTs zum Verkauf
+                const nftsForSaleRaw = await marketplace.methods.getNFTsForSale().call();
+                const nftsForSaleFiltered = nftsForSaleRaw.filter(nft => 
+                    nft.contractAddress.toLowerCase() === collectionaddress.toLowerCase()
+                );
+    
+                const nftsForSaleDetails = await Promise.all(nftsForSaleFiltered.map(async (nft) => {
+                    const nftData = await fetchSingleNFT(nft.contractAddress, marketplace, nft.tokenId);
+                    return nftData;
+                }));
+    
+                setNftsForSale(nftsForSaleDetails);
+    
+                // Parallel Abrufen von totalSupply und maxSupply
+                const [currentTotalSupply, currentMaxSupply] = await Promise.all([
+                    getTotalSupply(collectionaddress),
+                    getMaxSupply(collectionaddress)
+                ]);
+    
+                const totalSupplyNumber = currentTotalSupply !== null ? currentTotalSupply : 0;
+                const maxSupplyNumber = currentMaxSupply !== null ? currentMaxSupply : 0;
+    
+                setTotalSupply(totalSupplyNumber);
+                setMaxSupply(maxSupplyNumber);
+    
+                const batches = Math.ceil(totalSupplyNumber / resultsPerPage);
+                setTotalBatches(batches);
+    
+                // Laden der ersten Charge
+                const firstBatch = await fetchAllNFTs(collectionaddress, marketplace, 0, resultsPerPage);
+                const detailedFirstBatch = await Promise.all(firstBatch.map(async (nft) => {
                     const details = await getNFTDetails(nft.contractAddress, nft.tokenId, marketplace);
                     return { ...nft, ...details };
                 }));
-
-                // NFTs zum Verkauf von den geladenen NFTs ausschließen
-                const batchNFTsFiltered = detailedNFTs.filter(nft => !nftsForSaleIds.includes(`${nft.contractAddress}-${nft.tokenId}`));
-
-                setAllNFTs(prevNFTs => {
-                    const combinedNFTs = [...prevNFTs, ...batchNFTsFiltered];
-                    const uniqueNFTs = combinedNFTs.filter((nft, index, self) =>
-                        index === self.findIndex((t) => (
-                            t.tokenId === nft.tokenId && t.contractAddress.toLowerCase() === nft.contractAddress.toLowerCase()
-                        ))
+    
+                // NFTs zum Verkauf von allen NFTs ausschließen
+                const nftsForSaleIds = nftsForSaleDetails.map(nft => `${nft.contractAddress}-${nft.tokenId}`);
+                const allNFTsFiltered = detailedFirstBatch.filter(nft => 
+                    !nftsForSaleIds.includes(`${nft.contractAddress}-${nft.tokenId}`)
+                );
+    
+                setAllNFTs(allNFTsFiltered);
+                setLoadedBatches(1);
+                setLoading(false);
+    
+                // Hintergrundladen der restlichen Chargen
+                setBackgroundLoading(true);
+    
+                for (let batch = 1; batch < batches; batch++) {
+                    const start = batch * resultsPerPage;
+                    const limit = resultsPerPage;
+    
+                    const nfts = await fetchAllNFTs(collectionaddress, marketplace, start, limit);
+                    const detailedNFTs = await Promise.all(nfts.map(async (nft) => {
+                        const details = await getNFTDetails(nft.contractAddress, nft.tokenId, marketplace);
+                        return { ...nft, ...details };
+                    }));
+    
+                    // NFTs zum Verkauf von den geladenen NFTs ausschließen
+                    const batchNFTsFiltered = detailedNFTs.filter(nft => 
+                        !nftsForSaleIds.includes(`${nft.contractAddress}-${nft.tokenId}`)
                     );
-                    return uniqueNFTs;
-                });
-                setLoadedBatches(batch + 1);
+    
+                    setAllNFTs(prevNFTs => {
+                        const combinedNFTs = [...prevNFTs, ...batchNFTsFiltered];
+                        const uniqueNFTs = combinedNFTs.filter((nft, index, self) =>
+                            index === self.findIndex((t) => (
+                                t.tokenId === nft.tokenId && 
+                                t.contractAddress.toLowerCase() === nft.contractAddress.toLowerCase()
+                            ))
+                        );
+                        return uniqueNFTs;
+                    });
+                    setLoadedBatches(batch + 1);
+                }
+    
+                setBackgroundLoading(false);
+            } catch (error) {
+                console.error('Error fetching NFTs:', error);
+                setLoading(false);
+                setBackgroundLoading(false);
             }
-
-            setBackgroundLoading(false);
         };
-
+    
         if (collectionaddress && marketplace) {
             fetchNFTs();
-            const collection = nftCollections.find(col => col.address.toLowerCase() === collectionaddress.toLowerCase());
+            const collection = nftCollections.find(col => 
+                col.address.toLowerCase() === collectionaddress.toLowerCase()
+            );
             if (collection) {
                 setCollectionName(collection.name);
                 setCollectionDescription(collection.description);
                 setCurrencyIcon(collection.currency);
                 setBannerImage(collection.Collectionbanner);
             }
-
+    
             // Abrufen der Volumendaten für die spezifische Kollektion
             const fetchStats = async () => {
                 const stats = await fetchCollectionStats(marketplace, collectionaddress);
@@ -176,7 +199,9 @@ const CollectionNFTs = () => {
             };
             fetchStats();
         }
-    }, [collectionaddress, marketplace, resultsPerPage]); // Füge resultsPerPage als Abhängigkeit hinzu
+    }, [collectionaddress, marketplace, resultsPerPage]);
+    
+    
 
     // Sammeln aller Attribute aus den NFTs mit Zählung
     useEffect(() => {
@@ -328,9 +353,10 @@ const CollectionNFTs = () => {
     // Berechne die Gesamtseitenzahl dynamisch
     const isFilterApplied = filters.price.length > 0 || filters.availability.length > 0 || Object.keys(filters.attributes).length > 0 || searchQuery;
 
-        const totalPages = isFilterApplied
-        ? Math.ceil(displayedNFTs.length / resultsPerPage)
-        : Math.ceil(maxSupply / resultsPerPage);
+    const totalPages = isFilterApplied
+    ? Math.ceil(displayedNFTs.length / resultsPerPage)
+    : Math.ceil(totalSupply / resultsPerPage);
+
 
 
     // NFTs für die aktuelle Seite
@@ -465,10 +491,10 @@ const CollectionNFTs = () => {
 
                        
                         
-                        <div className='w95 flex center-ho space-between'>
-                            <p className='text-align-left opacity-70 mt0 w30'>{collectionDescription}</p>
+                        <div className='w95 flex center-ho space-between mediacolumn2'>
+                            <p className='text-align-left opacity-70 mt0 w30 w100media'>{collectionDescription}</p>
 
-                            <div className="collection-stats gap15">
+                            <div className="collection-stats gap15 mobilescroll">
                                 <div className='collection-stats-div text-align-left center-ho'>
                                     <div className='flex column'>
                                         <p className='s16 grey'>VOLUME IOTA</p>
@@ -497,7 +523,9 @@ const CollectionNFTs = () => {
 
                                 <div className='collection-stats-div text-align-left'>
                                     <p className='s16 grey'>TOTAL NFTS</p>
-                                    <div className='bold ml5'>{maxSupply || '0'}</div>
+                                    <div className='bold ml5'>
+                                    {`${totalSupply || '0'} / ${maxSupply || '0'}`}
+                                        </div>
                                 </div>
                                 <div className='collection-stats-div text-align-left'>
                                     <p className='s16 grey'>OWNERS</p>
@@ -519,7 +547,7 @@ const CollectionNFTs = () => {
                             </div>
                         </div>
 
-                        <div className='flex space-between w95'>
+                        <div className='flex space-between w95 mediacolumn2'>
                             <div className='SearchbarDesktop text-align-left w30 w100media'>
                                 <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
                             </div>

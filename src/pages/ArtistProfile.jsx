@@ -223,24 +223,24 @@ const ArtistProfile = () => {
       )} */}
 
       <div className="toggle-buttons flex centered mt15 VisibleLink gap15">
-        <button
+        {/* <button
           onClick={() => setSelectedComponent('gallery')}
           className={selectedComponent === 'gallery' ? 'active' : ''}
         >
           <a>COLLECTIONS</a>
-        </button>
-        <button
+        </button> */}
+        {/* <button
           onClick={() => setSelectedComponent('polls')}
           className={selectedComponent === 'polls' ? 'active' : ''}
         >
           <a>POLLS</a>
-        </button>
+        </button> */}
       </div>
       <div className="component-display">
         {selectedComponent === 'gallery' && <ArtistCollectionCards />}
-        {selectedComponent === 'polls' && (
+        {/* {selectedComponent === 'polls' && (
           <PollsList artistName={artist.name} />
-        )}
+        )} */}
       </div>
     </div>
   );

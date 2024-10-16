@@ -1,8 +1,9 @@
 :root {
   --branding-color: #535bf2;
   --branding-color-hover: #535bf2bf;
-  --background-color: #0C1215;
+  --background-color: #151b1e;
   --text-color: #FFFFFF;
+  --text-color-reverse: #000000;
   --card-background-color: #000000;
   --card-box-shadow: none;
 }
@@ -20,8 +21,9 @@ body {
 }
 
 body.dark-mode {
-  --background-color: #0C1215;
+  --background-color: #151b1e;
   --text-color: #FFFFFF;
+  --text-color-reverse: #000000;
   --card-background-color: #000000;
   --card-box-shadow: none;
 }
@@ -30,6 +32,7 @@ body.dark-mode {
 body.light-mode {
   --background-color: #FFFFFF;
   --text-color: #000000;
+  --text-color-reverse: #ffffff;
   --card-background-color: #F7F7F7;
   --card-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
 }
@@ -307,6 +310,10 @@ button {
 
 .margin0 {
   margin: 0px;
+}
+
+.ml12pr {
+  margin-left: 12%;
 }
 
 .mt5 {
