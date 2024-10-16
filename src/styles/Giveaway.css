@@ -39,3 +39,34 @@
     border-radius: 10px;
   }
   
+  @media (max-width: 999px) {
+    .giveaway-container {
+        flex-direction: column;
+        width: auto;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        background-color: rgba(0, 0, 0, 0.275);
+    }
+
+    .giveaway-content {
+        width: 90%;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .giveaway-video {
+        max-width: 80%;
+    }
+
+    .giveaway-description {
+        opacity: 90%;
+    }
+
+    .pt0 {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+  }

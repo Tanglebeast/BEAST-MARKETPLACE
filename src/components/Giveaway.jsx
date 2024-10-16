@@ -3,6 +3,14 @@ import '../styles/Giveaway.css';
 
 const Giveaway = () => {
   return (
+    <div 
+    className='w100 flex centered PlatinumDropBanner pt0' 
+    style={{ 
+      backgroundImage: `url(/platinum-background.png)`,
+      height: '100vh'
+    }}
+  >
+    
     <div className="giveaway-container">
       <div className="giveaway-content">
         <h2>X-GIVEAWAY</h2>
@@ -36,6 +44,7 @@ const Giveaway = () => {
       <div className="giveaway-video">
         <video src="/giveaway.mp4" loop autoPlay muted />
       </div>
+    </div>
     </div>
   );
 };
